@@ -28,7 +28,9 @@ app.use(helmet());
 // health check endpoint
 // ===============
 app.get("/health", (req, res) => {
-  res.status(200).json({ status: "200", timestamp: new Date() });
+  res
+    .status(200)
+    .json({ status: "OK", uptime: process.uptime, timestamp: new Date() });
 });
 
 module.exports = app;
