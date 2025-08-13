@@ -9,3 +9,26 @@
  * @updated 13-08-2024
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
+
+// Importing required packages
+const express = require("express");
+const dotenv = require("dotenv");
+const helmet = require("helmet");
+
+const app = express();
+
+// ===============
+// Middleware
+// ===============
+dotenv.config();
+app.use(express.json());
+app.use(helmet());
+
+// ===============
+// health check endpoint
+// ===============
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "200", timestamp: new Date() });
+});
+
+module.exports = app;
