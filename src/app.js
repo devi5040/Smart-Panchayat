@@ -12,7 +12,6 @@
 
 // Importing required packages
 const express = require("express");
-const dotenv = require("dotenv");
 const helmet = require("helmet");
 
 const app = express();
@@ -20,7 +19,6 @@ const app = express();
 // ===============
 // Middleware
 // ===============
-dotenv.config();
 app.use(express.json());
 app.use(helmet());
 
