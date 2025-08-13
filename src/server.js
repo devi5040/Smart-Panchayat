@@ -9,13 +9,28 @@
  */
 
 const app = require("./app");
-const dotenv = require("dotenv");
 const logger = require("./utils/logger");
-dotenv.config({ debug: false });
+const sequelize = require("./config/db");
 
 // Initialize PORT
 const PORT = process.env.PORT || 5050;
 
-app.listen(PORT, (req, res) => {
-  logger.info(`The server started with port: ${PORT}`);
-});
+// Initialize the db and start server if db is connected
+const startServer = async () => {
+  try {
+    // Verify db connection
+    await sequelize.authenticate();
+    logger.info("The db is connected successfully");
+
+    // sync the db
+    await sequelize.sync();
+
+    app.listen(PORT, () => {
+      logger.info(`The server started with port: ${PORT}`);
+    });
+  } catch (error) {
+    logger.error(`Some internal error has occurred: ${error}`);
+  }
+};
+
+startServer();
