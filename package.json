@@ -4,5 +4,23 @@
     "express": "^5.1.0",
     "helmet": "^8.1.0",
     "nodemon": "^3.1.10"
-  }
+  },
+  "name": "smart-panchayat",
+  "version": "1.0.0",
+  "description": "Smart Panchayat is a digital solution designed to modernize and streamline Panchayat-level governance. It aims to provide a centralized platform for managing village-level administration, public services, and citizen engagement. The project focuses on digitizing records, improving service delivery, and enhancing transparency through technology.",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "start":"nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devi5040/Smart-Panchayat.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/devi5040/Smart-Panchayat/issues"
+  },
+  "homepage": "https://github.com/devi5040/Smart-Panchayat#readme"
 }
