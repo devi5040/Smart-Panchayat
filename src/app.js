@@ -13,6 +13,7 @@
 // Importing required packages
 const express = require("express");
 const helmet = require("helmet");
+const morgan = require("morgan");
 
 const app = express();
 
@@ -21,6 +22,14 @@ const app = express();
 // ===============
 app.use(express.json());
 app.use(helmet());
+// stream morgan logs to winston's http level
+app.use(
+  morgan("combined", {
+    stream: {
+      write: (message) => logger.http(message.trim()),
+    },
+  })
+);
 
 // ===============
 // health check endpoint
