@@ -8,7 +8,7 @@
  */
 
 const winston = require("winston");
-const { combine, timestamp, printf, colorize } = winston.format;
+const { combine, timestamp, printf } = winston.format;
 
 // Define custom log format
 const logFormat = printf(({ level, message, timestamp }) => {
@@ -17,10 +17,14 @@ const logFormat = printf(({ level, message, timestamp }) => {
 
 // create the logger for logging messages
 const logger = winston.createLogger({
-  level: "info",
+  level: "http",
   format: combine(
-    colorize(),
-    timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+    timestamp({
+      format: new Date().toLocaleString("en-IN", {
+        hour12: false,
+        timeZone: "Asia/Kolkata",
+      }),
+    }),
     logFormat
   ),
   transports: [

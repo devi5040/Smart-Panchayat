@@ -10,11 +10,12 @@
 
 const app = require("./app");
 const dotenv = require("dotenv");
+const logger = require("./utils/logger");
 dotenv.config({ debug: false });
 
 // Initialize PORT
 const PORT = process.env.PORT || 5050;
 
 app.listen(PORT, (req, res) => {
-  console.log(`Server started with port: ${PORT}`);
+  logger.info(`The server started with port: ${PORT}`);
 });

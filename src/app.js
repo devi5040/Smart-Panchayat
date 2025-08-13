@@ -14,6 +14,7 @@
 const express = require("express");
 const helmet = require("helmet");
 const morgan = require("morgan");
+const logger = require("./utils/logger");
 
 const app = express();
 
