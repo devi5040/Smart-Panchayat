@@ -71,6 +71,14 @@ const User = sequelize.define("user", {
     allowNull: false,
     defaultValue: "user",
   },
+  latitude: {
+    type: Sequelize.DECIMAL(9, 6),
+    allowNull: true,
+  },
+  longitude: {
+    type: Sequelize.DECIMAL(9, 6),
+    allowNull: true,
+  },
 });
 
 module.exports = User;
