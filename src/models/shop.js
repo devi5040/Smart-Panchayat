@@ -9,7 +9,7 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../config/db");
 
-const Shop = sequelize.define("shop", {
+const Shops = sequelize.define("shops", {
   id: {
     type: Sequelize.INTEGER,
     allowNull: false,
@@ -42,4 +42,4 @@ const Shop = sequelize.define("shop", {
   },
 });
 
-module.exports = Shop;
+module.exports = Shops;

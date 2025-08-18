@@ -22,7 +22,7 @@ const Products = sequelize.define("products", {
     allowNull: false,
   },
   price: {
-    type: Sequelize.DECIMAL(9, 6),
+    type: Sequelize.DECIMAL(10, 2),
     allowNull: false,
   },
   image: {

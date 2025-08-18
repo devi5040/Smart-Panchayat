@@ -30,10 +30,10 @@ const ShopProducts = sequelize.define("shop-products", {
     defaultValue: "pending",
   },
   price: {
-    type: Sequelize.DECIMAL(9, 6),
+    type: Sequelize.DECIMAL(10, 2),
     allowNull: false,
     validate: {
-      min: args[0],
+      min: 0.01,
     },
   },
   quality: {

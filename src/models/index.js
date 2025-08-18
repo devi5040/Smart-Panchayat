@@ -1,9 +1,9 @@
 /**JSDOC needs to be done */
-const User = require("./user");
-const Shop = require("./shop");
+const Users = require("./user");
+const Shops = require("./shop");
 
 // Associations between shop and user (one-to-one)
-User.hasOne(Shop, { onDelete: "CASCADE" });
-Shop.belongsTo(User);
+Users.hasOne(Shops, { onDelete: "CASCADE" });
+Shops.belongsTo(Users);
 
-module.exports = { User, Shop };
+module.exports = { Users, Shops };
