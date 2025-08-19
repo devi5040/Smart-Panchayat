@@ -5,6 +5,8 @@ const Products = require("./products");
 const ShopProducts = require("./shopProducts");
 const Orders = require("./orders");
 const OrderItems = require("./orderItems");
+const Shipments = require("./shipments");
+const ShipmentShops = require("./shipmentShops");
 
 // One-to-One: User <-> Shop
 // A User has exactly one Shop.
@@ -29,5 +31,11 @@ Products.belongsToMany(Orders, { through: OrderItems });
 // Defaults: onDelete: NULL and onUpdate: CASCADE
 Users.hasMany(Orders, { onDelete: "CASCADE" });
 Orders.belongsTo(Users);
+
+// Many-to-Many: Shipments <-> Shops
+// A shipment can include multiple shops. A shop can have multiple shipments.
+// Defaults: onDelete: CASCADE and onUpdate: CASCADE
+Shipments.belongsToMany(Shops, { through: ShipmentShops });
+Shops.belongsToMany(Shipments, { through: ShipmentShops });
 
 module.exports = { Users, Shops };
