@@ -1,3 +1,14 @@
+/**
+ * @filename user.services.js
+ * @description This module provides a function to upload files to an AWS S3 bucket.  It generates a pre-signed URL for secure file uploads and
+ * returns both the signed URL and the final public URL of the uploaded file.  Error handling is included to manage issues during URL
+ * generation.
+ *
+ * @version v1.0.0
+ * @created Aug 19 2025
+ * @author Deviprasad Rai P <dpraidola@gmail.com>
+ */
+
 const s3 = require("../config/aws/aws.s3.config");
 
 exports.uploadFileToS3 = async (fileName, fileType) => {
