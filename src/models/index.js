@@ -24,4 +24,10 @@ Products.belongsToMany(Shops, { through: ShopProducts });
 Orders.belongsToMany(Products, { through: OrderItems });
 Products.belongsToMany(Orders, { through: OrderItems });
 
+// One-to-Many: Users <-> Orders
+// An user can have multiple orders. An order belongs to only one user.
+// Defaults: onDelete: NULL and onUpdate: CASCADE
+Users.hasMany(Orders, { onDelete: "CASCADE" });
+Orders.belongsTo(Users);
+
 module.exports = { Users, Shops };
