@@ -4,6 +4,9 @@ const Shops = require("./shop");
 const Products = require("./products");
 const ShopProducts = require("./shopProducts");
 
+// One-to-One: User <-> Shop
+// A User has exactly one Shop.
+// OnDelete: NULL and onUpdate: CASCADE -> defaults for one-to-one relationships.
 Users.hasOne(Shops, { onDelete: "CASCADE" });
 Shops.belongsTo(Users);
 
