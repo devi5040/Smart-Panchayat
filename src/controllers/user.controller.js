@@ -14,7 +14,7 @@ const logger = require("../utils/logger");
 exports.getSignedURL = async (req, res) => {
   try {
     const { fileName, fileType } = req.body;
-    const result = await userServices.uploadFileToS3(fileName, fileType);
+    const result = await userServices.getSignedUrlS3(fileName, fileType);
 
     res.status(200).json({ ...result });
   } catch (error) {

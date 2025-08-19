@@ -11,7 +11,7 @@
 
 const s3 = require("../config/aws/aws.s3.config");
 
-exports.uploadFileToS3 = async (fileName, fileType) => {
+exports.getSignedUrlS3 = async (fileName, fileType) => {
   const params = {
     Bucket: process.env.AWS_BUCKET_NAME,
     Key: `uploads/profiles/${Date.now()}-${fileName}`,

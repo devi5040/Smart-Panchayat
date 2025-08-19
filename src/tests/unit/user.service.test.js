@@ -1,5 +1,5 @@
 const AWS = require("aws-sdk");
-const { uploadFileToS3 } = require("../../services/user.services");
+const { getSignedUrlS3 } = require("../../services/user.services");
 
 jest.mock("aws-sdk", () => {
   const mS3 = { getSignedUrlPromise: jest.fn() };
@@ -9,7 +9,7 @@ jest.mock("aws-sdk", () => {
   };
 });
 
-describe("uploadFileToS3", () => {
+describe("getSignedUrlS3", () => {
   let s3Instance;
 
   beforeAll(() => {
@@ -31,7 +31,7 @@ describe("uploadFileToS3", () => {
     const mockSignedUrl = "https://example.com/signed-url";
     s3Instance.getSignedUrlPromise.mockResolvedValue(mockSignedUrl);
 
-    const result = await uploadFileToS3("test.jpg", "image/jpeg");
+    const result = await getSignedUrlS3("test.jpg", "image/jpeg");
 
     expect(s3Instance.getSignedUrlPromise).toHaveBeenCalledWith("putObject", {
       Bucket: "test-bucket",
@@ -52,7 +52,7 @@ describe("uploadFileToS3", () => {
     const error = new Error("S3 failure");
     s3Instance.getSignedUrlPromise.mockRejectedValue(error);
 
-    await expect(uploadFileToS3("file.txt", "text/plain")).rejects.toThrow(
+    await expect(getSignedUrlS3("file.txt", "text/plain")).rejects.toThrow(
       `Error generating signed URL: ${error.message}`
     );
   });
@@ -61,7 +61,7 @@ describe("uploadFileToS3", () => {
     const mockSignedUrl = "https://example.com/signed-url";
     s3Instance.getSignedUrlPromise.mockResolvedValue(mockSignedUrl);
 
-    const result = await uploadFileToS3("test.jpg", "image/jpeg");
+    const result = await getSignedUrlS3("test.jpg", "image/jpeg");
     expect(result.fileUrl).toContain(process.env.AWS_BUCKET_NAME);
     expect(result.fileUrl).toContain(process.env.AWS_REGION);
   });
@@ -70,8 +70,8 @@ describe("uploadFileToS3", () => {
     const mockSignedUrl = "https://example.com/signed-url";
     s3Instance.getSignedUrlPromise.mockResolvedValue(mockSignedUrl);
 
-    const result1 = await uploadFileToS3("file1.jpg", "image/jpeg");
-    const result2 = await uploadFileToS3("file2.jpg", "image/jpeg");
+    const result1 = await getSignedUrlS3("file1.jpg", "image/jpeg");
+    const result2 = await getSignedUrlS3("file2.jpg", "image/jpeg");
 
     expect(result1.fileUrl).not.toEqual(result2.fileUrl);
   });
