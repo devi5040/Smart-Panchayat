@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "aws-sdk": "^2.1692.0",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "firebase-admin": "^13.4.0",
@@ -16,7 +17,9 @@
   "description": "Smart Panchayat is a digital solution designed to modernize and streamline Panchayat-level governance. It aims to provide a centralized platform for managing village-level administration, public services, and citizen engagement. The project focuses on digitizing records, improving service delivery, and enhancing transparency through technology.",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon src/server.js"
+    "start": "node src/server.js",
+    "dev":"nodemon src/server.js",
+    "test": "jest --detectOpenHandles --forceExit"
   },
   "repository": {
     "type": "git",
@@ -27,5 +30,9 @@
   "bugs": {
     "url": "https://github.com/devi5040/Smart-Panchayat/issues"
   },
-  "homepage": "https://github.com/devi5040/Smart-Panchayat#readme"
+  "homepage": "https://github.com/devi5040/Smart-Panchayat#readme",
+  "devDependencies": {
+    "jest": "^30.0.5",
+    "supertest": "^7.1.4"
+  }
 }
