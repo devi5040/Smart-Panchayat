@@ -116,3 +116,19 @@ exports.changeUserRole = async (req, res) => {
       .json({ message: "Internal error while changing user role." });
   }
 };
+
+exports.addPassword = async (req, res) => {
+  const userId = req.user.id;
+  const { password } = req.body;
+  try {
+    await userServices.addPassword(userId, password);
+    res
+      .status(200)
+      .json({ message: "Added password to the user successfully." });
+  } catch (error) {
+    logger.error(`Internal error while adding password: ${error}`);
+    res
+      .status(500)
+      .json({ message: "Internal error while adding password.", error });
+  }
+};

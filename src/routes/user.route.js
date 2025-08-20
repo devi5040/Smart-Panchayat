@@ -38,4 +38,11 @@ router.patch(
 
 router.patch("/change-role", authMiddleware, userController.changeUserRole);
 
+router.patch(
+  "/add-password",
+  authMiddleware,
+  validate(userDataValidation.passwordSchema),
+  userController.addPassword
+);
+
 module.exports = router;
