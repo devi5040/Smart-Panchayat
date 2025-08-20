@@ -90,3 +90,32 @@ exports.getUserByID = async (id) => {
     throw error;
   }
 };
+
+exports.updateUserDetails = async ({ userId, data }) => {
+  if (userId === null || userId === undefined) {
+    throw new Error("Invalid user ID: ID cannot be null or undefined");
+  }
+  if (userId === null || userId === undefined) {
+    throw new Error("Invalid user ID: ID cannot be null or undefined");
+  }
+  if (userId === 0) {
+    return null;
+  }
+  try {
+    await Users.update(
+      {
+        home_address: data.home,
+        family_name: data.familyName,
+        pin_code: data.pinCode,
+        profile_image: data.profileImage,
+        password: data.password,
+        latitude: data.latitude,
+        longitude: data.longitude,
+      },
+      { where: { id: userId } }
+    );
+  } catch (error) {
+    logger.error(`Internal error occured while updating the user: ${error}`);
+    throw error;
+  }
+};

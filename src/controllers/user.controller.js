@@ -28,8 +28,8 @@ exports.addUser = async (req, res) => {
     req.body;
 
   try {
-    const users = await userServices.getUserByMobileNumber(mobileNumber);
-    if (users.length !== 0)
+    const user = await userServices.getUserByMobileNumber(mobileNumber);
+    if (user !== null)
       return res
         .status(400)
         .json({ message: "User already exists.", userExists: true });
@@ -63,6 +63,23 @@ exports.getUserDetails = async (req, res) => {
     logger.error(`Error while retrieving user detail: ${error}`);
     res.status(500).json({
       message: "Internal error while retrieving user details.",
+      error,
+    });
+  }
+};
+
+exports.updateUser = async (req, res) => {
+  const userId = req.params.userId;
+  const data = req.body;
+  logger.info(userId);
+  logger.info(`Datat is: ${JSON.stringify(data)}`);
+  try {
+    await userServices.updateUserDetails({ userId, data });
+    res.status(200).json({ message: "User details updated successfully" });
+  } catch (error) {
+    logger.error(`Internal error while updating the user: ${error}`);
+    res.status(500).json({
+      message: "Internal error while updating the user details.",
       error,
     });
   }

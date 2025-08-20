@@ -16,10 +16,17 @@ router.post(
 router.post(
   "/",
   authMiddleware,
-  validate(userDataValidation.userDataSchema),
+  validate(userDataValidation.createUserDataSchema),
   userController.addUser
 );
 
 router.get("/:userId", authMiddleware, userController.getUserDetails);
+
+router.put(
+  "/update-profile/:userId",
+  authMiddleware,
+  validate(userDataValidation.updateUserDataSchema),
+  userController.updateUser
+);
 
 module.exports = router;

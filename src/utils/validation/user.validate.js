@@ -11,7 +11,7 @@
 
 const Joi = require("joi");
 
-exports.userDataSchema = Joi.object({
+exports.createUserDataSchema = Joi.object({
   name: Joi.string().required(),
   mobileNumber: Joi.string()
     .pattern(/^\+?[1-9]\d{1,14}$/)
@@ -21,21 +21,10 @@ exports.userDataSchema = Joi.object({
       "string.pattern.base":
         "Mobile number must be a valid format with country code.",
     }),
-  home: Joi.string(),
-  familyName: Joi.string(),
-  pinCode: Joi.string(),
+
   languagePreference: Joi.string()
     .required()
     .messages({ "string.empty": "Language Preference is required." }),
-  profileImage: Joi.string()
-    .uri()
-    .messages({ "string.uri": "profile image should be an url." }),
-  password: Joi.string()
-    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$/)
-    .messages({
-      "string.pattern.base":
-        "Password must be at least 8 characters long and include uppercase, lowercase, and a number",
-    }),
   latitude: Joi.number().min(-90).max(90).required().messages({
     "number.base": "Latitude must be a number",
     "number.min": "Latitude cannot be less than -90",
@@ -48,5 +37,31 @@ exports.userDataSchema = Joi.object({
     "number.min": "Longitude cannot be less than -180",
     "number.max": "Longitude cannot be greater than 180",
     "any.required": "Longitude is required",
+  }),
+});
+
+exports.updateUserDataSchema = Joi.object({
+  home: Joi.string(),
+  familyName: Joi.string(),
+  pinCode: Joi.string(),
+  profileImage: Joi.string()
+    .uri()
+    .messages({ "string.uri": "profile image should be an url." }),
+  password: Joi.string()
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$/)
+    .messages({
+      "string.pattern.base":
+        "Password must be at least 8 characters long and include uppercase, lowercase, and a number",
+    }),
+  latitude: Joi.number().min(-90).max(90).messages({
+    "number.base": "Latitude must be a number",
+    "number.min": "Latitude cannot be less than -90",
+    "number.max": "Latitude cannot be greater than 90",
+  }),
+
+  longitude: Joi.number().min(-180).max(180).messages({
+    "number.base": "Longitude must be a number",
+    "number.min": "Longitude cannot be less than -180",
+    "number.max": "Longitude cannot be greater than 180",
   }),
 });
