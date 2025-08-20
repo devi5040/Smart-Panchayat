@@ -10,6 +10,8 @@
  */
 
 const s3 = require("../config/aws/aws.s3.config");
+const { Users } = require("../models");
+const logger = require("../utils/logger");
 
 exports.getSignedUrlS3 = async (fileName, fileType) => {
   const params = {
@@ -27,5 +29,42 @@ exports.getSignedUrlS3 = async (fileName, fileType) => {
     };
   } catch (error) {
     throw new Error(`Error generating signed URL: ${error.message}`);
+  }
+};
+
+exports.addUser = async ({
+  name,
+  mobileNumber,
+  languagePreference,
+  latitude,
+  longitude,
+  role,
+}) => {
+  try {
+    await Users.create({
+      phone_number: mobileNumber,
+      user_name: name,
+      language_preference: languagePreference,
+      latitude,
+      longitude,
+      role,
+    });
+    logger.info("User created successfully");
+  } catch (error) {
+    logger.error(`Error while creating user: ${error}`);
+    throw error;
+  }
+};
+
+exports.getUserByMobileNumber = async (mobileNumber) => {
+  if (!mobileNumber) throw new Error("The mobile number is invalid.");
+  try {
+    const users = await Users.findAll({
+      where: { phone_number: mobileNumber },
+    });
+    return users;
+  } catch (error) {
+    logger.error(`Error while retrieving user by mobile number: ${error}`);
+    throw error;
   }
 };
