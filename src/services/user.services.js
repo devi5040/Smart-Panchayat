@@ -119,3 +119,26 @@ exports.updateUserDetails = async ({ userId, data }) => {
     throw error;
   }
 };
+
+exports.setPreferredLanguage = async ({ userId, prefferedLanguage }) => {
+  if (userId === null || userId === undefined) {
+    throw new Error("Invalid user ID: ID cannot be null or undefined");
+  }
+  if (userId === null || userId === undefined) {
+    throw new Error("Invalid user ID: ID cannot be null or undefined");
+  }
+  if (userId === 0) {
+    return null;
+  }
+  try {
+    await Users.update(
+      { preferred_language: prefferedLanguage },
+      { where: { id: userId } }
+    );
+  } catch (error) {
+    logger.error(
+      `Internal error occured while setting preferred language: ${error}`
+    );
+    throw error;
+  }
+};
