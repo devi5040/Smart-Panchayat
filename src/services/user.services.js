@@ -70,8 +70,20 @@ exports.getUserByMobileNumber = async (mobileNumber) => {
 };
 
 exports.getUserByID = async (id) => {
+  if (id === null || id === undefined) {
+    throw new Error("Invalid user ID: ID cannot be null or undefined");
+  }
+  if (id === null || id === undefined) {
+    throw new Error("Invalid user ID: ID cannot be null or undefined");
+  }
+  if (id === 0) {
+    return null;
+  }
   try {
-    const user = Users.findByPk(id, { attributes: { exclude: ["password"] } });
+    const user = await Users.findByPk(id, {
+      attributes: { exclude: ["password"] },
+    });
+    if (!user) return null;
     return user;
   } catch (error) {
     logger.error(`Error while retrieving user by ID: ${error}`);

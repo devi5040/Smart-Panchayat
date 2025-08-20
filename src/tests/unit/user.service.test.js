@@ -2,6 +2,7 @@ const {
   getSignedUrlS3,
   addUser,
   getUserByMobileNumber,
+  getUserByID,
 } = require("../../services/user.services");
 const { Users } = require("../../models");
 const logger = require("../../utils/logger");
@@ -181,6 +182,56 @@ describe("addUser", () => {
         where: { phone_number: "+15551234567" },
       });
       expect(logger.error).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("getUserByID", () => {
+    it("should retrieve a user by ID successfully", async () => {
+      const userId = 1;
+      const mockUser = { id: userId };
+      Users.findByPk.mockResolvedValue(mockUser);
+
+      const user = await getUserByID(userId);
+      expect(Users.findByPk).toHaveBeenCalledWith(userId);
+      expect(user).toEqual(mockUser);
+    });
+
+    it("should handle user not found", async () => {
+      const userId = 1;
+      Users.findByPk.mockResolvedValue(null);
+      const user = await getUserByID(userId);
+      expect(user).toBeNull();
+    });
+
+    it("should handle invalid user ID (null)", async () => {
+      const userId = null;
+      await expect(getUserByID(userId)).rejects.toThrow(
+        "Invalid user ID: ID cannot be null or undefined"
+      );
+    });
+
+    it("should handle invalid user ID (undefined)", async () => {
+      const userId = undefined;
+      await expect(getUserByID(userId)).rejects.toThrow(
+        "Invalid user ID: ID cannot be null or undefined"
+      );
+    });
+
+    it("should handle ID 0", async () => {
+      const userId = 0;
+      const user = await getUserByID(userId);
+      expect(user).toBeNull();
+    });
+
+    it("should handle errors during user retrieval", async () => {
+      const userId = 1;
+      const mockError = new Error("Database error");
+      Users.findByPk.mockRejectedValue(mockError);
+
+      await expect(getUserByID(userId)).rejects.toThrow(mockError);
+      expect(logger.error).toHaveBeenCalledWith(
+        `Error while retrieving user by ID: ${mockError}`
+      );
     });
   });
 });
