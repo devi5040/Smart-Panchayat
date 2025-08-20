@@ -9,6 +9,7 @@
  */
 const admin = require("../config/firebase/firebase_config");
 const logger = require("../utils/logger");
+const { getUserByMobileNumber } = require("../services/user.services");
 
 const firebaseAuthMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -28,7 +29,8 @@ const firebaseAuthMiddleware = async (req, res, next) => {
 
   try {
     const decodedToken = await admin.auth().verifyIdToken(idToken);
-    req.user = decodedToken;
+    const user = await getUserByMobileNumber(decodedToken.phone_number);
+    req.user = { id: user.id, role: user.user_role };
     next();
   } catch (error) {
     logger.error(`Invalid or expired token: ${error}`);

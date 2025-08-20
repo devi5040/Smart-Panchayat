@@ -9,10 +9,18 @@
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
 
-module.exports = (schema) => {
+module.exports = (schema, property = "body") => {
   return (req, res, next) => {
-    const { error } = schema.validate(req.body);
-    if (error) return res.status(400).json({ error: error.details[0].message });
+    const { error } = schema.validate(req[property], { abortEarly: false });
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation error",
+        details: error.details.map((err) => err.message), // show all errors
+      });
+    }
+
     next();
   };
 };
