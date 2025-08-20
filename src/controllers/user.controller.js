@@ -22,3 +22,32 @@ exports.getSignedURL = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.addUser = async (req, res) => {
+  const { name, mobileNumber, languagePreference, latitude, longitude, role } =
+    req.body;
+
+  try {
+    const users = await userServices.getUserByMobileNumber(mobileNumber);
+    if (users.length !== 0)
+      return res
+        .status(400)
+        .json({ message: "User already exists.", userExists: true });
+    await userServices.addUser({
+      name,
+      mobileNumber,
+      languagePreference,
+      latitude,
+      longitude,
+      role,
+    });
+    res
+      .status(201)
+      .json({ message: "The user has been created successfully." });
+  } catch (error) {
+    logger.error(`Error while adding user to the db: ${error}`);
+    res
+      .status(500)
+      .json({ message: "Internal error while adding user.", error });
+  }
+};
