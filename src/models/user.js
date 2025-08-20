@@ -38,6 +38,10 @@ const Users = sequelize.define("users", {
     type: Sequelize.STRING(255),
     allowNull: true,
   },
+  family_name: {
+    type: Sequelize.STRING(255),
+    allowNull: true,
+  },
   pin_code: {
     type: Sequelize.STRING(10),
     allowNull: true,
