@@ -47,12 +47,6 @@ exports.updateUserDataSchema = Joi.object({
   profileImage: Joi.string()
     .uri()
     .messages({ "string.uri": "profile image should be an url." }),
-  password: Joi.string()
-    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$/)
-    .messages({
-      "string.pattern.base":
-        "Password must be at least 8 characters long and include uppercase, lowercase, and a number",
-    }),
   latitude: Joi.number().min(-90).max(90).messages({
     "number.base": "Latitude must be a number",
     "number.min": "Latitude cannot be less than -90",
@@ -73,5 +67,14 @@ exports.updateLanguageSchema = Joi.object({
     .messages({
       "string.required": "The language field is required.",
       "string.only": "Language must be either English or Kannada",
+    }),
+});
+
+exports.passwordSchema = Joi.object({
+  password: Joi.string()
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$/)
+    .messages({
+      "string.pattern.base":
+        "Password must be at least 8 characters long and include uppercase, lowercase, and a number",
     }),
 });
