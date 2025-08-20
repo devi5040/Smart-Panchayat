@@ -20,4 +20,6 @@ router.post(
   userController.addUser
 );
 
+router.get("/:userId", authMiddleware, userController.getUserDetails);
+
 module.exports = router;

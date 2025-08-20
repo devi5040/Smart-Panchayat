@@ -71,7 +71,7 @@ exports.getUserByMobileNumber = async (mobileNumber) => {
 
 exports.getUserByID = async (id) => {
   try {
-    const user = Users.findByPk(id);
+    const user = Users.findByPk(id, { attributes: { exclude: ["password"] } });
     return user;
   } catch (error) {
     logger.error(`Error while retrieving user by ID: ${error}`);
