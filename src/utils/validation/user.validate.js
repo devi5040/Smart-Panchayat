@@ -65,3 +65,13 @@ exports.updateUserDataSchema = Joi.object({
     "number.max": "Longitude cannot be greater than 180",
   }),
 });
+
+exports.updateLanguageSchema = Joi.object({
+  preferredLanguage: Joi.string()
+    .required()
+    .valid("English", "Kannada")
+    .messages({
+      "string.required": "The language field is required.",
+      "string.only": "Language must be either English or Kannada",
+    }),
+});
