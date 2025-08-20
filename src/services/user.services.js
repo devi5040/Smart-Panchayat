@@ -185,9 +185,59 @@ exports.addPassword = async (userId, password) => {
   }
   try {
     const hashedPassword = await encryptPassword(password);
+    const currentPassword = await Users.findByPk(userId, {
+      attributes: ["password"],
+    });
+    if (currentPassword.password !== null) {
+      throw new Error(
+        "User already has a password. Please select update password."
+      );
+    }
     await Users.update({ password: hashedPassword }, { where: { id: userId } });
   } catch (error) {
     logger.error(`Internal error in user service while adding password.`);
+    throw error;
+  }
+};
+
+exports.updatePassword = async (userId, oldPassword, newPassword) => {
+  if (userId === null || userId === undefined) {
+    throw new Error("Invalid user ID: ID cannot be null or undefined");
+  }
+  if (userId === null || userId === undefined) {
+    throw new Error("Invalid user ID: ID cannot be null or undefined");
+  }
+  if (userId === 0) {
+    return null;
+  }
+  try {
+    const currentUser = await Users.findByPk(userId, {
+      attributes: ["password"],
+    });
+    const passwordMatch = await comparePasswords(
+      oldPassword,
+      currentUser.password
+    );
+    if (!passwordMatch) {
+      throw new Error(
+        "The old password you entered doesn't match with the saved password."
+      );
+    }
+    const newHashedPassword = await encryptPassword(newPassword);
+    const isSamePassword = await comparePasswords(
+      newPassword,
+      currentUser.password
+    );
+    if (isSamePassword) {
+      throw new Error(
+        "You cannot enter same password as previous password. Please change new password."
+      );
+    }
+    await Users.update(
+      { password: newHashedPassword },
+      { where: { id: userId } }
+    );
+  } catch (error) {
     throw error;
   }
 };
