@@ -78,3 +78,18 @@ exports.passwordSchema = Joi.object({
         "Password must be at least 8 characters long and include uppercase, lowercase, and a number",
     }),
 });
+
+exports.updatePasswordSchema = Joi.object({
+  oldPassword: Joi.string()
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$/)
+    .messages({
+      "string.pattern.base":
+        "Password must be at least 8 characters long and include uppercase, lowercase, and a number",
+    }),
+  newPassword: Joi.string()
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$/)
+    .messages({
+      "string.pattern.base":
+        "Password must be at least 8 characters long and include uppercase, lowercase, and a number",
+    }),
+});
