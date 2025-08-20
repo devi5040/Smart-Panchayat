@@ -26,7 +26,14 @@ router.put(
   "/update-profile/:userId",
   authMiddleware,
   validate(userDataValidation.updateUserDataSchema),
-  userController.updateUser
+  userController.updateProfile
+);
+
+router.put(
+  "/language-change",
+  authMiddleware,
+  validate(userDataValidation.updateLanguageSchema),
+  userController.updateLanguagePreferrence
 );
 
 module.exports = router;

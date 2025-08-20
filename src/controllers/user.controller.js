@@ -68,11 +68,10 @@ exports.getUserDetails = async (req, res) => {
   }
 };
 
-exports.updateUser = async (req, res) => {
-  const userId = req.params.userId;
+exports.updateProfile = async (req, res) => {
+  const userId = req.user.id;
   const data = req.body;
-  logger.info(userId);
-  logger.info(`Datat is: ${JSON.stringify(data)}`);
+
   try {
     await userServices.updateUserDetails({ userId, data });
     res.status(200).json({ message: "User details updated successfully" });
@@ -82,5 +81,24 @@ exports.updateUser = async (req, res) => {
       message: "Internal error while updating the user details.",
       error,
     });
+  }
+};
+
+exports.updateLanguagePreferrence = async (req, res) => {
+  const userId = req.user.id;
+  const { preferredLanguage } = req.body;
+  try {
+    await userServices.setPreferredLanguage(userId, preferredLanguage);
+    res
+      .status(200)
+      .json({ message: "The system language has been set successfully." });
+  } catch (error) {
+    logger.error(
+      `Internal error while updating preferred language.
+        ${error}`
+    );
+    res
+      .status(500)
+      .json({ message: "Internal error while updating the user details." });
   }
 };
