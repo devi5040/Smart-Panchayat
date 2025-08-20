@@ -29,11 +29,13 @@ router.put(
   userController.updateProfile
 );
 
-router.put(
+router.patch(
   "/language-change",
   authMiddleware,
   validate(userDataValidation.updateLanguageSchema),
   userController.updateLanguagePreferrence
 );
+
+router.patch("/change-role", authMiddleware, userController.changeUserRole);
 
 module.exports = router;

@@ -102,3 +102,17 @@ exports.updateLanguagePreferrence = async (req, res) => {
       .json({ message: "Internal error while updating the user details." });
   }
 };
+
+exports.changeUserRole = async (req, res) => {
+  const userId = req.user.id;
+  const userRole = req.user.role;
+  try {
+    await userServices.changeUserRole(userId, userRole);
+    res.status(200).json({ message: "User role has changed successfully." });
+  } catch (error) {
+    logger.error(`Internal error while changing the user role. ${error}`);
+    res
+      .status(500)
+      .json({ message: "Internal error while changing user role." });
+  }
+};
