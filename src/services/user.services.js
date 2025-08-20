@@ -59,10 +59,10 @@ exports.addUser = async ({
 exports.getUserByMobileNumber = async (mobileNumber) => {
   if (!mobileNumber) throw new Error("The mobile number is invalid.");
   try {
-    const users = await Users.findAll({
+    const user = await Users.findOne({
       where: { phone_number: mobileNumber },
     });
-    return users;
+    return user;
   } catch (error) {
     logger.error(`Error while retrieving user by mobile number: ${error}`);
     throw error;
