@@ -120,7 +120,8 @@ exports.updateUserDetails = async ({ userId, data }) => {
   }
 };
 
-exports.setPreferredLanguage = async ({ userId, prefferedLanguage }) => {
+exports.setPreferredLanguage = async (userId, prefferedLanguage) => {
+  logger.info(`${userId}::::${prefferedLanguage}`);
   if (userId === null || userId === undefined) {
     throw new Error("Invalid user ID: ID cannot be null or undefined");
   }
@@ -132,7 +133,7 @@ exports.setPreferredLanguage = async ({ userId, prefferedLanguage }) => {
   }
   try {
     await Users.update(
-      { preferred_language: prefferedLanguage },
+      { language_preference: prefferedLanguage },
       { where: { id: userId } }
     );
   } catch (error) {
