@@ -45,4 +45,11 @@ router.patch(
   userController.addPassword
 );
 
+router.patch(
+  "/update-password",
+  authMiddleware,
+  validate(userDataValidation.updatePasswordSchema),
+  userController.updatePassword
+);
+
 module.exports = router;

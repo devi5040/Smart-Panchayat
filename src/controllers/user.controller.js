@@ -127,8 +127,24 @@ exports.addPassword = async (req, res) => {
       .json({ message: "Added password to the user successfully." });
   } catch (error) {
     logger.error(`Internal error while adding password: ${error}`);
-    res
-      .status(500)
-      .json({ message: "Internal error while adding password.", error });
+    res.status(500).json({
+      message: "Internal error while adding password.",
+      error: error.message,
+    });
+  }
+};
+
+exports.updatePassword = async (req, res) => {
+  const userId = req.user.id;
+  const { oldPassword, newPassword } = req.body;
+  try {
+    await userServices.updatePassword(userId, oldPassword, newPassword);
+    res.status(200).json({ message: "User password updated successfully." });
+  } catch (error) {
+    logger.error(`Internal error while updating password: ${error}`);
+    res.status(500).json({
+      message: "Internal error while updating password.",
+      error: error.message,
+    });
   }
 };
