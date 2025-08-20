@@ -21,7 +21,7 @@ const ShopProducts = sequelize.define("shop-products", {
     type: Sequelize.INTEGER,
     allowNull: false,
     validate: {
-      min: args[0],
+      min: 0,
     },
   },
   status: {
