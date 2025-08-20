@@ -16,6 +16,7 @@ const express = require("express");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const logger = require("./utils/logger");
+const routes = require("./routes");
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use(
     },
   })
 );
+app.use("/api/v1/", routes);
 
 // ===============
 // health check endpoint
