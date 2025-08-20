@@ -26,13 +26,16 @@ exports.userDataSchema = Joi.object({
   pinCode: Joi.string(),
   languagePreference: Joi.string()
     .required()
-    .message("Language Preference is required."),
-  profileImage: Joi.string().uri().message("profile image should be an url."),
+    .messages({ "string.empty": "Language Preference is required." }),
+  profileImage: Joi.string()
+    .uri()
+    .messages({ "string.uri": "profile image should be an url." }),
   password: Joi.string()
     .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$/)
-    .message(
-      "Password must be at least 8 characters long and include uppercase, lowercase, and a number"
-    ),
+    .messages({
+      "string.pattern.base":
+        "Password must be at least 8 characters long and include uppercase, lowercase, and a number",
+    }),
   latitude: Joi.number().min(-90).max(90).required().messages({
     "number.base": "Latitude must be a number",
     "number.min": "Latitude cannot be less than -90",

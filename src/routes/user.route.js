@@ -16,7 +16,7 @@ router.post(
 router.post(
   "/",
   authMiddleware,
-  validate(userDataValidation),
+  validate(userDataValidation.userDataSchema),
   userController.addUser
 );
 
