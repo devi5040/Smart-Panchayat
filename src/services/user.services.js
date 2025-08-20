@@ -12,6 +12,7 @@
 const s3 = require("../config/aws/aws.s3.config");
 const { Users } = require("../models");
 const logger = require("../utils/logger");
+const { encryptPassword, comparePasswords } = require("../utils/hashPassword");
 
 exports.getSignedUrlS3 = async (fileName, fileType) => {
   const params = {
@@ -151,6 +152,15 @@ exports.setPreferredLanguage = async (userId, prefferedLanguage) => {
 
 exports.changeUserRole = async (userId, currentRole) => {
   let userRole;
+  if (userId === null || userId === undefined) {
+    throw new Error("Invalid user ID: ID cannot be null or undefined");
+  }
+  if (userId === null || userId === undefined) {
+    throw new Error("Invalid user ID: ID cannot be null or undefined");
+  }
+  if (userId === 0) {
+    return null;
+  }
   if (currentRole === "user") userRole = "shop";
   else userRole = "user";
   try {
@@ -159,6 +169,25 @@ exports.changeUserRole = async (userId, currentRole) => {
     logger.error(
       `Internal error in services while changing user role. ${error}`
     );
+    throw error;
+  }
+};
+
+exports.addPassword = async (userId, password) => {
+  if (userId === null || userId === undefined) {
+    throw new Error("Invalid user ID: ID cannot be null or undefined");
+  }
+  if (userId === null || userId === undefined) {
+    throw new Error("Invalid user ID: ID cannot be null or undefined");
+  }
+  if (userId === 0) {
+    return null;
+  }
+  try {
+    const hashedPassword = await encryptPassword(password);
+    await Users.update({ password: hashedPassword }, { where: { id: userId } });
+  } catch (error) {
+    logger.error(`Internal error in user service while adding password.`);
     throw error;
   }
 };
