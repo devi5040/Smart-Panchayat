@@ -54,4 +54,6 @@ router.patch(
   userController.updatePassword
 );
 
+router.post("/logout", authMiddleware, userController.logout);
+
 module.exports = router;
