@@ -157,11 +157,23 @@ exports.getAllUsers = async (req, res) => {
       .json({ message: "Retrieved all users successfully.", users });
   } catch (error) {
     logger.error(`Internal error while getting all users: ${error}`);
-    res
-      .status(500)
-      .json({
-        message: "Internal error while getting users.",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Internal error while getting users.",
+      error: error.message,
+    });
+  }
+};
+
+exports.logout = async (req, res) => {
+  const idToken = req.headers.authorization?.split("Bearer ")[1];
+  try {
+    await userServices.logoutUser(idToken);
+    res.status(200).json({ message: "User logged out successfully." });
+  } catch (error) {
+    logger.error(`Internal error while logging out the user: ${error}`);
+    res.status(500).json({
+      message: "Internal error while logging out.",
+      error: error.message,
+    });
   }
 };
