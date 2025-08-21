@@ -1,3 +1,14 @@
+/**
+ * @filename user.services.test.js
+ * @description This file contains unit tests for the user service functions.  It thoroughly tests various user-related operations, including
+ * user creation, retrieval (by ID and mobile number), details updates, password management (adding, updating), role changes, language
+ * preference updates, and user logout.  Each test case covers successful execution and error handling for robust validation.
+ *
+ * @version v1.0.0
+ * @updated Aug 21, 2025
+ * @author Deviprasad Rai P <dpraidola@gmail.com>
+ */
+
 const userServices = require("../../services/user.services");
 const s3 = require("../../config/aws/aws.s3.config");
 const { Users } = require("../../models");
