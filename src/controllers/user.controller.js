@@ -1,13 +1,14 @@
 /**
  * @filename user.controller.js
- * @description This file provides an API endpoint for generating pre-signed URLs to upload files to Amazon S3.  It receives a filename and file
- * type from the request body, uses the `userServices` module to generate the S3 upload URL, and returns the result to the client.
- * Error handling is included to gracefully manage exceptions during the process.
+ * @description This file houses the controller logic for user-related operations.  It handles requests for user creation, profile updates,
+ * authentication, and administrative tasks such as role changes and user listing. The controller acts as an intermediary between incoming
+ * requests and the underlying user service layer, ensuring proper error handling and response formatting.
  *
  * @version v1.0.0
- * @created August 19, 2025
+ * @updated Aug 21, 2025
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
+
 const userServices = require("../services/user.services");
 const logger = require("../utils/logger");
 
@@ -144,6 +145,35 @@ exports.updatePassword = async (req, res) => {
     logger.error(`Internal error while updating password: ${error}`);
     res.status(500).json({
       message: "Internal error while updating password.",
+      error: error.message,
+    });
+  }
+};
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await userServices.getAllUsers();
+    res
+      .status(200)
+      .json({ message: "Retrieved all users successfully.", users });
+  } catch (error) {
+    logger.error(`Internal error while getting all users: ${error}`);
+    res.status(500).json({
+      message: "Internal error while getting users.",
+      error: error.message,
+    });
+  }
+};
+
+exports.logout = async (req, res) => {
+  const idToken = req.headers.authorization?.split("Bearer ")[1];
+  try {
+    await userServices.logoutUser(idToken);
+    res.status(200).json({ message: "User logged out successfully." });
+  } catch (error) {
+    logger.error(`Internal error while logging out the user: ${error}`);
+    res.status(500).json({
+      message: "Internal error while logging out.",
       error: error.message,
     });
   }

@@ -1,17 +1,18 @@
 /**
  * @filename user.services.js
- * @description This module provides a function to upload files to an AWS S3 bucket.  It generates a pre-signed URL for secure file uploads and
- * returns both the signed URL and the final public URL of the uploaded file.  Error handling is included to manage issues during URL
- * generation.
+ * @description This file provides a comprehensive set of services for managing user accounts and data. It handles user creation, retrieval,
+ * updates (including profile details, language preferences, roles, and passwords), and also facilitates secure S3 file uploads for profile
+ * images.  Additionally, it offers user logout functionality via Firebase Admin SDK.
  *
  * @version v1.0.0
- * @created Aug 19 2025
+ * @updated Thu Aug 21 2025
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
 
 const s3 = require("../config/aws/aws.s3.config");
 const { Users } = require("../models");
 const logger = require("../utils/logger");
+const admin = require("firebase-admin");
 const { encryptPassword, comparePasswords } = require("../utils/hashPassword");
 
 exports.getSignedUrlS3 = async (fileName, fileType) => {
@@ -29,9 +30,7 @@ exports.getSignedUrlS3 = async (fileName, fileType) => {
       fileUrl: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${params.Key}`,
     };
   } catch (error) {
-    throw new Error(
-      `Error in services generating signed URL: ${error.message}`
-    );
+    throw error;
   }
 };
 
@@ -54,7 +53,6 @@ exports.addUser = async ({
     });
     logger.info("User created successfully");
   } catch (error) {
-    logger.error(`Error while creating user: ${error}`);
     throw error;
   }
 };
@@ -67,9 +65,6 @@ exports.getUserByMobileNumber = async (mobileNumber) => {
     });
     return user;
   } catch (error) {
-    logger.error(
-      `Error in services while retrieving user by mobile number: ${error}`
-    );
     throw error;
   }
 };
@@ -91,7 +86,6 @@ exports.getUserByID = async (id) => {
     if (!user) return null;
     return user;
   } catch (error) {
-    logger.error(`Error in services while retrieving user by ID: ${error}`);
     throw error;
   }
 };
@@ -120,9 +114,6 @@ exports.updateUserDetails = async ({ userId, data }) => {
       { where: { id: userId } }
     );
   } catch (error) {
-    logger.error(
-      `Internal error in services occured while updating the user: ${error}`
-    );
     throw error;
   }
 };
@@ -131,21 +122,16 @@ exports.setPreferredLanguage = async (userId, prefferedLanguage) => {
   if (userId === null || userId === undefined) {
     throw new Error("Invalid user ID: ID cannot be null or undefined");
   }
-  if (userId === null || userId === undefined) {
-    throw new Error("Invalid user ID: ID cannot be null or undefined");
-  }
   if (userId === 0) {
-    return null;
+    throw new Error("Invalid user ID: must not be 0");
   }
   try {
     await Users.update(
       { language_preference: prefferedLanguage },
       { where: { id: userId } }
     );
+    return true;
   } catch (error) {
-    logger.error(
-      `Internal error in services occured while setting preferred language: ${error}`
-    );
     throw error;
   }
 };
@@ -166,9 +152,6 @@ exports.changeUserRole = async (userId, currentRole) => {
   try {
     await Users.update({ user_role: userRole }, { where: { id: userId } });
   } catch (error) {
-    logger.error(
-      `Internal error in services while changing user role. ${error}`
-    );
     throw error;
   }
 };
@@ -195,7 +178,6 @@ exports.addPassword = async (userId, password) => {
     }
     await Users.update({ password: hashedPassword }, { where: { id: userId } });
   } catch (error) {
-    logger.error(`Internal error in user service while adding password.`);
     throw error;
   }
 };
@@ -237,6 +219,27 @@ exports.updatePassword = async (userId, oldPassword, newPassword) => {
       { password: newHashedPassword },
       { where: { id: userId } }
     );
+  } catch (error) {
+    throw error;
+  }
+};
+
+exports.getAllUsers = async () => {
+  try {
+    const users = await Users.findAll();
+    return users;
+  } catch (error) {
+    throw error;
+  }
+};
+
+exports.logoutUser = async (idToken) => {
+  try {
+    if (!idToken) throw new Error("No token provided.");
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const uid = decodedToken.uid;
+    await admin.auth().revokeRefreshTokens(uid);
+    return;
   } catch (error) {
     throw error;
   }

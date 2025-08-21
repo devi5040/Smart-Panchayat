@@ -1,3 +1,14 @@
+/**
+ * @filename user.route.js
+ * @description This file defines all the API routes for user management.  It leverages Express.js routing to handle various HTTP requests
+ * related to user creation, retrieval, updates, and authentication.  Middleware is used for authentication (Firebase), input validation, and
+ * file uploads.
+ *
+ * @version v1.0.0
+ * @updated Thu Aug 21 2025
+ * @author Deviprasad Rai P <dpraidola@gmail.com>
+ */
+
 const router = require("express").Router();
 const userController = require("../controllers/user.controller");
 
@@ -12,6 +23,8 @@ router.post(
   validate(fileUploadValidation),
   userController.getSignedURL
 );
+
+router.get("/", authMiddleware, userController.getAllUsers);
 
 router.post(
   "/",
@@ -51,5 +64,7 @@ router.patch(
   validate(userDataValidation.updatePasswordSchema),
   userController.updatePassword
 );
+
+router.post("/logout", authMiddleware, userController.logout);
 
 module.exports = router;

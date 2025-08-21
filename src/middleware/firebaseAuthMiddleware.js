@@ -28,7 +28,7 @@ const firebaseAuthMiddleware = async (req, res, next) => {
   const idToken = authHeader.split("Bearer ")[1];
 
   try {
-    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const decodedToken = await admin.auth().verifyIdToken(idToken, true);
     const user = await getUserByMobileNumber(decodedToken.phone_number);
     req.user = { id: user.id, role: user.user_role };
     next();
