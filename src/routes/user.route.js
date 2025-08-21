@@ -13,6 +13,8 @@ router.post(
   userController.getSignedURL
 );
 
+router.get("/", authMiddleware, userController.getAllUsers);
+
 router.post(
   "/",
   authMiddleware,
