@@ -241,3 +241,12 @@ exports.updatePassword = async (userId, oldPassword, newPassword) => {
     throw error;
   }
 };
+
+exports.getAllUsers = async () => {
+  try {
+    const users = await Users.findAll();
+    return users;
+  } catch (error) {
+    throw error;
+  }
+};
