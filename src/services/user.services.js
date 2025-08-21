@@ -30,9 +30,7 @@ exports.getSignedUrlS3 = async (fileName, fileType) => {
       fileUrl: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${params.Key}`,
     };
   } catch (error) {
-    throw new Error(
-      `Error in services generating signed URL: ${error.message}`
-    );
+    throw error;
   }
 };
 
@@ -55,7 +53,6 @@ exports.addUser = async ({
     });
     logger.info("User created successfully");
   } catch (error) {
-    logger.error(`Error while creating user: ${error}`);
     throw error;
   }
 };
@@ -68,9 +65,6 @@ exports.getUserByMobileNumber = async (mobileNumber) => {
     });
     return user;
   } catch (error) {
-    logger.error(
-      `Error in services while retrieving user by mobile number: ${error}`
-    );
     throw error;
   }
 };
@@ -92,7 +86,6 @@ exports.getUserByID = async (id) => {
     if (!user) return null;
     return user;
   } catch (error) {
-    logger.error(`Error in services while retrieving user by ID: ${error}`);
     throw error;
   }
 };
@@ -121,9 +114,6 @@ exports.updateUserDetails = async ({ userId, data }) => {
       { where: { id: userId } }
     );
   } catch (error) {
-    logger.error(
-      `Internal error in services occured while updating the user: ${error}`
-    );
     throw error;
   }
 };
@@ -132,21 +122,16 @@ exports.setPreferredLanguage = async (userId, prefferedLanguage) => {
   if (userId === null || userId === undefined) {
     throw new Error("Invalid user ID: ID cannot be null or undefined");
   }
-  if (userId === null || userId === undefined) {
-    throw new Error("Invalid user ID: ID cannot be null or undefined");
-  }
   if (userId === 0) {
-    return null;
+    throw new Error("Invalid user ID: must not be 0");
   }
   try {
     await Users.update(
       { language_preference: prefferedLanguage },
       { where: { id: userId } }
     );
+    return true;
   } catch (error) {
-    logger.error(
-      `Internal error in services occured while setting preferred language: ${error}`
-    );
     throw error;
   }
 };
@@ -167,9 +152,6 @@ exports.changeUserRole = async (userId, currentRole) => {
   try {
     await Users.update({ user_role: userRole }, { where: { id: userId } });
   } catch (error) {
-    logger.error(
-      `Internal error in services while changing user role. ${error}`
-    );
     throw error;
   }
 };
@@ -196,7 +178,6 @@ exports.addPassword = async (userId, password) => {
     }
     await Users.update({ password: hashedPassword }, { where: { id: userId } });
   } catch (error) {
-    logger.error(`Internal error in user service while adding password.`);
     throw error;
   }
 };
