@@ -148,3 +148,20 @@ exports.updatePassword = async (req, res) => {
     });
   }
 };
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await userServices.getAllUsers();
+    res
+      .status(200)
+      .json({ message: "Retrieved all users successfully.", users });
+  } catch (error) {
+    logger.error(`Internal error while getting all users: ${error}`);
+    res
+      .status(500)
+      .json({
+        message: "Internal error while getting users.",
+        error: error.message,
+      });
+  }
+};
