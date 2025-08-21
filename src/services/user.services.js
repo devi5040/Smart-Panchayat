@@ -12,6 +12,7 @@
 const s3 = require("../config/aws/aws.s3.config");
 const { Users } = require("../models");
 const logger = require("../utils/logger");
+const admin = require("firebase-admin");
 const { encryptPassword, comparePasswords } = require("../utils/hashPassword");
 
 exports.getSignedUrlS3 = async (fileName, fileType) => {
@@ -246,6 +247,18 @@ exports.getAllUsers = async () => {
   try {
     const users = await Users.findAll();
     return users;
+  } catch (error) {
+    throw error;
+  }
+};
+
+exports.logoutUser = async (idToken) => {
+  try {
+    if (!idToken) throw new Error("No token provided.");
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const uid = decodedToken.uid;
+    await admin.auth().revokeRefreshTokens(uid);
+    return;
   } catch (error) {
     throw error;
   }
