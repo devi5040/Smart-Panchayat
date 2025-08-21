@@ -1,13 +1,14 @@
 /**
  * @filename user.controller.js
- * @description This file provides an API endpoint for generating pre-signed URLs to upload files to Amazon S3.  It receives a filename and file
- * type from the request body, uses the `userServices` module to generate the S3 upload URL, and returns the result to the client.
- * Error handling is included to gracefully manage exceptions during the process.
+ * @description This file houses the controller logic for user-related operations.  It handles requests for user creation, profile updates,
+ * authentication, and administrative tasks such as role changes and user listing. The controller acts as an intermediary between incoming
+ * requests and the underlying user service layer, ensuring proper error handling and response formatting.
  *
  * @version v1.0.0
- * @created August 19, 2025
+ * @updated Aug 21, 2025
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
+
 const userServices = require("../services/user.services");
 const logger = require("../utils/logger");
 
