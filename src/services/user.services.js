@@ -1,11 +1,11 @@
 /**
  * @filename user.services.js
- * @description This module provides a function to upload files to an AWS S3 bucket.  It generates a pre-signed URL for secure file uploads and
- * returns both the signed URL and the final public URL of the uploaded file.  Error handling is included to manage issues during URL
- * generation.
+ * @description This file provides a comprehensive set of services for managing user accounts and data. It handles user creation, retrieval,
+ * updates (including profile details, language preferences, roles, and passwords), and also facilitates secure S3 file uploads for profile
+ * images.  Additionally, it offers user logout functionality via Firebase Admin SDK.
  *
  * @version v1.0.0
- * @created Aug 19 2025
+ * @updated Thu Aug 21 2025
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
 
