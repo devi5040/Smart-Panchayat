@@ -38,7 +38,7 @@ exports.getCategories = async () => {
 exports.getSignedUrl = async (fileName, fileType) => {
   const params = {
     Bucket: process.env.AWS_BUCKET_NAME, // S3 bucket name from environment variables.
-    Key: `/uploads/category/${Date.now()}-${fileName}`, // S3 key for the file, includes timestamp to avoid collisions.
+    Key: `uploads/category/${Date.now()}-${fileName}`, // S3 key for the file, includes timestamp to avoid collisions.
     ContentType: fileType, // MIME type of the file.
     ACL: "public-read", // Access Control List: makes the file publicly readable.
   };
