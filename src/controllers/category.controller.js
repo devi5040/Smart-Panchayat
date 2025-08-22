@@ -38,3 +38,19 @@ exports.getSignedUrl = async (req, res) => {
     });
   }
 };
+
+exports.addCategory = async (req, res) => {
+  try {
+    const { name, imageUrl } = req.body;
+    await categoryServices.addCategory(name, imageUrl);
+    res.status(201).json({ message: "Category added successfully" });
+  } catch (error) {
+    logger.error(`Internal error while creating a category: ${error}`);
+    res
+      .status(500)
+      .json({
+        message: "Internal error while adding a category",
+        error: error.message,
+      });
+  }
+};
