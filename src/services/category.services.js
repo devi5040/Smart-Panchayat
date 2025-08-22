@@ -52,3 +52,18 @@ exports.updateCategory = async (categoryId, name, imageUrl) => {
     throw error;
   }
 };
+
+exports.deleteCategory = async (categoryId) => {
+  if (categoryId === null || categoryId === 0 || isNaN(categoryId))
+    throw new Error("Category ID is not valid");
+  try {
+    const numOfDeletedRows = await Category.destroy({
+      where: { id: categoryId },
+    });
+    if (numOfDeletedRows == 0)
+      throw new Error("Category ID is invalid. No records deleted.");
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
