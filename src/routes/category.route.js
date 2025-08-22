@@ -7,11 +7,13 @@ const {
   fileUploadSchema,
 } = require("../utils/validation/fileUploadValidation");
 
-router.get(
-  "/",
+router.get("/", authMiddleware, categoryController.getAllCategories);
+
+router.post(
+  "/signed-url",
   authMiddleware,
   validate(fileUploadSchema),
-  categoryController.getAllCategories
+  categoryController.getSignedUrl
 );
 
 module.exports = router;
