@@ -46,10 +46,25 @@ exports.addCategory = async (req, res) => {
     res.status(201).json({ message: "Category added successfully" });
   } catch (error) {
     logger.error(`Internal error while creating a category: ${error}`);
+    res.status(500).json({
+      message: "Internal error while adding a category",
+      error: error.message,
+    });
+  }
+};
+
+exports.updateCatogory = async (req, res) => {
+  const categoryId = req.params.categoryId;
+  const { name, imageUrl } = req.body;
+  try {
+    await categoryServices.updateCategory(categoryId, name, imageUrl);
+    res.status(200).json({ message: "Category details updated successfully." });
+  } catch (error) {
+    logger.error(`Internal error while updating the category: ${error}`);
     res
       .status(500)
       .json({
-        message: "Internal error while adding a category",
+        message: "Internal error while updating the category.",
         error: error.message,
       });
   }
