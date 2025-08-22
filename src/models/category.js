@@ -15,7 +15,6 @@ const Category = sequelize.define("category", {
   },
   imageUrl: {
     type: Sequelize.STRING(1000),
-    allowNull: false,
     validate: {
       isUrl: true,
     },
