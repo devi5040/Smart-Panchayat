@@ -10,4 +10,6 @@ router.get(
   productController.getAllProductsByCategory
 );
 
+router.get("/", authentication, productController.getAllProducts);
+
 module.exports = router;
