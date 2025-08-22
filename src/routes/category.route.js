@@ -26,4 +26,11 @@ router.post(
   categoryController.addCategory
 );
 
+router.put(
+  "/:categoryId",
+  authMiddleware,
+  validate(categoryValidationSchema),
+  categoryController.updateCatogory
+);
+
 module.exports = router;
