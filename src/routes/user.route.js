@@ -28,7 +28,6 @@ router.get("/", authMiddleware, userController.getAllUsers);
 
 router.post(
   "/",
-  authMiddleware,
   validate(userDataValidation.createUserDataSchema),
   userController.addUser
 );
