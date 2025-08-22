@@ -27,3 +27,12 @@ exports.getSignedUrl = async (fileName, fileType) => {
     throw error;
   }
 };
+
+exports.addCategory = async (name, imageUrl) => {
+  try {
+    await Category.create({ name, imageUrl });
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
