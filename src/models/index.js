@@ -57,6 +57,8 @@ ShipmentShops.belongsToMany(Products, { through: ShipmentShopProducts });
 Products.belongsToMany(ShipmentShops, { through: ShipmentShopProducts });
 
 // One-to-Many: Products <-> Category
+// A category can have multiple products. A product belong to one category.
+// Defaults: onDelete: NULL and onUpdate: CASCADE
 Category.hasMany(Products, { onDelete: "CASCADE" });
 Products.belongsTo(Category);
 
