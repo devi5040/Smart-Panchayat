@@ -18,6 +18,7 @@ const OrderItems = require("./orderItems");
 const Shipments = require("./shipments");
 const ShipmentShops = require("./shipmentShops");
 const ShipmentShopProducts = require("./shipmentShopsProducts");
+const Category = require("./category");
 
 // One-to-One: User <-> Shop
 // A User has exactly one Shop.
@@ -55,6 +56,10 @@ Shops.belongsToMany(Shipments, { through: ShipmentShops });
 ShipmentShops.belongsToMany(Products, { through: ShipmentShopProducts });
 Products.belongsToMany(ShipmentShops, { through: ShipmentShopProducts });
 
+// One-to-Many: Products <-> Category
+Category.hasMany(Products, { onDelete: "CASCADE" });
+Products.belongsTo(Category);
+
 module.exports = {
   Users,
   Shops,
@@ -65,4 +70,5 @@ module.exports = {
   ShipmentShops,
   ShipmentShopProducts,
   ShopProducts,
+  Category,
 };
