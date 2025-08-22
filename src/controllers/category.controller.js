@@ -54,18 +54,32 @@ exports.addCategory = async (req, res) => {
 };
 
 exports.updateCatogory = async (req, res) => {
-  const categoryId = req.params.categoryId;
+  const { categoryId } = req.params;
   const { name, imageUrl } = req.body;
   try {
     await categoryServices.updateCategory(categoryId, name, imageUrl);
     res.status(200).json({ message: "Category details updated successfully." });
   } catch (error) {
     logger.error(`Internal error while updating the category: ${error}`);
-    res
-      .status(500)
-      .json({
-        message: "Internal error while updating the category.",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Internal error while updating the category.",
+      error: error.message,
+    });
+  }
+};
+
+exports.deleteCategory = async (req, res) => {
+  const { categoryId } = req.params;
+  try {
+    await categoryServices.deleteCategory(categoryId);
+    res.status(200).json({ message: "Category has deleted successfully" });
+  } catch (error) {
+    logger.error(
+      `Internal error while deleting the category: ${JSON.stringify(error)}`
+    );
+    res.status(500).json({
+      message: "Internal error while deleting the category.",
+      error: error.message,
+    });
   }
 };
