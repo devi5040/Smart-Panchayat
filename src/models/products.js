@@ -32,10 +32,6 @@ const Products = sequelize.define("products", {
       isUrl: true,
     },
   },
-  category: {
-    type: Sequelize.STRING(100),
-    allowNull: false,
-  },
 });
 
 module.exports = Products;
