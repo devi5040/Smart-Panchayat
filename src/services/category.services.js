@@ -36,3 +36,19 @@ exports.addCategory = async (name, imageUrl) => {
     throw error;
   }
 };
+
+exports.updateCategory = async (categoryId, name, imageUrl) => {
+  if (categoryId === null || categoryId === 0 || isNaN(categoryId))
+    throw new Error("Category ID is not valid");
+  try {
+    const updatedRows = await Category.update(
+      { name, imageUrl },
+      { where: { id: categoryId } }
+    );
+    if (updatedRows == 0)
+      throw new Error("Category ID is not valid. No records updated.");
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
