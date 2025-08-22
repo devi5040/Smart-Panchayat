@@ -6,6 +6,9 @@ const authMiddleware = require("../middleware/firebaseAuthMiddleware");
 const {
   fileUploadSchema,
 } = require("../utils/validation/fileUploadValidation");
+const {
+  categoryValidationSchema,
+} = require("../utils/validation/category.validation");
 
 router.get("/", authMiddleware, categoryController.getAllCategories);
 
@@ -14,6 +17,13 @@ router.post(
   authMiddleware,
   validate(fileUploadSchema),
   categoryController.getSignedUrl
+);
+
+router.post(
+  "/",
+  authMiddleware,
+  validate(categoryValidationSchema),
+  categoryController.addCategory
 );
 
 module.exports = router;
