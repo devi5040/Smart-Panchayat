@@ -33,4 +33,10 @@ router.put(
   categoryController.updateCatogory
 );
 
+router.delete(
+  "/:categoryId",
+  authMiddleware,
+  categoryController.deleteCategory
+);
+
 module.exports = router;
