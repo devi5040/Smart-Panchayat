@@ -15,3 +15,12 @@ exports.getProductsByCategory = async (categoryId) => {
     throw error;
   }
 };
+
+exports.getAllProducts = async () => {
+  try {
+    const products = await Products.findAll();
+    return products;
+  } catch (error) {
+    throw error;
+  }
+};
