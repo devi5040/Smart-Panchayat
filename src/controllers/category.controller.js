@@ -1,3 +1,14 @@
+/**
+ * @filename category.controller.js
+ * @description This file implements the controller logic for managing categories.  It handles requests for retrieving all categories, getting
+ * a pre-signed URL for image uploads, adding new categories, updating existing categories, and deleting categories.  It uses the
+ * `categoryServices` module for data access and the `logger` module for logging errors.
+ *
+ * @version v1.0.0
+ * @updated Aug 22, 2025
+ * @author Deviprasad Rai P <dpraidola@gmail.com>
+ */
+
 const categoryServices = require("../services/category.services");
 const logger = require("../utils/logger");
 
