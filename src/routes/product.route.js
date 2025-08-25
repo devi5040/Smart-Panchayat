@@ -33,6 +33,13 @@ router.post(
   productController.addProduct
 );
 
+router.patch(
+  "/:shopProductId/status",
+  authentication,
+  validate(productValidator.statusValidation),
+  productController.updateProductStatus
+);
+
 router.put(
   "/:productId",
   authentication,
