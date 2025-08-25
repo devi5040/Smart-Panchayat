@@ -1,7 +1,7 @@
 const { Products, ShopProducts, Category } = require("../models");
 const {
   NotFoundError,
-  NotModifiedError,
+  BadRequestError,
   ConflictError,
 } = require("../utils/error");
 
@@ -94,8 +94,26 @@ exports.updateProduct = async (
       { name, price, imageUrl, categoryId },
       { where: { id: productId } }
     );
-    if (numRowsUpdated == 0) NotModifiedError("Product did not update.");
+    if (numRowsUpdated == 0) BadRequestError("Product did not update.");
     const productData = await Products.findByPk(productId);
+    return productData;
+  } catch (error) {
+    throw error;
+  }
+};
+
+exports.updateProductStatus = async (shopProductId, status) => {
+  try {
+    const product = await ShopProducts.findByPk(shopProductId);
+    if (!product || product?.length == 0)
+      throw new NotFoundError("Product not found");
+    const [numRowsUpdated] = await ShopProducts.update(
+      { status },
+      { where: { id: shopProductId } }
+    );
+    if (numRowsUpdated == 0)
+      throw new BadRequestError("Product status is not updated");
+    const productData = await ShopProducts.findByPk(shopProductId);
     return productData;
   } catch (error) {
     throw error;
