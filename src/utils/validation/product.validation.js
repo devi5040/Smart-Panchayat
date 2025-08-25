@@ -15,4 +15,15 @@ exports.productValidation = Joi.object({
   categoryId: Joi.string()
     .required()
     .messages({ "string.empty": "Category id should not be empty" }),
+  status: Joi.string().valid("accepted", "rejected", "pending").messages({
+    "string.empty": "Status should not be empty",
+    "string.valid": "Status should be accepted,rejected or pending.",
+  }),
+});
+
+exports.statusValidation = Joi.object({
+  status: Joi.string().valid("accepted", "rejected", "pending").messages({
+    "string.empty": "Status should not be empty",
+    "string.valid": "Status should be accepted,rejected or pending.",
+  }),
 });
