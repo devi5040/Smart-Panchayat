@@ -3,6 +3,9 @@ const router = require("express").Router();
 const authentication = require("../middleware/firebaseAuthMiddleware");
 const authorization = require("../middleware/authorization.middleware");
 
+const validate = require("../middleware/validation.middleware");
+const productValidator = require("../utils/validation/product.validation");
+
 const productController = require("../controllers/product.controller");
 
 router.get(
@@ -22,5 +25,12 @@ router.get(
 router.get("/", authentication, productController.getAllProducts);
 
 router.get("/:productId", authentication, productController.getProductDetails);
+
+router.put(
+  "/:productId",
+  authentication,
+  validate(productValidator.productUpdateValidation),
+  productController.updateProduct
+);
 
 module.exports = router;
