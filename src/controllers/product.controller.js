@@ -40,20 +40,34 @@ exports.getProductForShops = async (req, res) => {
     return res.status(500).json({ message: "The shop ID is not valid." });
   try {
     const products = await productServices.getProductsForShop(shopId);
-    res
-      .status(200)
-      .json({
-        message: "Products fetched for the shop successfully.",
-        products,
-      });
+    res.status(200).json({
+      message: "Products fetched for the shop successfully.",
+      products,
+    });
   } catch (error) {
     logger.error(
       `Internal error while fetching products for the shop: ${shopId}`
     );
+    res.status(500).json({
+      message: "Internal error while fetching products for the shop.",
+      error: error.message,
+    });
+  }
+};
+
+exports.getProductForStatus = async (req, res) => {
+  const shopId = req.user?.shop;
+  const { status } = req.params;
+  try {
+    const products = await productServices.getProductsForStatus(shopId, status);
+    res.status(200).json({ message: "Fetched data successfully.", products });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while fetching products for status: ${error}`);
     res
-      .status(500)
+      .status(status)
       .json({
-        message: "Internal error while fetching products for the shop.",
+        message: "Internal error while fetching products.",
         error: error.message,
       });
   }
