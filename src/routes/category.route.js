@@ -13,6 +13,7 @@
 const express = require("express");
 const router = express.Router(); // Create a router instance
 
+const productController = require("../controllers/product.controller");
 const categoryController = require("../controllers/category.controller"); // Import category controller
 const validate = require("../middleware/validation.middleware"); // Import validation middleware
 const authMiddleware = require("../middleware/firebaseAuthMiddleware"); // Import Firebase authentication middleware
@@ -56,6 +57,12 @@ router.post(
   authMiddleware,
   validate(categoryValidationSchema),
   categoryController.addCategory
+);
+
+router.get(
+  "/:categoryId/products",
+  authMiddleware,
+  productController.getAllProductsByCategory
 );
 
 /**
