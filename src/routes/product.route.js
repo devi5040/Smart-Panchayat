@@ -21,10 +21,6 @@ router.get(
 
 router.get("/", authentication, productController.getAllProducts);
 
-router.get(
-  "/:categoryId",
-  authentication,
-  productController.getAllProductsByCategory
-);
+router.get("/:productId", authentication, productController.getProductDetails);
 
 module.exports = router;
