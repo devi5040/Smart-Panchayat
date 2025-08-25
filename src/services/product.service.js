@@ -1,5 +1,9 @@
 const { Products, ShopProducts, Category } = require("../models");
-const { NotFoundError, NotModifiedError } = require("../utils/error");
+const {
+  NotFoundError,
+  NotModifiedError,
+  ConflictError,
+} = require("../utils/error");
 
 exports.getProductsByCategory = async (categoryId) => {
   if (
@@ -54,6 +58,22 @@ exports.getSingleProduct = async (productId) => {
     const product = await Products.findByPk(productId);
     if (!product) throw new NotFoundError("Product does not available.");
     return product;
+  } catch (error) {
+    throw error;
+  }
+};
+
+exports.addProduct = async (name, price, imageUrl, categoryId) => {
+  try {
+    const product = await Products.findOne({ where: { name } });
+    if (product) throw new ConflictError("Product already exists.");
+    const productData = await Products.create({
+      name,
+      price,
+      image: imageUrl,
+      categoryId,
+    });
+    return productData;
   } catch (error) {
     throw error;
   }
