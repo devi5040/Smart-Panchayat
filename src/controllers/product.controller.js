@@ -33,3 +33,28 @@ exports.getAllProducts = async (req, res) => {
     });
   }
 };
+
+exports.getProductForShops = async (req, res) => {
+  const shopId = req.user?.shop;
+  if (!shopId)
+    return res.status(500).json({ message: "The shop ID is not valid." });
+  try {
+    const products = await productServices.getProductsForShop(shopId);
+    res
+      .status(200)
+      .json({
+        message: "Products fetched for the shop successfully.",
+        products,
+      });
+  } catch (error) {
+    logger.error(
+      `Internal error while fetching products for the shop: ${shopId}`
+    );
+    res
+      .status(500)
+      .json({
+        message: "Internal error while fetching products for the shop.",
+        error: error.message,
+      });
+  }
+};
