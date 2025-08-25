@@ -102,12 +102,10 @@ exports.addProduct = async (req, res) => {
   } catch (error) {
     logger.error(`Internal error while adding the product: ${error}`);
     const status = error.statusCode || 500;
-    res
-      .status(status)
-      .json({
-        message: "Internal error while adding product.",
-        error: error.message,
-      });
+    res.status(status).json({
+      message: "Internal error while adding product.",
+      error: error.message,
+    });
   }
 };
 
@@ -128,6 +126,27 @@ exports.updateProduct = async (req, res) => {
     const status = error.statusCode;
     res.status(status).json({
       message: "Internal error while updating the product",
+      error: error.message,
+    });
+  }
+};
+
+exports.updateProductStatus = async (req, res) => {
+  const { shopProductId } = req.params;
+  const { status } = req.body;
+  try {
+    const product = await productServices.updateProductStatus(
+      shopProductId,
+      status
+    );
+    res
+      .status(200)
+      .json({ message: "Product status updated successfully", product });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while updating product status: ${error}`);
+    res.status(status).json({
+      message: "Internal error while updating product status",
       error: error.message,
     });
   }
