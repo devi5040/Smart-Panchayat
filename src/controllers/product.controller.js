@@ -88,3 +88,25 @@ exports.getProductDetails = async (req, res) => {
     });
   }
 };
+
+exports.updateProduct = async (req, res) => {
+  const { productId } = req.params;
+  const { name, price, imageUrl, categoryId } = req.body;
+  try {
+    const product = await productServices.updateProduct(
+      productId,
+      name,
+      price,
+      imageUrl,
+      categoryId
+    );
+    res.status(200).json({ message: "Product updated successfully.", product });
+  } catch (error) {
+    logger.error(`Internal error while updating the product: ${error}`);
+    const status = error.statusCode;
+    res.status(status).json({
+      message: "Internal error while updating the product",
+      error: error.message,
+    });
+  }
+};
