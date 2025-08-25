@@ -13,11 +13,18 @@ router.get(
 );
 
 router.get(
+  "/shop/:status",
+  authentication,
+  authorization(["shop", "admin"]),
+  productController.getProductForStatus
+);
+
+router.get("/", authentication, productController.getAllProducts);
+
+router.get(
   "/:categoryId",
   authentication,
   productController.getAllProductsByCategory
 );
-
-router.get("/", authentication, productController.getAllProducts);
 
 module.exports = router;
