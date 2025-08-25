@@ -1,4 +1,4 @@
-const { Products } = require("../models");
+const { Products, ShopProducts } = require("../models");
 
 exports.getProductsByCategory = async (categoryId) => {
   if (
@@ -20,6 +20,15 @@ exports.getAllProducts = async () => {
   try {
     const products = await Products.findAll();
     return products;
+  } catch (error) {
+    throw error;
+  }
+};
+
+exports.getProductsForShop = async (shopId) => {
+  try {
+    const shopProducts = await ShopProducts.findAll({ where: { shopId } });
+    return shopProducts;
   } catch (error) {
     throw error;
   }
