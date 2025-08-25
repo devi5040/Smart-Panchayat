@@ -33,3 +33,14 @@ exports.getProductsForShop = async (shopId) => {
     throw error;
   }
 };
+
+exports.getProductsForStatus = async (shopId, status) => {
+  try {
+    const productsData = await ShopProducts.findAll({
+      where: { shopId, status },
+    });
+    return productsData;
+  } catch (error) {
+    throw error;
+  }
+};
