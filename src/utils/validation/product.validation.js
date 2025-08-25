@@ -1,6 +1,6 @@
 const Joi = require("joi");
 
-exports.productUpdateValidation = Joi.object({
+exports.productValidation = Joi.object({
   name: Joi.string()
     .required()
     .messages({ "string.empty": "Product name should not be empty." }),
