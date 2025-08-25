@@ -9,10 +9,11 @@ exports.getAllProductsByCategory = async (req, res) => {
       .status(200)
       .json({ message: "Products fetched successfully.", products });
   } catch (error) {
+    const status = error.statusCode || 500;
     logger.error(
       `Internal error while retrieving products by category. ${error}`
     );
-    res.status(500).json({
+    res.status(status).json({
       message: "Internal error while retrieving products.",
       error: error.message,
     });
@@ -64,11 +65,26 @@ exports.getProductForStatus = async (req, res) => {
   } catch (error) {
     const status = error.statusCode || 500;
     logger.error(`Internal error while fetching products for status: ${error}`);
+    res.status(status).json({
+      message: "Internal error while fetching products.",
+      error: error.message,
+    });
+  }
+};
+
+exports.getProductDetails = async (req, res) => {
+  const { productId } = req.params;
+  try {
+    const product = await productServices.getSingleProduct(productId);
     res
-      .status(status)
-      .json({
-        message: "Internal error while fetching products.",
-        error: error.message,
-      });
+      .status(200)
+      .json({ message: "Product details fetched successfully.", product });
+  } catch (error) {
+    logger.error(`Internal error while fetching product details: ${error}`);
+    const status = error.statusCode || 500;
+    res.status(status).json({
+      message: "Internal error while fetching product details.",
+      error: error.message,
+    });
   }
 };
