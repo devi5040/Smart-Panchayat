@@ -89,6 +89,28 @@ exports.getProductDetails = async (req, res) => {
   }
 };
 
+exports.addProduct = async (req, res) => {
+  const { name, price, imageUrl, categoryId } = req.body;
+  try {
+    const product = await productServices.addProduct(
+      name,
+      price,
+      imageUrl,
+      categoryId
+    );
+    res.status(201).json({ message: "Product added successfully", product });
+  } catch (error) {
+    logger.error(`Internal error while adding the product: ${error}`);
+    const status = error.statusCode || 500;
+    res
+      .status(status)
+      .json({
+        message: "Internal error while adding product.",
+        error: error.message,
+      });
+  }
+};
+
 exports.updateProduct = async (req, res) => {
   const { productId } = req.params;
   const { name, price, imageUrl, categoryId } = req.body;
