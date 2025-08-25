@@ -10,12 +10,6 @@ class BadRequestError extends Error {
   }
 }
 
-class NotModifiedError extends Error {
-  constructor(message) {
-    super(message), (this.statusCode = 304), (this.name = "NotModifiedError");
-  }
-}
-
 class ConflictError extends Error {
   constructor(message) {
     super(message), (this.statusCode = 409), (this.name = "ConflictError");
@@ -25,6 +19,5 @@ class ConflictError extends Error {
 module.exports = {
   NotFoundError,
   BadRequestError,
-  NotModifiedError,
   ConflictError,
 };
