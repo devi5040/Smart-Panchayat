@@ -10,4 +10,10 @@ class BadRequestError extends Error {
   }
 }
 
-module.exports = { NotFoundError, BadRequestError };
+class NotModifiedError extends Error {
+  constructor(message) {
+    super(message), (this.statusCode = 304), (this.name = "NotModifiedError");
+  }
+}
+
+module.exports = { NotFoundError, BadRequestError, NotModifiedError };
