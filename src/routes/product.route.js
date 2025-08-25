@@ -26,10 +26,17 @@ router.get("/", authentication, productController.getAllProducts);
 
 router.get("/:productId", authentication, productController.getProductDetails);
 
+router.post(
+  "/",
+  authentication,
+  validate(productValidator.productValidation),
+  productController.addProduct
+);
+
 router.put(
   "/:productId",
   authentication,
-  validate(productValidator.productUpdateValidation),
+  validate(productValidator.productValidation),
   productController.updateProduct
 );
 
