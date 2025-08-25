@@ -1,5 +1,5 @@
 const { Products, ShopProducts, Category } = require("../models");
-const { NotFoundError } = require("../utils/error");
+const { NotFoundError, NotModifiedError } = require("../utils/error");
 
 exports.getProductsByCategory = async (categoryId) => {
   if (
@@ -54,6 +54,29 @@ exports.getSingleProduct = async (productId) => {
     const product = await Products.findByPk(productId);
     if (!product) throw new NotFoundError("Product does not available.");
     return product;
+  } catch (error) {
+    throw error;
+  }
+};
+
+exports.updateProduct = async (
+  productId,
+  name,
+  price,
+  imageUrl,
+  categoryId
+) => {
+  try {
+    const product = await Products.findByPk(productId);
+    if (!product || product?.length == 0)
+      throw new NotFoundError("Product not found.");
+    const [numRowsUpdated] = await Products.update(
+      { name, price, imageUrl, categoryId },
+      { where: { id: productId } }
+    );
+    if (numRowsUpdated == 0) NotModifiedError("Product did not update.");
+    const productData = await Products.findByPk(productId);
+    return productData;
   } catch (error) {
     throw error;
   }
