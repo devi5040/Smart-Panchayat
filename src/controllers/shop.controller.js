@@ -50,11 +50,38 @@ exports.getShopDetails = async (req, res) => {
   } catch (error) {
     logger.error(`Internal error while fetching shop details: ${error}`);
     const status = error.statusCode || 500;
+    res.status(status).json({
+      message:
+        "⚠️ An internal error occurred while fetching shop details. Please try again later.",
+      error: error.message,
+    });
+  }
+};
+
+exports.updateShopDetails = async (req, res) => {
+  const { shopId } = req.params;
+  const userId = req.user.id;
+  const { name, pinCode, latitude, longitude } = req.body;
+  try {
+    const shopDetails = await shopServices.updateShopDetails(
+      userId,
+      shopId,
+      name,
+      pinCode,
+      latitude,
+      longitude
+    );
+    res
+      .status(200)
+      .json({ message: "✅ Shop details updated successfully!", shopDetails });
+  } catch (error) {
+    logger.error(`Internal error while updating the shop: ${error}`);
+    const status = error.statusCode || 500;
     res
       .status(status)
       .json({
         message:
-          "⚠️ An internal error occurred while fetching shop details. Please try again later.",
+          "⚠️ An internal error occurred while updating the shop. Please try again later.",
         error: error.message,
       });
   }
