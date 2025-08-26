@@ -9,6 +9,8 @@ const shopValidator = require("../utils/validation/shop.validation");
 
 router.get("/", auth, shopController.getShops);
 
+router.get("/:shopId", auth, shopController.getShopDetails);
+
 router.post(
   "/",
   auth,
