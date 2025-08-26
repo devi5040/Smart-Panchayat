@@ -1,5 +1,5 @@
 const { Shops } = require("../models");
-const { ConflictError } = require("../utils/error");
+const { ConflictError, NotFoundError } = require("../utils/error");
 
 exports.getShopIdbyUserId = async (userId) => {
   if (!userId || isNaN(userId)) throw new Error("User id is invalid");
@@ -37,4 +37,11 @@ exports.getShops = async () => {
   } catch (error) {
     throw error;
   }
+};
+
+exports.getShopDetails = async (shopId) => {
+  if (!shopId || isNaN(shopId)) throw new Error("Invalid shop id");
+  const shop = await Shops.findByPk(shopId);
+  if (!shop || shop?.length == 0) throw new NotFoundError("Shop not found");
+  return shop;
 };
