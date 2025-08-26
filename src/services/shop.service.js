@@ -29,3 +29,12 @@ exports.addShop = async (name, pinCode, latitude, longitude, userId) => {
     throw error;
   }
 };
+
+exports.getShops = async () => {
+  try {
+    const shops = await Shops.findAll();
+    return shops;
+  } catch (error) {
+    throw error;
+  }
+};
