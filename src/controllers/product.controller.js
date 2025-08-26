@@ -151,3 +151,20 @@ exports.updateProductStatus = async (req, res) => {
     });
   }
 };
+
+exports.deleteProduct = async (req, res) => {
+  const { productId } = req.params;
+  try {
+    await productServices.deleteProduct(productId);
+    res.status(200).json({ message: "Product deleted successfully" });
+  } catch (error) {
+    logger.error(`Internal error while deleting product: ${error}`);
+    const status = error.statusCode;
+    res
+      .status(status)
+      .json({
+        message: "Internal error while deleting the product",
+        error: error.message,
+      });
+  }
+};
