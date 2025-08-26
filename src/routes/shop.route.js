@@ -7,6 +7,8 @@ const shopController = require("../controllers/shop.controller");
 
 const shopValidator = require("../utils/validation/shop.validation");
 
+router.get("/", auth, shopController.getShops);
+
 router.post(
   "/",
   auth,
