@@ -18,4 +18,11 @@ router.post(
   shopController.addShop
 );
 
+router.put(
+  "/:shopId",
+  auth,
+  validation(shopValidator.productDataSchema),
+  shopController.updateShopDetails
+);
+
 module.exports = router;
