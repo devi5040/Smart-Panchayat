@@ -119,3 +119,17 @@ exports.updateProductStatus = async (shopProductId, status) => {
     throw error;
   }
 };
+
+exports.deleteProduct = async (productId) => {
+  if (!productId || isNaN(productId)) throw new Error("Product ID is invalid");
+  try {
+    const product = await Products.findByPk(productId);
+    if (!product || product?.length == 0)
+      throw new NotFoundError("Product not found.");
+    const numRowsDeleted = await Products.destroy({ where: { id: productId } });
+    if (numRowsDeleted == 0) BadRequestError("Product is not deleted");
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
