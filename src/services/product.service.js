@@ -1,3 +1,13 @@
+/**
+ * @filename product.service.js
+ * @description This file provides a comprehensive set of services for managing product data, including retrieving products by category, shop,
+ * or status, adding new products, updating existing product information and status, and deleting products.  It handles various scenarios,
+ * such as invalid inputs and non-existent records, throwing appropriate custom errors for better error handling.
+ *
+ * @version v1.0.0
+ * @updated August 26, 2025
+ * @author Deviprasad Rai P <dpraidola@gmail.com>
+ */
 const { Products, ShopProducts, Category } = require("../models");
 const {
   NotFoundError,
@@ -5,6 +15,13 @@ const {
   ConflictError,
 } = require("../utils/error");
 
+/**
+ * Retrieves all products associated with a given category ID.
+ * @param {number} categoryId - The ID of the category.  Must be a valid number.
+ * @returns {Promise<Array<object>>} - A promise that resolves to an array of product objects. Rejects with an error if the category ID is invalid or the category is not found.
+ * @throws {Error} If categoryId is invalid (0, NaN, undefined, or null).
+ * @throws {NotFoundError} If the category is not found.
+ */
 exports.getProductsByCategory = async (categoryId) => {
   if (
     categoryId == 0 ||
@@ -24,6 +41,10 @@ exports.getProductsByCategory = async (categoryId) => {
   }
 };
 
+/**
+ * Retrieves all products.
+ * @returns {Promise<Array<object>>} - A promise that resolves to an array of all product objects.
+ */
 exports.getAllProducts = async () => {
   try {
     const products = await Products.findAll();
@@ -33,6 +54,11 @@ exports.getAllProducts = async () => {
   }
 };
 
+/**
+ * Retrieves all products for a given shop ID.
+ * @param {number} shopId - The ID of the shop.
+ * @returns {Promise<Array<object>>} - A promise that resolves to an array of ShopProduct objects.
+ */
 exports.getProductsForShop = async (shopId) => {
   try {
     const shopProducts = await ShopProducts.findAll({ where: { shopId } });
@@ -42,6 +68,12 @@ exports.getProductsForShop = async (shopId) => {
   }
 };
 
+/**
+ * Retrieves products for a given shop ID and status.
+ * @param {number} shopId - The ID of the shop.
+ * @param {string} status - The status of the product.
+ * @returns {Promise<Array<object>>} - A promise that resolves to an array of ShopProduct objects matching the criteria.
+ */
 exports.getProductsForStatus = async (shopId, status) => {
   try {
     const productsData = await ShopProducts.findAll({
@@ -53,6 +85,12 @@ exports.getProductsForStatus = async (shopId, status) => {
   }
 };
 
+/**
+ * Retrieves a single product by its ID.
+ * @param {number} productId - The ID of the product.
+ * @returns {Promise<object>} - A promise that resolves to a single product object. Rejects with a NotFoundError if the product is not found.
+ * @throws {NotFoundError} If the product is not found.
+ */
 exports.getSingleProduct = async (productId) => {
   try {
     const product = await Products.findByPk(productId);
@@ -63,6 +101,15 @@ exports.getSingleProduct = async (productId) => {
   }
 };
 
+/**
+ * Adds a new product.
+ * @param {string} name - The name of the product.
+ * @param {number} price - The price of the product.
+ * @param {string} imageUrl - The URL of the product image.
+ * @param {number} categoryId - The ID of the product category.
+ * @returns {Promise<object>} - A promise that resolves to the newly created product object. Rejects with a ConflictError if a product with the same name already exists.
+ * @throws {ConflictError} If a product with the same name already exists.
+ */
 exports.addProduct = async (name, price, imageUrl, categoryId) => {
   try {
     const product = await Products.findOne({ where: { name } });
@@ -79,6 +126,17 @@ exports.addProduct = async (name, price, imageUrl, categoryId) => {
   }
 };
 
+/**
+ * Updates an existing product.
+ * @param {number} productId - The ID of the product to update.
+ * @param {string} name - The new name of the product.
+ * @param {number} price - The new price of the product.
+ * @param {string} imageUrl - The new URL of the product image.
+ * @param {number} categoryId - The new ID of the product category.
+ * @returns {Promise<object>} - A promise that resolves to the updated product object. Rejects with a NotFoundError if the product is not found or a BadRequestError if the update fails.
+ * @throws {NotFoundError} If the product is not found.
+ * @throws {BadRequestError} If the product was not updated.
+ */
 exports.updateProduct = async (
   productId,
   name,
@@ -94,7 +152,8 @@ exports.updateProduct = async (
       { name, price, imageUrl, categoryId },
       { where: { id: productId } }
     );
-    if (numRowsUpdated == 0) BadRequestError("Product did not update.");
+    if (numRowsUpdated == 0)
+      throw new BadRequestError("Product did not update.");
     const productData = await Products.findByPk(productId);
     return productData;
   } catch (error) {
@@ -102,6 +161,14 @@ exports.updateProduct = async (
   }
 };
 
+/**
+ * Updates the status of a shop product.
+ * @param {number} shopProductId - The ID of the shop product.
+ * @param {string} status - The new status of the product.
+ * @returns {Promise<object>} - A promise that resolves to the updated shop product object. Rejects with a NotFoundError if the product is not found or a BadRequestError if the update fails.
+ * @throws {NotFoundError} If the product is not found.
+ * @throws {BadRequestError} If the product status was not updated.
+ */
 exports.updateProductStatus = async (shopProductId, status) => {
   try {
     const product = await ShopProducts.findByPk(shopProductId);
@@ -120,6 +187,14 @@ exports.updateProductStatus = async (shopProductId, status) => {
   }
 };
 
+/**
+ * Deletes a product by its ID.
+ * @param {number} productId - The ID of the product to delete.
+ * @returns {Promise<boolean>} - A promise that resolves to `true` if the product was deleted successfully. Rejects with an error if the product ID is invalid or the product is not found or if deletion fails.
+ * @throws {Error} If productId is invalid (null, undefined, or NaN).
+ * @throws {NotFoundError} If the product is not found.
+ * @throws {BadRequestError} If the product was not deleted.
+ */
 exports.deleteProduct = async (productId) => {
   if (!productId || isNaN(productId)) throw new Error("Product ID is invalid");
   try {
@@ -127,7 +202,8 @@ exports.deleteProduct = async (productId) => {
     if (!product || product?.length == 0)
       throw new NotFoundError("Product not found.");
     const numRowsDeleted = await Products.destroy({ where: { id: productId } });
-    if (numRowsDeleted == 0) BadRequestError("Product is not deleted");
+    if (numRowsDeleted == 0)
+      throw new BadRequestError("Product is not deleted");
     return true;
   } catch (error) {
     throw error;
