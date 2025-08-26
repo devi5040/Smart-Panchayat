@@ -25,3 +25,19 @@ exports.addShop = async (req, res) => {
     });
   }
 };
+
+exports.getShops = async (req, res) => {
+  try {
+    const shops = await shopServices.getShops();
+    res.status(200).json({ message: "✅ Shops fetched successfully!", shops });
+  } catch (error) {
+    logger.error(`Internal error while fetching the shops: ${error}`);
+    res
+      .status(500)
+      .json({
+        message:
+          "⚠️ An internal error occurred while fetching the shops. Please try again later.",
+        error: error.message,
+      });
+  }
+};
