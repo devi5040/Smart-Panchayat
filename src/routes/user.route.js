@@ -36,6 +36,8 @@ router.get("/:userId", authMiddleware, userController.getUserDetails);
 
 router.get("/status/:status", userController.getUsersByStatus);
 
+router.get("/role/:role", userController.getUsersByRole);
+
 router.put(
   "/update-profile/:userId",
   authMiddleware,
