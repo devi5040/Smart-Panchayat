@@ -21,3 +21,12 @@ exports.productDataSchema = Joi.object({
     "any.required": "Longitude is required",
   }),
 });
+
+exports.remarksSchema = Joi.object({
+  remarks: Joi.string()
+    .required()
+    .messages({
+      "string.empty": "Remarks should not be empty",
+      "string.required": "Remarks is required",
+    }),
+});
