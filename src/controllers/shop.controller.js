@@ -77,11 +77,36 @@ exports.updateShopDetails = async (req, res) => {
   } catch (error) {
     logger.error(`Internal error while updating the shop: ${error}`);
     const status = error.statusCode || 500;
+    res.status(status).json({
+      message:
+        "⚠️ An internal error occurred while updating the shop. Please try again later.",
+      error: error.message,
+    });
+  }
+};
+
+exports.addRemarks = async (req, res) => {
+  const { shipmentId } = req.params;
+  const { remarks } = req.body;
+  try {
+    const shipment = await shopServices.addRemarksToShipments(
+      shipmentId,
+      remarks
+    );
+    res.status(200).json({
+      message: "✅ Remarks added to the shipment successfully!",
+      shipment,
+    });
+  } catch (error) {
+    logger.error(
+      `Internal error while updating the shipment remarks: ${error}`
+    );
+    const status = error.statusCode;
     res
       .status(status)
       .json({
         message:
-          "⚠️ An internal error occurred while updating the shop. Please try again later.",
+          "⚠️ An internal error occurred while updating the shipment remarks. Please try again later.",
         error: error.message,
       });
   }
