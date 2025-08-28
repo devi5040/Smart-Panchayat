@@ -189,3 +189,17 @@ exports.getUsersByStatus = async (status) => {
   if (!users) throw new Error("Users data is invalid");
   return users;
 };
+
+exports.getUserByRole = async (role) => {
+  if (!role) throw new Error("User role is not provided");
+  if (
+    role !== "user" &&
+    role !== "shop" &&
+    role !== "admin" &&
+    role !== "agent"
+  )
+    throw new BadRequestError("User role provided is invalid");
+  const users = await Users.findAll({ where: { user_role: role } });
+  if (!users) throw new Error("Users data is invalid");
+  return users;
+};
