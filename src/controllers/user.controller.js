@@ -196,3 +196,21 @@ exports.getUsersByStatus = async (req, res) => {
     });
   }
 };
+
+exports.getUsersByRole = async (req, res) => {
+  const { role } = req.params;
+  try {
+    const users = await userServices.getUserByRole(role);
+    res
+      .status(200)
+      .json({ message: "✅ Users fetched by role successfully!", users });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while getting users by role: ${error}`);
+    res.status(status).json({
+      message:
+        "⚠️ An internal error occurred while fetching users by role. Please try again later.",
+      error: error.message,
+    });
+  }
+};
