@@ -178,3 +178,21 @@ exports.logout = async (req, res) => {
     });
   }
 };
+
+exports.getUsersByStatus = async (req, res) => {
+  const { status } = req.params;
+  try {
+    const users = await userServices.getUsersByStatus(status);
+    res
+      .status(200)
+      .json({ message: "✅ Users fetched by status successfully!", users });
+  } catch (error) {
+    logger.error(`Internal error while fetching users' by status: ${error}`);
+    const status = error.statusCode || 500;
+    res.status(status).json({
+      message:
+        "⚠️ An internal error occurred while fetching users by status. Please try again later.",
+      error: error.message,
+    });
+  }
+};
