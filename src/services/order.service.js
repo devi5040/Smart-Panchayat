@@ -87,6 +87,12 @@ exports.getOrderHistory = async (userId) => {
 exports.getOrderByCollectionCentre = async (collectionCentre) => {
   const order = await Orders.findAll({
     where: { collection_centre: collectionCentre },
+    include: {
+      model: Products,
+      through: {
+        attributes: ["quantity", "product_quality"],
+      },
+    },
   });
   if (order?.length == 0) throw new NotFoundError("Order not found");
   return order;
@@ -96,6 +102,12 @@ exports.getOrderByPaymentStatus = async (paymentStatus) => {
   const order = await Orders.findAll({
     where: {
       payment_status: paymentStatus,
+    },
+    include: {
+      model: Products,
+      through: {
+        attributes: ["quantity", "product_quality"],
+      },
     },
   });
   return order;
@@ -111,6 +123,24 @@ exports.updatePaymentStatus = async (orderId, paymentStatus) => {
     { where: { id: orderId } }
   );
   if (numRowsUpdated == 0) throw new Error("No rows are updated!");
-  const orderData = await Orders.findByPk(orderId);
+  const orderData = await Orders.findByPk(orderId, {
+    include: {
+      model: Products,
+      through: {
+        attributes: ["quantity", "product_quality"],
+      },
+    },
+  });
   return orderData;
+};
+
+exports.getOrderById = async (orderId) => {
+  const order = await Orders.findByPk(orderId, {
+    include: {
+      model: Products,
+      through: { attributes: ["quantity", "product_quality"] },
+    },
+  });
+  if (!order) throw new NotFoundError("Order not found");
+  return order;
 };
