@@ -91,3 +91,12 @@ exports.getOrderByCollectionCentre = async (collectionCentre) => {
   if (order?.length == 0) throw new NotFoundError("Order not found");
   return order;
 };
+
+exports.getOrderByPaymentStatus = async (paymentStatus) => {
+  const order = await Orders.findAll({
+    where: {
+      payment_status: paymentStatus,
+    },
+  });
+  return order;
+};
