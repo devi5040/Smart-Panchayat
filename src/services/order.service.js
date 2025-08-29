@@ -58,3 +58,14 @@ exports.addOrder = async (orderData, items) => {
     return orderData;
   });
 };
+
+exports.getOrders = async () => {
+  const order = await Orders.findAll({
+    include: {
+      model: Products,
+      through: { attributes: ["quantity", "product_quality"] },
+    },
+  });
+  if (!order) throw new Error("Order is undefined/null");
+  return order;
+};
