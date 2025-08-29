@@ -18,4 +18,10 @@ router.get(
   orderController.getOrdersByCollectionCentre
 );
 
+router.get(
+  "/payment-status/:paymentStatus",
+  validate(orderSchema.paymentStatusOrderSchema, "params"),
+  orderController.getOrdersByPaymentStatus
+);
+
 module.exports = router;
