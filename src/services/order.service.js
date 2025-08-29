@@ -100,3 +100,17 @@ exports.getOrderByPaymentStatus = async (paymentStatus) => {
   });
   return order;
 };
+
+exports.updatePaymentStatus = async (orderId, paymentStatus) => {
+  const order = await Orders.findByPk(orderId);
+  if (!order) throw new NotFoundError("Order not found!");
+  const [numRowsUpdated] = await Orders.update(
+    {
+      payment_status: paymentStatus,
+    },
+    { where: { id: orderId } }
+  );
+  if (numRowsUpdated == 0) throw new Error("No rows are updated!");
+  const orderData = await Orders.findByPk(orderId);
+  return orderData;
+};
