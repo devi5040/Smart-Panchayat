@@ -69,3 +69,17 @@ exports.getOrders = async () => {
   if (!order) throw new Error("Order is undefined/null");
   return order;
 };
+
+exports.getOrderHistory = async (userId) => {
+  const user = await Users.findByPk(userId);
+  if (!user) throw new NotFoundError("User not found!");
+  const orders = await Orders.findAll({
+    where: { userId },
+    include: {
+      model: Products,
+      through: { attributes: ["quantity", "product_quality"] },
+    },
+  });
+  if (!orders) throw new Error("Order data is undefined/null");
+  return orders;
+};
