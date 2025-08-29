@@ -9,7 +9,7 @@ const shopValidator = require("../utils/validation/shop.validation");
 
 router.get("/", auth, shopController.getShops);
 
-router.get("/:shopId", auth, shopController.getShopDetails);
+router.get("/:shopId", shopController.getShopDetails);
 
 router.post(
   "/",
@@ -23,6 +23,12 @@ router.put(
   auth,
   validation(shopValidator.productDataSchema),
   shopController.updateShopDetails
+);
+
+router.patch(
+  "/shipment/:shipmentId",
+  validation(shopValidator.remarksSchema),
+  shopController.addRemarks
 );
 
 module.exports = router;
