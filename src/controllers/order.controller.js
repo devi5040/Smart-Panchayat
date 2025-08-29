@@ -32,3 +32,23 @@ exports.getOrders = async (req, res) => {
     });
   }
 };
+
+exports.getOrderHistory = async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const orders = await orderServices.getOrderHistory(userId);
+    res
+      .status(200)
+      .json({ message: "✅ Orders history fetched successfully!", orders });
+  } catch (error) {
+    logger.error(`Internal error while fetching order history:${error}`);
+    const status = error.statusCode || 500;
+    res
+      .status(status)
+      .json({
+        message:
+          "⚠️ An internal error occurred while fetching order history. Please try again later!",
+        error: error.message,
+      });
+  }
+};
