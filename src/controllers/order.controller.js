@@ -43,12 +43,32 @@ exports.getOrderHistory = async (req, res) => {
   } catch (error) {
     logger.error(`Internal error while fetching order history:${error}`);
     const status = error.statusCode || 500;
+    res.status(status).json({
+      message:
+        "⚠️ An internal error occurred while fetching order history. Please try again later!",
+      error: error.message,
+    });
+  }
+};
+
+exports.getOrdersByCollectionCentre = async (req, res) => {
+  const { collectionCentre } = req.params;
+  try {
+    const orders = await orderServices.getOrderByCollectionCentre(
+      collectionCentre
+    );
     res
-      .status(status)
-      .json({
-        message:
-          "⚠️ An internal error occurred while fetching order history. Please try again later!",
-        error: error.message,
-      });
+      .status(200)
+      .json({ message: "✅ Orders fetched successfully!", orders });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(
+      `Internal error while fetching orders by collection centre: ${error}`
+    );
+    res.status(status).json({
+      message:
+        "⚠️ An internal error occurred while fetching orders data. Please try again later!",
+      error: error.message,
+    });
   }
 };
