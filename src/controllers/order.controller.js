@@ -72,3 +72,23 @@ exports.getOrdersByCollectionCentre = async (req, res) => {
     });
   }
 };
+
+exports.getOrdersByPaymentStatus = async (req, res) => {
+  const { paymentStatus } = req.params;
+  try {
+    const orders = await orderServices.getOrderByPaymentStatus(paymentStatus);
+    res
+      .status(200)
+      .json({ message: "✅ Orders fetched successfully!", orders });
+  } catch (error) {
+    logger.error(`Internal error while fetching Orders data: ${error}`);
+    const status = error.statusCode || 500;
+    res
+      .status(status)
+      .json({
+        message:
+          "⚠️ An internal error occurred while fetching orders data. Please try again later!",
+        error: error.message,
+      });
+  }
+};
