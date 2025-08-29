@@ -83,11 +83,31 @@ exports.getOrdersByPaymentStatus = async (req, res) => {
   } catch (error) {
     logger.error(`Internal error while fetching Orders data: ${error}`);
     const status = error.statusCode || 500;
+    res.status(status).json({
+      message:
+        "⚠️ An internal error occurred while fetching orders data. Please try again later!",
+      error: error.message,
+    });
+  }
+};
+
+exports.updateOrderPaymentStatus = async (req, res) => {
+  const { orderId } = req.params;
+  const { paymentStatus } = req.body;
+  try {
+    const order = await orderServices.updatePaymentStatus(
+      orderId,
+      paymentStatus
+    );
+    res.status(200).json({ message: "✅ Order updated successfully!", order });
+  } catch (error) {
+    logger.error(`Internal error while updating the order: ${error}`);
+    const status = error.statusCode;
     res
       .status(status)
       .json({
         message:
-          "⚠️ An internal error occurred while fetching orders data. Please try again later!",
+          "⚠️ An internal error occurred while updating the order. Please try again later.",
         error: error.message,
       });
   }
