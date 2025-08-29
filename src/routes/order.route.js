@@ -11,6 +11,8 @@ router.get("/", orderController.getOrders);
 
 router.get("/history", auth, orderController.getOrderHistory);
 
+router.get("/:orderId", orderController.getOrderByID);
+
 router.get(
   "/collection-centre/:collectionCentre",
   orderController.getOrdersByCollectionCentre
