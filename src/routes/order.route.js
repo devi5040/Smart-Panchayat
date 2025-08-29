@@ -13,4 +13,9 @@ router.post("/", validate(orderSchema.orderSchema), orderController.addOrder);
 
 router.get("/history", auth, orderController.getOrderHistory);
 
+router.get(
+  "/collection-centre/:collectionCentre",
+  orderController.getOrdersByCollectionCentre
+);
+
 module.exports = router;
