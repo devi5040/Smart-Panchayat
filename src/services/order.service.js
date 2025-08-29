@@ -83,3 +83,11 @@ exports.getOrderHistory = async (userId) => {
   if (!orders) throw new Error("Order data is undefined/null");
   return orders;
 };
+
+exports.getOrderByCollectionCentre = async (collectionCentre) => {
+  const order = await Orders.findAll({
+    where: { collection_centre: collectionCentre },
+  });
+  if (order?.length == 0) throw new NotFoundError("Order not found");
+  return order;
+};
