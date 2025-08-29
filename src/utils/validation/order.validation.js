@@ -35,3 +35,11 @@ exports.orderSchema = Joi.object({
     "any.required": "Items field is required",
   }),
 });
+
+exports.paymentStatusOrderSchema = Joi.object({
+  paymentStatus: Joi.string().valid("paid", "pending").required().messages({
+    "string.empty": "Payment status cannot be empty",
+    "any.valid": "Payment status should either be paid or pending",
+    "any.required": "Payment Status field is required",
+  }),
+});
