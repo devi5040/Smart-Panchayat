@@ -9,8 +9,6 @@ const orderController = require("../controllers/order.controller");
 
 router.get("/", orderController.getOrders);
 
-router.post("/", validate(orderSchema.orderSchema), orderController.addOrder);
-
 router.get("/history", auth, orderController.getOrderHistory);
 
 router.get(
@@ -22,6 +20,14 @@ router.get(
   "/payment-status/:paymentStatus",
   validate(orderSchema.paymentStatusOrderSchema, "params"),
   orderController.getOrdersByPaymentStatus
+);
+
+router.post("/", validate(orderSchema.orderSchema), orderController.addOrder);
+
+router.patch(
+  "/:orderId",
+  validate(orderSchema.paymentStatusOrderSchema),
+  orderController.updateOrderPaymentStatus
 );
 
 module.exports = router;
