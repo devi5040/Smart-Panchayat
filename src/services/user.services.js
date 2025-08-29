@@ -169,7 +169,7 @@ exports.updatePassword = async (userId, oldPassword, newPassword) => {
 
 exports.getAllUsers = async () => {
   const users = await Users.findAll();
-  if (users) throw new NotFoundError("users not found");
+  if (!users) throw new NotFoundError("users not found");
   return users;
 };
 

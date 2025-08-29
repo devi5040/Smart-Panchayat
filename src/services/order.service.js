@@ -101,7 +101,7 @@ exports.getOrders = async () => {
       through: { attributes: ["quantity", "product_quality"] },
     },
   });
-  if (!orders) throw new Error("Orders are undefined/null"); //Improved error message
+  if (!orders) throw new Error("Order is undefined/null"); //Improved error message
   return orders;
 };
 
