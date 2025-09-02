@@ -13,4 +13,10 @@ router.post(
   shipmentController.createShipment
 );
 
+router.put(
+  "/",
+  validate(schema.addShopToShipmentSchema),
+  shipmentController.addShopToShipment
+);
+
 module.exports = router;
