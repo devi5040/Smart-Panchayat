@@ -54,3 +54,24 @@ exports.shipmentSchema = Joi.object({
     "any.required": "Items field is required",
   }),
 });
+
+exports.addShopToShipmentSchema = Joi.object({
+  shopId: Joi.number().required().min(1).messages({
+    "number.empty": "The shop id should be a valid number",
+    "any.required": "The shop id is required",
+    "number.min": "The shop id should be greater than 0",
+  }),
+  shipmentId: Joi.number().required().min(1).messages({
+    "number.empty": "The shop id should be a valid number",
+    "any.required": "The shop id is required",
+    "number.min": "The shop id should be greater than 0",
+  }),
+  products: Joi.array()
+    .items(shipmentProductSchema)
+    .required()
+    .min(1)
+    .messages({
+      "array.required": "The shops array is required",
+      "any.min": "There should be atleast 1 shop",
+    }),
+});
