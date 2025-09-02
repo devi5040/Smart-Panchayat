@@ -9,12 +9,31 @@ exports.getShipmentList = async (req, res) => {
       .json({ message: "✅ Shipments fetched successfully!", shipments });
   } catch (error) {
     logger.error(`Internal error while fetching shipments: ${error}`);
+    res.status(500).json({
+      message:
+        "⚠️ An internal error occurred while fetching shipments. Please try again later.",
+      error: error.message,
+    });
+  }
+};
+
+exports.createShipment = async (req, res) => {
+  const { shipmentDetails, shops } = req.body;
+  try {
+    const shipment = await shipmentServices.createShipment(
+      shipmentDetails,
+      shops
+    );
     res
-      .status(500)
-      .json({
-        message:
-          "⚠️ An internal error occurred while fetching shipments. Please try again later.",
-        error: error.message,
-      });
+      .status(201)
+      .json({ message: "✅ Shipment created successfully!", shipment });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while creating the shipment: ${error}`);
+    res.status(status).json({
+      message:
+        "⚠️ An internal error occurred while creating the shipment. Please try again later.",
+      error: error.message,
+    });
   }
 };
