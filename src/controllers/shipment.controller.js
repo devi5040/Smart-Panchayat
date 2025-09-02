@@ -37,3 +37,32 @@ exports.createShipment = async (req, res) => {
     });
   }
 };
+
+exports.addShopToShipment = async (req, res) => {
+  const { shipmentId, shopId, products } = req.body;
+  try {
+    const shipment = await shipmentServices.addShopsToShipments(
+      shipmentId,
+      shopId,
+      products
+    );
+    res
+      .status(201)
+      .json({
+        message: "Shop and products added to the shipment successfully.",
+        shipment,
+      });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(
+      `Internal error while updating the shipment with shop and product: ${error}`
+    );
+    res
+      .status(status)
+      .json({
+        message:
+          "⚠️ An internal error occurred while creating the shipment. Please try again later.",
+        error: error.message,
+      });
+  }
+};
