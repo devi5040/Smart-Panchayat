@@ -32,6 +32,10 @@ const Shipments = sequelize.define("shipments", {
     allowNull: false,
     defaultValue: "truck",
   },
+  location: {
+    type: Sequelize.STRING(255),
+    allowNull: false,
+  },
 });
 
 module.exports = Shipments;

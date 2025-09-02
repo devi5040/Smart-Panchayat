@@ -20,7 +20,7 @@ const ShipmentShopProducts = sequelize.define("shipment-shop-products", {
     autoIncrement: true,
   },
   quantity: {
-    type: Sequelize.DECIMAL(10, 2),
+    type: Sequelize.INTEGER,
     allowNull: false,
     validate: {
       min: 0.01,

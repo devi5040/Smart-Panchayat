@@ -16,8 +16,15 @@ class ConflictError extends Error {
   }
 }
 
+class NoContentError extends Error {
+  constructor(message) {
+    super(message), (this.statusCode = 204), (this.name = "NoContentError");
+  }
+}
+
 module.exports = {
   NotFoundError,
   BadRequestError,
   ConflictError,
+  NoContentError,
 };
