@@ -6,7 +6,11 @@ const {
   Shops,
   Products,
 } = require("../models");
-const { ConflictError, NotFoundError } = require("../utils/error");
+const {
+  ConflictError,
+  NotFoundError,
+  NoContentError,
+} = require("../utils/error");
 
 exports.getShipmentList = async () => {
   const shipments = await Shipments.findAll({
@@ -77,6 +81,57 @@ exports.createShipment = async (shipmentDetails, shops) => {
       }
     }
     const shipmentData = await Shipments.findAll({
+      attributes: ["id", "date", "collection_centre", "transportation_mode"],
+      include: {
+        model: Shops,
+        attributes: ["shop_name", "id", "latitude", "longitude", "pin_code"],
+        through: { attributes: ["status"] },
+      },
+      transaction: t,
+    });
+    if (!shipmentData) throw new Error("Error finding shipments");
+    return shipmentData;
+  });
+};
+
+// add a shop data for shipment table
+exports.addShopsToShipments = async (shipmentId, shopId, products) => {
+  return await sequelize.transaction(async (t) => {
+    const shop = await Shops.findByPk(shopId, { transaction: t });
+    if (!shop) throw new NotFoundError("❌ Shop does not exist.");
+    const shipment = await Shipments.findByPk(shipmentId, { transaction: t });
+    if (!shipment) throw new NotFoundError("❌ Shipment does not exist");
+    const existsData = await ShipmentShops.findAll({
+      where: { shopId, shipmentId },
+      transaction: t,
+    });
+    if (existsData && existsData?.length > 0)
+      throw new ConflictError("Shop already exists in the given shipment");
+    const shipmentShops = await ShipmentShops.create(
+      { shopId, shipmentId },
+      { transaction: t }
+    );
+    for (const product of products) {
+      const { quantity, productId } = product;
+      const existingProduct = await Products.findByPk(productId, {
+        transaction: t,
+      });
+      if (!existingProduct)
+        throw new NotFoundError(
+          `Product with product id ${productId} not found`
+        );
+      const shipmentShopProduct = await ShipmentShopProducts.create(
+        {
+          quantity,
+          productId,
+          shipmentShopId: shipmentShops.id,
+        },
+        { transaction: t }
+      );
+      if (!shipmentShopProduct)
+        throw new Error("shipment shop product not created");
+    }
+    const shipmentData = await Shipments.findByPk(shipmentId, {
       attributes: ["id", "date", "collection_centre", "transportation_mode"],
       include: {
         model: Shops,
