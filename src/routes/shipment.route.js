@@ -21,4 +21,10 @@ router.put(
 
 router.get("/shop/:shopId", shipmentController.getShipmentForShops);
 
+router.get(
+  "/status/:status",
+  validate(schema.shipmentStatus, "params"),
+  shipmentController.getShipmentByStatus
+);
+
 module.exports = router;
