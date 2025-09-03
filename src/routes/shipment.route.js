@@ -44,4 +44,9 @@ router.delete(
   shipmentController.removeShipmentProduct
 );
 
+router.delete(
+  "/:shipmentId/shop/:shopId",
+  shipmentController.removeShipmentShop
+);
+
 module.exports = router;
