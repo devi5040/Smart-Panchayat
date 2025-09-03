@@ -14,11 +14,27 @@ const {
 
 exports.getShipmentList = async () => {
   const shipments = await Shipments.findAll({
-    attributes: ["id", "date", "collection_centre", "transportation_mode"],
+    attributes: [
+      "id",
+      "date",
+      "location",
+      "collection_centre",
+      "transportation_mode",
+    ],
     include: { model: Shops, through: { attributes: ["status"] } },
   });
   if (!shipments) throw new Error("Error finding shipments");
-  return shipments;
+  const shipmentData = shipments.flatMap((shipment) =>
+    shipment["shops"].map((sh) => ({
+      id: shipment.id,
+      collectionCentre: shipment.collection_centre,
+      mode: shipment.transportation_mode,
+      date: shipment.date,
+      location: shipment.location,
+      status: sh["shipment-shops"].status,
+    }))
+  );
+  return shipmentData;
 };
 
 // shipment details with location and transportation mode
@@ -171,4 +187,31 @@ exports.getShipmentForShop = async (shopId) => {
     }))
   );
   return products;
+};
+
+exports.getShipmentsByStatus = async (status) => {
+  const shipmentData = await Shipments.findAll({
+    attributes: [
+      "id",
+      "date",
+      "location",
+      "collection_centre",
+      "transportation_mode",
+    ],
+    include: {
+      model: Shops,
+      through: { attributes: ["status"], where: { status } },
+    },
+  });
+  if (!shipmentData) throw new Error("Could not find shipment data");
+  const shipments = shipmentData.flatMap((shipment) =>
+    shipment["shops"].map((sh) => ({
+      id: shipment.id,
+      location: shipment.location,
+      mode: shipment.transportation_mode,
+      collectionCentre: shipment.collection_centre,
+      status: sh["shipment-shops"].status,
+    }))
+  );
+  return shipments;
 };
