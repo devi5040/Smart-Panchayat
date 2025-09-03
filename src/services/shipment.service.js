@@ -1,3 +1,14 @@
+/**
+ * @filename shipment.service.js
+ * @description This service file manages shipment data, providing functionalities for creating, updating, and retrieving shipment details.  It
+ * handles the relationships between shipments, shops, and products, ensuring data integrity through database transactions. The service offers
+ * methods to list shipments, create new shipments with associated shops and products, update product quantities within existing shipments, add
+ * shops to existing shipments, retrieve shipments by shop, status, or transportation mode, and remove products or shops from shipments.
+ *
+ * @version v1.0.0
+ * @updated Sep 3, 2025
+ * @author Deviprasad Rai P <dpraidola@gmail.com>
+ */
 const sequelize = require("../config/db");
 const {
   Shipments,
@@ -12,6 +23,14 @@ const {
   NoContentError,
 } = require("../utils/error");
 
+/**
+ * Retrieves a list of all shipments.
+ * Includes shipment details and associated shop status.
+ * @async
+ * @function getShipmentList
+ * @returns {Array<Object>} An array of shipment objects, each containing shipment details and shop status.  Returns an empty array if no shipments are found.
+ * @throws {Error} If an error occurs while fetching shipments.
+ */
 exports.getShipmentList = async () => {
   const shipments = await Shipments.findAll({
     attributes: [
@@ -23,7 +42,10 @@ exports.getShipmentList = async () => {
     ],
     include: { model: Shops, through: { attributes: ["status"] } },
   });
-  if (!shipments) throw new Error("Error finding shipments");
+  if (!shipments) {
+    //Returning empty array instead of throwing error for better error handling.
+    return [];
+  }
   const shipmentData = shipments.flatMap((shipment) =>
     shipment["shops"].map((sh) => ({
       id: shipment.id,
@@ -37,7 +59,25 @@ exports.getShipmentList = async () => {
   return shipmentData;
 };
 
-// shipment details with location and transportation mode
+/**
+ * Creates a new shipment.  Handles creation of associated ShipmentShops and ShipmentShopProducts records.
+ * @async
+ * @function createShipment
+ * @param {Object} shipmentDetails - Details of the shipment.
+ * @param {Object} shipmentDetails.date - The date of the shipment.
+ * @param {string} shipmentDetails.location - The location of the shipment.
+ * @param {string} shipmentDetails.collectionCentre - The collection centre of the shipment.
+ * @param {string} shipmentDetails.transportationMode - The mode of transportation.
+ * @param {Array<Object>} shops - An array of shop objects, each containing shopId and products.
+ * @param {number} shops[].shopId - The ID of the shop.
+ * @param {Array<Object>} shops[].products - An array of product objects, each containing productId and quantity.
+ * @param {number} shops[].products[].productId - The ID of the product.
+ * @param {number} shops[].products[].quantity - The quantity of the product.
+ * @returns {Array<Object>} An array of shipment objects including associated shop details. Returns null if shipment creation fails.
+ * @throws {ConflictError} If a shipment with the same details already exists.
+ * @throws {NotFoundError} If a shop or product does not exist.
+ * @throws {Error} If an error occurs during shipment creation.
+ */
 exports.createShipment = async (shipmentDetails, shops) => {
   const { date, location, collectionCentre, transportationMode } =
     shipmentDetails;
@@ -110,6 +150,19 @@ exports.createShipment = async (shipmentDetails, shops) => {
   });
 };
 
+/**
+ * Updates the quantity of a product in a specific shipment.
+ * @async
+ * @function updateShipmentProduct
+ * @param {number} shipmentId - The ID of the shipment.
+ * @param {number} shopId - The ID of the shop.
+ * @param {number} productId - The ID of the product.
+ * @param {number} quantity - The new quantity of the product.
+ * @returns {Object} The updated ShipmentShopProduct object. Returns null if update fails.
+ * @throws {NotFoundError} If the shipment, shop, or product does not exist.
+ * @throws {NoContentError} If no rows were updated.
+ * @throws {Error} If an error occurs during the update.
+ */
 exports.updateShipmentProduct = async (
   shipmentId,
   shopId,
@@ -128,12 +181,10 @@ exports.updateShipmentProduct = async (
       transaction: t,
       attributes: ["id"],
     });
-    console.log(`shipmentshop: ${JSON.stringify(shipmentShop)}`);
     let shipmentShopProduct = await ShipmentShopProducts.findOne({
       where: { shipmentShopId: shipmentShop.id, productId },
       transaction: t,
     });
-    console.log(`shipmentshop product: ${JSON.stringify(shipmentShopProduct)}`);
     if (shipmentShopProduct) {
       const [numRowsUpdated] = await ShipmentShopProducts.update(
         { quantity },
@@ -154,7 +205,20 @@ exports.updateShipmentProduct = async (
   });
 };
 
-// add a shop data for shipment table
+/**
+ * Adds shops to an existing shipment.
+ * @async
+ * @function addShopsToShipments
+ * @param {number} shipmentId - The ID of the shipment.
+ * @param {number} shopId - The ID of the shop to add.
+ * @param {Array<Object>} products - An array of product objects to add.
+ * @param {number} products[].productId - The ID of the product.
+ * @param {number} products[].quantity - The quantity of the product.
+ * @returns {Object} The updated shipment object including associated shops and products. Returns null if addition fails.
+ * @throws {NotFoundError} If the shipment or shop does not exist, or if a product does not exist.
+ * @throws {ConflictError} If the shop is already associated with the shipment.
+ * @throws {Error} If an error occurs during the addition.
+ */
 exports.addShopsToShipments = async (shipmentId, shopId, products) => {
   return await sequelize.transaction(async (t) => {
     const shop = await Shops.findByPk(shopId, { transaction: t });
@@ -205,6 +269,15 @@ exports.addShopsToShipments = async (shipmentId, shopId, products) => {
   });
 };
 
+/**
+ * Retrieves shipment details for a given shop.
+ * @async
+ * @function getShipmentForShop
+ * @param {number} shopId - The ID of the shop.
+ * @returns {Array<Object>} An array of product objects associated with the shop's shipments, including shipment status. Returns an empty array if no data is found.
+ * @throws {NotFoundError} If the shop does not exist.
+ * @throws {Error} If an error occurs during data retrieval.
+ */
 exports.getShipmentForShop = async (shopId) => {
   const shop = await Shops.findByPk(shopId);
   if (!shop) throw new NotFoundError("Shop not found");
@@ -219,8 +292,8 @@ exports.getShipmentForShop = async (shopId) => {
       },
     ],
   });
-
-  // flatten the result to get seperate product data
+  //Returning empty array instead of throwing error for better error handling.
+  if (!shipmentProducts) return [];
   const products = shipmentProducts.flatMap((shipmentProduct) =>
     shipmentProduct["shipment-shops"].map((sh) => ({
       id: shipmentProduct.id,
@@ -233,6 +306,14 @@ exports.getShipmentForShop = async (shopId) => {
   return products;
 };
 
+/**
+ * Retrieves shipments filtered by status.
+ * @async
+ * @function getShipmentsByStatus
+ * @param {string} status - The status to filter by.
+ * @returns {Array<Object>} An array of shipment objects that match the provided status. Returns an empty array if no data found.
+ * @throws {Error} If an error occurs while fetching shipments.
+ */
 exports.getShipmentsByStatus = async (status) => {
   const shipmentData = await Shipments.findAll({
     attributes: [
@@ -247,7 +328,8 @@ exports.getShipmentsByStatus = async (status) => {
       through: { attributes: ["status"], where: { status } },
     },
   });
-  if (!shipmentData) throw new Error("Could not find shipment data");
+  //Returning empty array instead of throwing error for better error handling.
+  if (!shipmentData) return [];
   const shipments = shipmentData.flatMap((shipment) =>
     shipment["shops"].map((sh) => ({
       id: shipment.id,
@@ -260,6 +342,14 @@ exports.getShipmentsByStatus = async (status) => {
   return shipments;
 };
 
+/**
+ * Retrieves shipments filtered by transportation mode.
+ * @async
+ * @function getShipmentsByMode
+ * @param {string} mode - The transportation mode to filter by.
+ * @returns {Array<Object>} An array of shipment objects that match the provided transportation mode. Returns an empty array if no data is found.
+ * @throws {Error} If an error occurs while fetching shipments.
+ */
 exports.getShipmentsByMode = async (mode) => {
   const shipmentData = await Shipments.findAll({
     where: { transportation_mode: mode },
@@ -279,8 +369,8 @@ exports.getShipmentsByMode = async (mode) => {
       },
     ],
   });
-  if (!shipmentData) throw new Error("Could not find shipments");
-
+  //Returning empty array instead of throwing error for better error handling.
+  if (!shipmentData) return [];
   const shipments = shipmentData.flatMap((shipment) =>
     shipment["shops"].map((sh) => ({
       id: shipment.id,
@@ -293,6 +383,18 @@ exports.getShipmentsByMode = async (mode) => {
   return shipments;
 };
 
+/**
+ * Removes a product from a shipment.
+ * @async
+ * @function removeProductFromShipment
+ * @param {number} shipmentId - The ID of the shipment.
+ * @param {number} shopId - The ID of the shop.
+ * @param {number} productId - The ID of the product to remove.
+ * @returns {Object} The ShipmentShopProduct object after removal (will be null if product not found). Returns null if removal fails.
+ * @throws {NotFoundError} If the shipment, shop, or product does not exist.
+ * @throws {NoContentError} If no rows were deleted.
+ * @throws {Error} If an error occurs during removal.
+ */
 exports.removeProductFromShipment = async (shipmentId, shopId, productId) => {
   return await sequelize.transaction(async (t) => {
     const shipment = await Shipments.findByPk(shipmentId, { transaction: t });
@@ -309,6 +411,7 @@ exports.removeProductFromShipment = async (shipmentId, shopId, productId) => {
     if (!shipmentShop) throw new Error("shipment shop not found");
     const rowsDeleted = await ShipmentShopProducts.destroy({
       where: { shipmentShopId: shipmentShop.id, productId },
+      transaction: t,
     });
     if (rowsDeleted == 0) throw new NoContentError("No rows deleted");
     const data = await ShipmentShopProducts.findOne({
@@ -319,6 +422,17 @@ exports.removeProductFromShipment = async (shipmentId, shopId, productId) => {
   });
 };
 
+/**
+ * Removes a shop from a shipment.
+ * @async
+ * @function removeShopFromShipment
+ * @param {number} shipmentId - The ID of the shipment.
+ * @param {number} shopId - The ID of the shop to remove.
+ * @returns {Array<Object>} An array of ShipmentShops objects associated with the shipment after the removal. Returns an empty array if no shops are left.
+ * @throws {NotFoundError} If the shipment or shop does not exist.
+ * @throws {NoContentError} If no rows were deleted.
+ * @throws {Error} If an error occurs during removal.
+ */
 exports.removeShopFromShipment = async (shipmentId, shopId) => {
   return await sequelize.transaction(async (t) => {
     const shipment = await Shipments.findByPk(shipmentId, { transaction: t });
