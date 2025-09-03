@@ -292,3 +292,29 @@ exports.getShipmentsByMode = async (mode) => {
   );
   return shipments;
 };
+
+exports.removeProductFromShipment = async (shipmentId, shopId, productId) => {
+  return await sequelize.transaction(async (t) => {
+    const shipment = await Shipments.findByPk(shipmentId, { transaction: t });
+    if (!shipment) throw new NotFoundError("shipment not found");
+    const shop = await Shops.findByPk(shopId, { transaction: t });
+    if (!shop) throw new NotFoundError("Shop not found");
+    const product = await Products.findByPk(productId, { transaction: t });
+    if (!product) throw new NotFoundError("Product not found!");
+    const shipmentShop = await ShipmentShops.findOne({
+      where: { shopId, shipmentId },
+      attributes: ["id"],
+      transaction: t,
+    });
+    if (!shipmentShop) throw new Error("shipment shop not found");
+    const rowsDeleted = await ShipmentShopProducts.destroy({
+      where: { shipmentShopId: shipmentShop.id, productId },
+    });
+    if (rowsDeleted == 0) throw new NoContentError("No rows deleted");
+    const data = await ShipmentShopProducts.findOne({
+      where: { shipmentShopId: shipmentShop.id, productId },
+      transaction: t,
+    });
+    return data;
+  });
+};
