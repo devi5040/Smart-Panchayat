@@ -39,4 +39,9 @@ router.get(
   shipmentController.getShipmentByTransportationMode
 );
 
+router.delete(
+  "/:shipmentId/shop/:shopId/product/:productId",
+  shipmentController.removeShipmentProduct
+);
+
 module.exports = router;
