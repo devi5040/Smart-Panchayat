@@ -19,4 +19,6 @@ router.put(
   shipmentController.addShopToShipment
 );
 
+router.get("/shop/:shopId", shipmentController.getShipmentForShops);
+
 module.exports = router;
