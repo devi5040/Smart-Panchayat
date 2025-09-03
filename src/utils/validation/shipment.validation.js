@@ -90,3 +90,21 @@ exports.shipmentModeSchema = Joi.object({
     "any.valid": "The mode should be bus,truck,train or others",
   }),
 });
+
+exports.shipmentProductUpdateSchema = Joi.object({
+  shopId: Joi.number().required().min(1).messages({
+    "number.empty": "The shop id should be a valid number",
+    "any.required": "The shop id is required",
+    "number.min": "The shop id should be greater than 0",
+  }),
+  quantity: Joi.number().required().min(1).messages({
+    "number.empty": "The quantity should not be empty",
+    "number.min": "The quantity should be more than 0",
+    "any.required": "The quantity field is required",
+  }),
+  productId: Joi.number().min(1).required().messages({
+    "number.empty": "The product id should not be empty",
+    "number.min": "Product id should be more than 0",
+    "any.required": "Product id field is required",
+  }),
+});
