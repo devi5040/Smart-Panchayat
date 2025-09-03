@@ -13,6 +13,12 @@ router.post(
   shipmentController.createShipment
 );
 
+router.patch(
+  "/:shipmentId",
+  validate(schema.shipmentProductUpdateSchema),
+  shipmentController.updateShipmentProduct
+);
+
 router.put(
   "/",
   validate(schema.addShopToShipmentSchema),
