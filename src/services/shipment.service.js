@@ -110,6 +110,50 @@ exports.createShipment = async (shipmentDetails, shops) => {
   });
 };
 
+exports.updateShipmentProduct = async (
+  shipmentId,
+  shopId,
+  productId,
+  quantity
+) => {
+  return await sequelize.transaction(async (t) => {
+    const shipment = await Shipments.findByPk(shipmentId, { transaction: t });
+    if (!shipment) throw new NotFoundError("Shipment Not found");
+    const shop = await Shops.findByPk(shopId, { transaction: t });
+    if (!shop) throw new NotFoundError("Shop not found!");
+    const product = await Products.findByPk(productId, { transaction: t });
+    if (!product) throw new NotFoundError("Product not found");
+    const shipmentShop = await ShipmentShops.findOne({
+      where: { shipmentId, shopId },
+      transaction: t,
+      attributes: ["id"],
+    });
+    console.log(`shipmentshop: ${JSON.stringify(shipmentShop)}`);
+    let shipmentShopProduct = await ShipmentShopProducts.findOne({
+      where: { shipmentShopId: shipmentShop.id, productId },
+      transaction: t,
+    });
+    console.log(`shipmentshop product: ${JSON.stringify(shipmentShopProduct)}`);
+    if (shipmentShopProduct) {
+      const [numRowsUpdated] = await ShipmentShopProducts.update(
+        { quantity },
+        { where: { id: shipmentShopProduct.id }, transaction: t }
+      );
+      if (numRowsUpdated == 0) throw new NoContentError("No rows updateds");
+    } else {
+      await ShipmentShopProducts.create(
+        { quantity, productId, shipmentShopId: shipmentShop.id },
+        { transaction: t }
+      );
+    }
+    const data = await ShipmentShopProducts.findOne({
+      where: { shipmentShopId: shipmentShop.id, productId },
+      transaction: t,
+    });
+    return data;
+  });
+};
+
 // add a shop data for shipment table
 exports.addShopsToShipments = async (shipmentId, shopId, products) => {
   return await sequelize.transaction(async (t) => {
