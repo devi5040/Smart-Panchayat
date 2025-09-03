@@ -27,4 +27,10 @@ router.get(
   shipmentController.getShipmentByStatus
 );
 
+router.get(
+  "/mode/:mode",
+  validate(schema.shipmentModeSchema, "params"),
+  shipmentController.getShipmentByTransportationMode
+);
+
 module.exports = router;
