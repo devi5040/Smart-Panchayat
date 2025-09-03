@@ -144,3 +144,31 @@ exports.addShopsToShipments = async (shipmentId, shopId, products) => {
     return shipmentData;
   });
 };
+
+exports.getShipmentForShop = async (shopId) => {
+  const shop = await Shops.findByPk(shopId);
+  if (!shop) throw new NotFoundError("Shop not found");
+  const shipmentProducts = await Products.findAll({
+    attributes: ["id", "name", "price"],
+    include: [
+      {
+        model: ShipmentShops,
+        where: { shopId },
+        attributes: ["id", "status"],
+        through: { attributes: [] },
+      },
+    ],
+  });
+
+  // flatten the result to get seperate product data
+  const products = shipmentProducts.flatMap((shipmentProduct) =>
+    shipmentProduct["shipment-shops"].map((sh) => ({
+      id: shipmentProduct.id,
+      name: shipmentProduct.name,
+      price: shipmentProduct.price,
+      shipmentShopId: sh.id,
+      status: sh.status,
+    }))
+  );
+  return products;
+};
