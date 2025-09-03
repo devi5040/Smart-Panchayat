@@ -215,3 +215,36 @@ exports.getShipmentsByStatus = async (status) => {
   );
   return shipments;
 };
+
+exports.getShipmentsByMode = async (mode) => {
+  const shipmentData = await Shipments.findAll({
+    where: { transportation_mode: mode },
+    attributes: [
+      "id",
+      "date",
+      "collection_centre",
+      "transportation_mode",
+      "location",
+    ],
+    include: [
+      {
+        model: Shops,
+        through: {
+          attributes: ["status"],
+        },
+      },
+    ],
+  });
+  if (!shipmentData) throw new Error("Could not find shipments");
+
+  const shipments = shipmentData.flatMap((shipment) =>
+    shipment["shops"].map((sh) => ({
+      id: shipment.id,
+      date: shipment.date,
+      mode: shipment.transportation_mode,
+      collectionCentre: shipment.collection_centre,
+      status: sh["shipment-shops"].status,
+    }))
+  );
+  return shipments;
+};
