@@ -46,22 +46,40 @@ exports.addShopToShipment = async (req, res) => {
       shopId,
       products
     );
-    res
-      .status(201)
-      .json({
-        message: "Shop and products added to the shipment successfully.",
-        shipment,
-      });
+    res.status(201).json({
+      message: "Shop and products added to the shipment successfully.",
+      shipment,
+    });
   } catch (error) {
     const status = error.statusCode || 500;
     logger.error(
       `Internal error while updating the shipment with shop and product: ${error}`
     );
+    res.status(status).json({
+      message:
+        "⚠️ An internal error occurred while creating the shipment. Please try again later.",
+      error: error.message,
+    });
+  }
+};
+
+exports.getShipmentForShops = async (req, res) => {
+  const { shopId } = req.params;
+  try {
+    const shipment = await shipmentServices.getShipmentForShop(shopId);
+    res
+      .status(200)
+      .json({ message: "Shipment fetched successfully!", shipment });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(
+      `Internal error while fetching the shipment data for shops: ${shopId}`
+    );
     res
       .status(status)
       .json({
         message:
-          "⚠️ An internal error occurred while creating the shipment. Please try again later.",
+          "⚠️ An internal error occurred while fetching the shipment data for shops. Please try again later.",
         error: error.message,
       });
   }
