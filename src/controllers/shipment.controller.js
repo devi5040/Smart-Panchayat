@@ -160,11 +160,32 @@ exports.removeShipmentProduct = async (req, res) => {
   } catch (error) {
     const status = error.statusCode || 500;
     logger.error(`Internal error while removing shipment product: ${error}`);
+    res.status(status).json({
+      message:
+        "⚠️ An internal error occurred while removing the shipment product. Please try again later!",
+      error: error.message,
+    });
+  }
+};
+
+exports.removeShipmentShop = async (req, res) => {
+  const { shipmentId, shopId } = req.params;
+  try {
+    const shipment = await shipmentServices.removeShopFromShipment(
+      shipmentId,
+      shopId
+    );
+    res
+      .status(200)
+      .json({ message: "Shipment data fetched successfully!", shipment });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while removing the shop details:${error}`);
     res
       .status(status)
       .json({
         message:
-          "⚠️ An internal error occurred while removing the shipment product. Please try again later!",
+          "⚠️ An internal error occurred while removing the shop details. Please try again later.",
         error: error.message,
       });
   }
