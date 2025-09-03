@@ -75,3 +75,36 @@ exports.addShopToShipmentSchema = Joi.object({
       "any.min": "There should be atleast 1 shop",
     }),
 });
+
+exports.shipmentStatus = Joi.object({
+  status: Joi.string().required().valid("pending", "delivered").messages({
+    "string.empty": "The status should not be empty",
+    "any.required": "The status param is required",
+    "any.valid": "The status should either be pending or delivered. ",
+  }),
+});
+
+exports.shipmentModeSchema = Joi.object({
+  mode: Joi.string().valid("bus", "train", "truck", "others").messages({
+    "string.empty": "The mode should not be empty",
+    "any.valid": "The mode should be bus,truck,train or others",
+  }),
+});
+
+exports.shipmentProductUpdateSchema = Joi.object({
+  shopId: Joi.number().required().min(1).messages({
+    "number.empty": "The shop id should be a valid number",
+    "any.required": "The shop id is required",
+    "number.min": "The shop id should be greater than 0",
+  }),
+  quantity: Joi.number().required().min(1).messages({
+    "number.empty": "The quantity should not be empty",
+    "number.min": "The quantity should be more than 0",
+    "any.required": "The quantity field is required",
+  }),
+  productId: Joi.number().min(1).required().messages({
+    "number.empty": "The product id should not be empty",
+    "number.min": "Product id should be more than 0",
+    "any.required": "Product id field is required",
+  }),
+});
