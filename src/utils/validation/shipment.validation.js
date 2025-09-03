@@ -75,3 +75,11 @@ exports.addShopToShipmentSchema = Joi.object({
       "any.min": "There should be atleast 1 shop",
     }),
 });
+
+exports.shipmentStatus = Joi.object({
+  status: Joi.string().required().valid("pending", "delivered").messages({
+    "string.empty": "The status should not be empty",
+    "any.required": "The status param is required",
+    "any.valid": "The status should either be pending or delivered. ",
+  }),
+});
