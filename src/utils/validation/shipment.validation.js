@@ -83,3 +83,10 @@ exports.shipmentStatus = Joi.object({
     "any.valid": "The status should either be pending or delivered. ",
   }),
 });
+
+exports.shipmentModeSchema = Joi.object({
+  mode: Joi.string().valid("bus", "train", "truck", "others").messages({
+    "string.empty": "The mode should not be empty",
+    "any.valid": "The mode should be bus,truck,train or others",
+  }),
+});
