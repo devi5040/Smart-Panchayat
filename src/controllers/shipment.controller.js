@@ -75,6 +75,24 @@ exports.getShipmentForShops = async (req, res) => {
     logger.error(
       `Internal error while fetching the shipment data for shops: ${shopId}`
     );
+    res.status(status).json({
+      message:
+        "⚠️ An internal error occurred while fetching the shipment data for shops. Please try again later.",
+      error: error.message,
+    });
+  }
+};
+
+exports.getShipmentByStatus = async (req, res) => {
+  const { status } = req.params;
+  try {
+    const shipment = await shipmentServices.getShipmentsByStatus(status);
+    res
+      .status(200)
+      .json({ message: "Shipment fetched successfully!", shipment });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while fetching shipment by status: ${status}`);
     res
       .status(status)
       .json({
