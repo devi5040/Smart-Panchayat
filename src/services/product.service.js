@@ -8,7 +8,7 @@
  * @updated August 26, 2025
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
-const { Products, ShopProducts, Category } = require("../models");
+const { Products, ShopProducts, Category, Shops } = require("../models");
 const {
   NotFoundError,
   BadRequestError,
@@ -207,5 +207,54 @@ exports.deleteProduct = async (productId) => {
     return true;
   } catch (error) {
     throw error;
+  }
+};
+
+exports.addProductShop = async (
+  quantity,
+  price,
+  quality,
+  shopId,
+  productId,
+  name,
+  image = process.env.DEFAULT_PRODUCT_IMAGE,
+  categoryId
+) => {
+  console.log(
+    `${quantity}, ${price}, ${quality}, ${shopId},${name}, ${image}, ${productId}, ${categoryId}`
+  );
+  const shop = await Shops.findByPk(shopId);
+  if (!shop) throw new NotFoundError("Shop not found!");
+  const product = await Products.findByPk(productId);
+  console.log(`${JSON.stringify(shop)}`);
+  console.log(`${JSON.stringify(product)}`);
+  if (!product && productId) throw new NotFoundError("Product not found!");
+  if (!productId) {
+    const productData = await Products.create({
+      name,
+      price,
+      image,
+      categoryId,
+    });
+    const shopProductData = await ShopProducts.create({
+      quantity,
+      price,
+      quality,
+      shopId,
+      productId: productData.id,
+    });
+    return shopProductData;
+  } else {
+    console.log(
+      `inserting ${quality}, ${quantity}, ${price}, ${shopId}, ${productId}`
+    );
+    const shopProduct = await ShopProducts.create({
+      quality,
+      quantity,
+      price,
+      shopId,
+      productId,
+    });
+    return shopProduct;
   }
 };
