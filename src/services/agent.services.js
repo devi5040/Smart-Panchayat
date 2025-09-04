@@ -6,17 +6,19 @@ exports.addAgent = async (
   name,
   latitude,
   longitude,
-  language
+  languagePreference
 ) => {
-  const userExist = await Users.findOne({ where: { mobileNumber } });
+  const userExist = await Users.findOne({
+    where: { phone_number: mobileNumber },
+  });
   if (userExist) throw new ConflictError("User already exists");
   const user = await Users.create({
-    mobileNumber,
-    name,
+    phone_number: mobileNumber,
+    user_name: name,
     latitude,
     longitude,
-    language_preference: language,
-    role: "agent",
+    language_preference: languagePreference,
+    user_role: "agent",
   });
   if (!user) throw new Error("User not created");
   return user;
