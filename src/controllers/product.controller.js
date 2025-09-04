@@ -268,3 +268,38 @@ exports.deleteProduct = async (req, res) => {
     });
   }
 };
+
+exports.addShopProduct = async (req, res) => {
+  const {
+    quality,
+    quantity,
+    name,
+    price,
+    image,
+    categoryId,
+    shopId,
+    productId,
+  } = req.body;
+  try {
+    const product = await productServices.addProductShop(
+      quantity,
+      price,
+      quality,
+      shopId,
+      productId,
+      name,
+      image,
+      categoryId
+    );
+    res.status(201).json({ message: "Product created successfully!", product });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while creating product for shop: ${error}`);
+    res
+      .status(status)
+      .json({
+        message: "Internal error while creating product",
+        error: error.message,
+      });
+  }
+};
