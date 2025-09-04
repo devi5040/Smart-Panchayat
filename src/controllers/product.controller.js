@@ -295,10 +295,29 @@ exports.addShopProduct = async (req, res) => {
   } catch (error) {
     const status = error.statusCode || 500;
     logger.error(`Internal error while creating product for shop: ${error}`);
+    res.status(status).json({
+      message: "Internal error while creating product",
+      error: error.message,
+    });
+  }
+};
+
+exports.updateProductPrice = async (req, res) => {
+  const { productId } = req.params;
+  const { price } = req.body;
+  try {
+    const product = await productServices.updateProductPrice(productId, price);
+    res
+      .status(200)
+      .json({ message: "Product price updated successfully!", product });
+  } catch (error) {
+    const status = req.statusCode || 500;
+    logger.error(`Internal error while updating the product price: ${error}`);
     res
       .status(status)
       .json({
-        message: "Internal error while creating product",
+        message:
+          "Internal error while updating the product price. Please try again later!",
         error: error.message,
       });
   }
