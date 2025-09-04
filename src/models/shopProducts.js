@@ -43,6 +43,10 @@ const ShopProducts = sequelize.define(
       allowNull: false,
       defaultValue: "medium",
     },
+    date: {
+      type: Sequelize.DATE,
+      defaultValue: Date.now(),
+    },
   },
   { indexes: [] }
 );
