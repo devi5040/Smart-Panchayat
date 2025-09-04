@@ -37,4 +37,5 @@ exports.productShopSchema = Joi.object({
   shopId: Joi.number().required(),
   productId: Joi.number(),
   categoryId: Joi.number(),
+  date: Joi.date(),
 });

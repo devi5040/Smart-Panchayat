@@ -225,7 +225,16 @@ exports.addProductShop = async (
   if (!shop) throw new NotFoundError("Shop not found!");
   const product = await Products.findByPk(productId);
   if (!product && productId) throw new NotFoundError("Product not found!");
+  if (productId) {
+    const sp = await ShopProducts.findOne({ where: { productId, shopId } });
+    if (sp)
+      throw new ConflictError(
+        "Product already exists in the shop please update it"
+      );
+  }
   if (!productId) {
+    const existProduct = await Products.findOne({ where: { name } });
+    if (existProduct) throw new ConflictError("Product already exists");
     const productData = await Products.create({
       name,
       price,
@@ -267,4 +276,16 @@ exports.updateProductPrice = async (productId, price) => {
   if (numRowsUpdated == 0) throw new NotFoundError("No rows updated!");
   const productData = await Products.findByPk(productId);
   return productData;
+};
+
+exports.updateShopProducts = async (
+  quantity,
+  quality,
+  price,
+  image,
+  shopId,
+  productId,
+  date
+) => {
+  const shopProducts = await ShopProducts.find;
 };
