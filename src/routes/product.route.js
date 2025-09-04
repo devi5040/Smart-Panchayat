@@ -158,12 +158,24 @@ router.get("/:productId", authentication, productController.getProductDetails);
  *         description: Unauthorized
  */
 router.post(
+  "/shop",
+  validate(productValidator.productShopSchema),
+  productController.addShopProduct
+);
+router.post(
   "/",
   authentication,
   validate(productValidator.productValidation),
   productController.addProduct
 );
 
+router.patch("/shop/:productId", productController.updateProductPrice);
+
+router.put(
+  "/shop/:shopProductId",
+  validate(productValidator.updateProductShopSchema),
+  productController.updateShopProduct
+);
 /**
  * @swagger
  * /{shopProductId}/status:

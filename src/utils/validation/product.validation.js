@@ -27,3 +27,22 @@ exports.statusValidation = Joi.object({
     "string.valid": "Status should be accepted,rejected or pending.",
   }),
 });
+
+exports.productShopSchema = Joi.object({
+  name: Joi.string(),
+  quality: Joi.string().valid("premium", "high", "medium"),
+  quantity: Joi.number().min(1).required(),
+  image: Joi.string().uri(),
+  price: Joi.number().min(1).required(),
+  shopId: Joi.number().required(),
+  productId: Joi.number(),
+  categoryId: Joi.number(),
+  date: Joi.date(),
+});
+
+exports.updateProductShopSchema = Joi.object({
+  quality: Joi.string().valid("premium", "high", "medium"),
+  quantity: Joi.number().min(1).required(),
+  price: Joi.number().min(1).required(),
+  date: Joi.date(),
+});

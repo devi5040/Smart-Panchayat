@@ -5,6 +5,7 @@ const productRoutes = require("./product.route");
 const shopRoutes = require("./shop.route");
 const orderRoutes = require("./order.route");
 const shipmentRoutes = require("./shipment.route");
+const agentRoutes = require("./agent.route");
 
 router.use("/user", userRoutes);
 
@@ -17,5 +18,7 @@ router.use("/shop", shopRoutes);
 router.use("/order", orderRoutes);
 
 router.use("/shipment", shipmentRoutes);
+
+router.use("/agent", agentRoutes);
 
 module.exports = router;

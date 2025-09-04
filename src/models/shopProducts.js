@@ -10,37 +10,45 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../config/db");
 
-const ShopProducts = sequelize.define("shop-products", {
-  id: {
-    type: Sequelize.INTEGER,
-    primaryKey: true,
-    allowNull: false,
-    autoIncrement: true,
-  },
-  quantity: {
-    type: Sequelize.INTEGER,
-    allowNull: false,
-    validate: {
-      min: 0,
+const ShopProducts = sequelize.define(
+  "shop-products",
+  {
+    id: {
+      type: Sequelize.INTEGER,
+      primaryKey: true,
+      allowNull: false,
+      autoIncrement: true,
+    },
+    quantity: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      validate: {
+        min: 0,
+      },
+    },
+    status: {
+      type: Sequelize.ENUM("accepted", "rejected", "pending"),
+      allowNull: false,
+      defaultValue: "pending",
+    },
+    price: {
+      type: Sequelize.DECIMAL(10, 2),
+      allowNull: false,
+      validate: {
+        min: 0.01,
+      },
+    },
+    quality: {
+      type: Sequelize.ENUM("premium", "medium", "low"),
+      allowNull: false,
+      defaultValue: "medium",
+    },
+    date: {
+      type: Sequelize.DATE,
+      defaultValue: Date.now(),
     },
   },
-  status: {
-    type: Sequelize.ENUM("accepted", "rejected", "pending"),
-    allowNull: false,
-    defaultValue: "pending",
-  },
-  price: {
-    type: Sequelize.DECIMAL(10, 2),
-    allowNull: false,
-    validate: {
-      min: 0.01,
-    },
-  },
-  quality: {
-    type: Sequelize.ENUM("premium", "medium", "low"),
-    allowNull: false,
-    defaultValue: "medium",
-  },
-});
+  { indexes: [] }
+);
 
 module.exports = ShopProducts;

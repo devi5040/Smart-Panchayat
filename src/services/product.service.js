@@ -8,11 +8,12 @@
  * @updated August 26, 2025
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
-const { Products, ShopProducts, Category } = require("../models");
+const { Products, ShopProducts, Category, Shops } = require("../models");
 const {
   NotFoundError,
   BadRequestError,
   ConflictError,
+  NoContentError,
 } = require("../utils/error");
 
 /**
@@ -208,4 +209,96 @@ exports.deleteProduct = async (productId) => {
   } catch (error) {
     throw error;
   }
+};
+
+exports.addProductShop = async (
+  quantity,
+  price,
+  quality,
+  shopId,
+  productId,
+  name,
+  image = process.env.DEFAULT_PRODUCT_IMAGE,
+  categoryId,
+  date
+) => {
+  const shop = await Shops.findByPk(shopId);
+  if (!shop) throw new NotFoundError("Shop not found!");
+  const product = await Products.findByPk(productId);
+  if (!product && productId) throw new NotFoundError("Product not found!");
+  if (productId) {
+    const sp = await ShopProducts.findOne({ where: { productId, shopId } });
+    if (sp)
+      throw new ConflictError(
+        "Product already exists in the shop please update it"
+      );
+  }
+  if (!productId) {
+    const existProduct = await Products.findOne({ where: { name } });
+    if (existProduct) throw new ConflictError("Product already exists");
+    const productData = await Products.create({
+      name,
+      price,
+      image,
+      categoryId,
+    });
+    const shopProductData = await ShopProducts.create({
+      quantity,
+      price,
+      quality,
+      shopId,
+      productId: productData.id,
+      date,
+    });
+    return shopProductData;
+  } else {
+    console.log(
+      `inserting ${quality}, ${quantity}, ${price}, ${shopId}, ${productId}`
+    );
+    const shopProduct = await ShopProducts.create({
+      quality,
+      quantity,
+      price,
+      shopId,
+      productId,
+      date,
+    });
+    return shopProduct;
+  }
+};
+
+exports.updateProductPrice = async (productId, price) => {
+  const product = await Products.findByPk(productId);
+  if (!product) throw new NotFoundError("Product not found!");
+  const [numRowsUpdated] = await Products.update(
+    { price },
+    { where: { id: productId } }
+  );
+  if (numRowsUpdated == 0) throw new NotFoundError("No rows updated!");
+  const productData = await Products.findByPk(productId);
+  return productData;
+};
+
+exports.updateShopProducts = async (
+  quantity,
+  quality,
+  price,
+  date,
+  shopProductId
+) => {
+  const shopProducts = await ShopProducts.findByPk(shopProductId);
+  if (!shopProducts) throw new NotFoundError("Shop products not found!");
+  const [numRowsUpdated] = await ShopProducts.update(
+    {
+      quantity,
+      quality,
+      price,
+      date,
+      status: "pending",
+    },
+    { where: { id: shopProductId } }
+  );
+  if (numRowsUpdated == 0) throw new NoContentError("No rows updated!");
+  const products = await ShopProducts.findByPk(shopProductId);
+  return products;
 };

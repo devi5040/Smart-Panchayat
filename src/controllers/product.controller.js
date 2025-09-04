@@ -268,3 +268,83 @@ exports.deleteProduct = async (req, res) => {
     });
   }
 };
+
+exports.addShopProduct = async (req, res) => {
+  const {
+    quality,
+    quantity,
+    name,
+    price,
+    image,
+    categoryId,
+    shopId,
+    productId,
+    date,
+  } = req.body;
+  try {
+    const product = await productServices.addProductShop(
+      quantity,
+      price,
+      quality,
+      shopId,
+      productId,
+      name,
+      image,
+      categoryId,
+      date
+    );
+    res.status(201).json({ message: "Product created successfully!", product });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while creating product for shop: ${error}`);
+    res.status(status).json({
+      message: "Internal error while creating product",
+      error: error.message,
+    });
+  }
+};
+
+exports.updateProductPrice = async (req, res) => {
+  const { productId } = req.params;
+  const { price } = req.body;
+  try {
+    const product = await productServices.updateProductPrice(productId, price);
+    res
+      .status(200)
+      .json({ message: "Product price updated successfully!", product });
+  } catch (error) {
+    const status = req.statusCode || 500;
+    logger.error(`Internal error while updating the product price: ${error}`);
+    res.status(status).json({
+      message:
+        "Internal error while updating the product price. Please try again later!",
+      error: error.message,
+    });
+  }
+};
+
+exports.updateShopProduct = async (req, res) => {
+  const { shopProductId } = req.params;
+  const { quality, quantity, date, price } = req.body;
+  try {
+    const data = await productServices.updateShopProducts(
+      quantity,
+      quality,
+      price,
+      date,
+      shopProductId
+    );
+    res
+      .status(200)
+      .json({ message: "Shop products updated successfully!", data });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while updating the shop products: ${error}`);
+    res
+      .status(status)
+      .json({
+        message: "Internal error while updating the shop products.",
+        error: error.message,
+      });
+  }
+};
