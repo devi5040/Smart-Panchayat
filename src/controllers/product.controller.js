@@ -279,6 +279,7 @@ exports.addShopProduct = async (req, res) => {
     categoryId,
     shopId,
     productId,
+    date,
   } = req.body;
   try {
     const product = await productServices.addProductShop(
@@ -289,7 +290,8 @@ exports.addShopProduct = async (req, res) => {
       productId,
       name,
       image,
-      categoryId
+      categoryId,
+      date
     );
     res.status(201).json({ message: "Product created successfully!", product });
   } catch (error) {
@@ -313,12 +315,10 @@ exports.updateProductPrice = async (req, res) => {
   } catch (error) {
     const status = req.statusCode || 500;
     logger.error(`Internal error while updating the product price: ${error}`);
-    res
-      .status(status)
-      .json({
-        message:
-          "Internal error while updating the product price. Please try again later!",
-        error: error.message,
-      });
+    res.status(status).json({
+      message:
+        "Internal error while updating the product price. Please try again later!",
+      error: error.message,
+    });
   }
 };
