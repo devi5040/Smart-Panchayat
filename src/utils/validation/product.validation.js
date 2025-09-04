@@ -39,3 +39,10 @@ exports.productShopSchema = Joi.object({
   categoryId: Joi.number(),
   date: Joi.date(),
 });
+
+exports.updateProductShopSchema = Joi.object({
+  quality: Joi.string().valid("premium", "high", "medium"),
+  quantity: Joi.number().min(1).required(),
+  price: Joi.number().min(1).required(),
+  date: Joi.date(),
+});

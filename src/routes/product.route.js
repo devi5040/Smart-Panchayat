@@ -171,6 +171,11 @@ router.post(
 
 router.patch("/shop/:productId", productController.updateProductPrice);
 
+router.put(
+  "/shop/:shopProductId",
+  validate(productValidator.updateProductShopSchema),
+  productController.updateShopProduct
+);
 /**
  * @swagger
  * /{shopProductId}/status:
