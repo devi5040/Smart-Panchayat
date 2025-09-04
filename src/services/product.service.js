@@ -218,16 +218,12 @@ exports.addProductShop = async (
   productId,
   name,
   image = process.env.DEFAULT_PRODUCT_IMAGE,
-  categoryId
+  categoryId,
+  date
 ) => {
-  console.log(
-    `${quantity}, ${price}, ${quality}, ${shopId},${name}, ${image}, ${productId}, ${categoryId}`
-  );
   const shop = await Shops.findByPk(shopId);
   if (!shop) throw new NotFoundError("Shop not found!");
   const product = await Products.findByPk(productId);
-  console.log(`${JSON.stringify(shop)}`);
-  console.log(`${JSON.stringify(product)}`);
   if (!product && productId) throw new NotFoundError("Product not found!");
   if (!productId) {
     const productData = await Products.create({
@@ -242,6 +238,7 @@ exports.addProductShop = async (
       quality,
       shopId,
       productId: productData.id,
+      date,
     });
     return shopProductData;
   } else {
@@ -254,6 +251,7 @@ exports.addProductShop = async (
       price,
       shopId,
       productId,
+      date,
     });
     return shopProduct;
   }
