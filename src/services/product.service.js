@@ -258,3 +258,15 @@ exports.addProductShop = async (
     return shopProduct;
   }
 };
+
+exports.updateProductPrice = async (productId, price) => {
+  const product = await Products.findByPk(productId);
+  if (!product) throw new NotFoundError("Product not found!");
+  const [numRowsUpdated] = await Products.update(
+    { price },
+    { where: { id: productId } }
+  );
+  if (numRowsUpdated == 0) throw new NotFoundError("No rows updated!");
+  const productData = await Products.findByPk(productId);
+  return productData;
+};
