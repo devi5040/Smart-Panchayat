@@ -23,3 +23,19 @@ exports.createAgent = async (req, res) => {
     });
   }
 };
+
+exports.removeAgent = async (req, res) => {
+  const { agentId } = req.params;
+  try {
+    const success = await agentServices.removeAgent(agentId);
+    res.status(200).json({ message: "Agent successfully removed!", success });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while removing the agent: ${error}`);
+    res.status(status).json({
+      message:
+        "⚠️ An internal error occurred while removing the agent. Please try again later!",
+      error: error.message,
+    });
+  }
+};
