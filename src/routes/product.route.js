@@ -158,6 +158,11 @@ router.get("/:productId", authentication, productController.getProductDetails);
  *         description: Unauthorized
  */
 router.post(
+  "/shop",
+  validate(productValidator.productShopSchema),
+  productController.addShopProduct
+);
+router.post(
   "/",
   authentication,
   validate(productValidator.productValidation),
