@@ -11,6 +11,8 @@ router.post(
   agentController.createAgent
 );
 
+router.patch("/:userId", agentController.changeRoleToAgent);
+
 router.delete("/:agentId", agentController.removeAgent);
 
 module.exports = router;
