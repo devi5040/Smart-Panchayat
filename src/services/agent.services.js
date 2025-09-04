@@ -1,5 +1,9 @@
 const { Users } = require("../models");
-const { ConflictError, NotFoundError } = require("../utils/error");
+const {
+  ConflictError,
+  NotFoundError,
+  NoContentError,
+} = require("../utils/error");
 
 exports.addAgent = async (
   mobileNumber,
@@ -32,4 +36,24 @@ exports.removeAgent = async (agentId) => {
   const numRowsDeleted = await Users.destroy({ where: { id: agentId } });
   if (numRowsDeleted === 0) throw new NotFoundError("Agent is not deleted!");
   return true;
+};
+
+exports.changeToAgent = async (userId) => {
+  const user = await Users.findByPk(userId);
+  if (!user) throw new NotFoundError("User not found!");
+  const [numRowsUpdated] = await Users.update(
+    { user_role: "agent" },
+    { where: { id: userId } }
+  );
+  if (numRowsUpdated == 0) throw new NoContentError("No rows updated!");
+  const data = await Users.findByPk(userId, {
+    attributes: [
+      "id",
+      "user_name",
+      "phone_number",
+      "user_role",
+      "language_preference",
+    ],
+  });
+  return data;
 };
