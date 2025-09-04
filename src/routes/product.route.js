@@ -169,6 +169,8 @@ router.post(
   productController.addProduct
 );
 
+router.patch("/shop/:productId", productController.updateProductPrice);
+
 /**
  * @swagger
  * /{shopProductId}/status:
