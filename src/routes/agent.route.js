@@ -11,4 +11,6 @@ router.post(
   agentController.createAgent
 );
 
+router.delete("/:agentId", agentController.removeAgent);
+
 module.exports = router;
