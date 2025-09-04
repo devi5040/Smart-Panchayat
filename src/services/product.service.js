@@ -13,6 +13,7 @@ const {
   NotFoundError,
   BadRequestError,
   ConflictError,
+  NoContentError,
 } = require("../utils/error");
 
 /**
@@ -282,10 +283,22 @@ exports.updateShopProducts = async (
   quantity,
   quality,
   price,
-  image,
-  shopId,
-  productId,
-  date
+  date,
+  shopProductId
 ) => {
-  const shopProducts = await ShopProducts.find;
+  const shopProducts = await ShopProducts.findByPk(shopProductId);
+  if (!shopProducts) throw new NotFoundError("Shop products not found!");
+  const [numRowsUpdated] = await ShopProducts.update(
+    {
+      quantity,
+      quality,
+      price,
+      date,
+      status: "pending",
+    },
+    { where: { id: shopProductId } }
+  );
+  if (numRowsUpdated == 0) throw new NoContentError("No rows updated!");
+  const products = await ShopProducts.findByPk(shopProductId);
+  return products;
 };
