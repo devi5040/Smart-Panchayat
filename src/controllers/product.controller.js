@@ -322,3 +322,29 @@ exports.updateProductPrice = async (req, res) => {
     });
   }
 };
+
+exports.updateShopProduct = async (req, res) => {
+  const { shopProductId } = req.params;
+  const { quality, quantity, date, price } = req.body;
+  try {
+    const data = await productServices.updateShopProducts(
+      quantity,
+      quality,
+      price,
+      date,
+      shopProductId
+    );
+    res
+      .status(200)
+      .json({ message: "Shop products updated successfully!", data });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while updating the shop products: ${error}`);
+    res
+      .status(status)
+      .json({
+        message: "Internal error while updating the shop products.",
+        error: error.message,
+      });
+  }
+};
