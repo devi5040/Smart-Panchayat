@@ -34,10 +34,7 @@ const Users = sequelize.define("users", {
   },
   user_name: {
     type: Sequelize.STRING(100),
-    allowNull: false,
-    validate: {
-      notEmpty: true,
-    },
+    allowNull: true,
   },
   home_address: {
     type: Sequelize.STRING(255),

@@ -11,7 +11,6 @@
 
 const s3 = require("../config/aws/aws.s3.config");
 const { Users } = require("../models");
-const logger = require("../utils/logger");
 const admin = require("firebase-admin");
 const { encryptPassword, comparePasswords } = require("../utils/hashPassword");
 const { NotFoundError, BadRequestError } = require("../utils/error");
@@ -46,6 +45,7 @@ exports.addUser = async ({
     longitude,
     role,
   });
+  return data;
 };
 
 exports.getUserByMobileNumber = async (mobileNumber) => {
@@ -202,4 +202,15 @@ exports.getUserByRole = async (role) => {
   const users = await Users.findAll({ where: { user_role: role } });
   if (!users) throw new Error("Users data is invalid");
   return users;
+};
+
+exports.verifyUser = async (decodedToken) => {
+  let user = await Users.findOne({ where: { firebaseUid: decodedToken.uid } });
+  if (!user) {
+    user = await Users.create({
+      firebaseUid: decodedToken.uid,
+      phone_number: decodedToken.phone_number,
+    });
+  }
+  return user;
 };

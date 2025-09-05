@@ -9,7 +9,7 @@
  */
 const admin = require("../config/firebase/firebase_config");
 const logger = require("../utils/logger");
-const { getUserByMobileNumber } = require("../services/user.services");
+const { verifyUser } = require("../services/user.services");
 const { getShopIdbyUserId } = require("../services/shop.service");
 
 const firebaseAuthMiddleware = async (req, res, next) => {
@@ -21,7 +21,7 @@ const firebaseAuthMiddleware = async (req, res, next) => {
         headers: req.headers,
       }}`
     );
-    res
+    return res
       .status(401)
       .json({ message: "Unauthorized: No token provided or invalid token" });
   }
@@ -30,7 +30,7 @@ const firebaseAuthMiddleware = async (req, res, next) => {
 
   try {
     const decodedToken = await admin.auth().verifyIdToken(idToken, true);
-    const user = await getUserByMobileNumber(decodedToken.phone_number);
+    const user = await verifyUser(decodedToken);
     req.user = { id: user.id, role: user.user_role };
     if (user.user_role === "shop") {
       const shop = await getShopIdbyUserId(user.id);
@@ -39,7 +39,7 @@ const firebaseAuthMiddleware = async (req, res, next) => {
     next();
   } catch (error) {
     logger.error(`Invalid or expired token: ${error}`);
-    res.status(500).json({ message: "Unauthorized: Invalid token" });
+    res.status(401).json({ message: "Unauthorized: Invalid or expired token" });
   }
 };
 
