@@ -59,15 +59,55 @@ Smart Panchayat is a comprehensive platform designed to streamline and optimize 
 ## 📂 Project Structure
 ```bash
 Smart-Panchayat/
-├── config/              # Database & Firebase configuration
-├── migrations/          # Sequelize migration files
-├── models/              # Sequelize models
-├── services/            # Business logic
-├── middleware/          # Auth & custom middlewares
-├── utils/               # Utility functions (e.g., logger)
-├── seeders/             # Sequelize seeders
-├── app.js               # Express app entry point
-└── package.json
+├── src/                          
+│   ├── config/                   # Database & Firebase config
+│   │   ├── db.js                 # Sequelize config
+│   │   ├── firebase/             # Firebase setup
+│   │   │   └── firebase_config.js
+│   │   └── index.js              # Central config export
+│   │
+│   ├── migrations/               # Sequelize migration files
+│   ├── seeders/                  # Sequelize seeders
+│   ├── models/                   # Sequelize models
+│   │   └── index.js              # Model associations setup
+│   │
+│   ├── services/                 # Business logic
+│   │   ├── user.service.js
+│   │   ├── shop.service.js
+│   │   └── ...
+│   │
+│   ├── controllers/              # Route handlers (calls services)
+│   │   ├── user.controller.js
+│   │   ├── shop.controller.js
+│   │   └── ...
+│   │
+│   ├── routes/                   # Express routes
+│   │   ├── user.routes.js
+│   │   ├── shop.routes.js
+│   │   └── index.js              # Register all routes
+│   │
+│   ├── middleware/               # Express middlewares
+│   │   ├── firebaseAuth.js
+│   │   ├── errorHandler.js
+│   │   └── ...
+│   │
+│   ├── utils/                    # Utilities
+│   │   ├── logger.js
+│   │   └── response.js
+│   │
+│   ├── tests/                    # Unit & integration tests
+│   │   ├── controllers/
+│   │   ├── services/
+│   │   └── utils/
+│   │
+│   └── app.js                    # Express app entry point
+│
+├── .eslintrc.cjs                 # ESLint config
+├── .prettierrc                   # Prettier config
+├── .gitignore
+├── package.json
+└── README.md
+
 ```
 
 ---
