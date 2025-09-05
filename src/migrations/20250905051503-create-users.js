@@ -16,6 +16,11 @@ module.exports = {
         autoIncrement: true,
         primaryKey: true,
       },
+      firebaseUid: {
+        type: Sequelize.STRING(255),
+        unique: true,
+        allowNull: false,
+      },
       phone_number: {
         type: Sequelize.STRING(20),
         unique: true,
