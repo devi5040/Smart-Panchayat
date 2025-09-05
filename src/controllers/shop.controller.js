@@ -129,10 +129,10 @@ exports.updateShopDetails = async (req, res) => {
  */
 exports.addRemarks = async (req, res) => {
   const { shipmentId } = req.params;
-  const { remarks } = req.body;
+  const { remarks, shopId } = req.body;
   try {
     /** @type {Object} shipment - The updated shipment object including remarks. */
-    const shipment = await shopServices.addRemarksToShipments(shipmentId, remarks);
+    const shipment = await shopServices.addRemarksToShipments(shopId, shipmentId, remarks);
     res.status(200).json({
       message: '✅ Remarks added to the shipment successfully!',
       shipment,
