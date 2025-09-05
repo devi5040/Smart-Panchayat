@@ -8,11 +8,11 @@
  * @updated August 22, 2025
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
-const Sequelize = require("sequelize");
+const Sequelize = require('sequelize');
 
-const sequelize = require("../config/db");
+const sequelize = require('../config/db');
 
-const Category = sequelize.define("category", {
+const Category = sequelize.define('category', {
   id: {
     type: Sequelize.INTEGER,
     allowNull: false,
@@ -28,6 +28,7 @@ const Category = sequelize.define("category", {
     validate: {
       isUrl: true,
     },
+    defaultValue: process.env.DEFAULT_CATEGORY_IMAGE,
   },
 });
 

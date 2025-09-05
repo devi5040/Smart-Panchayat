@@ -9,10 +9,10 @@
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
 
-const Sequelize = require("sequelize");
-const sequelize = require("../config/db");
+const Sequelize = require('sequelize');
+const sequelize = require('../config/db');
 
-const ShipmentShopProducts = sequelize.define("shipment-shop-products", {
+const ShipmentShopProducts = sequelize.define('shipment-shop-products', {
   id: {
     type: Sequelize.INTEGER,
     allowNull: false,

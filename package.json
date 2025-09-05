@@ -11,6 +11,7 @@
     "mysql2": "^3.14.3",
     "nodemon": "^3.1.10",
     "sequelize": "^6.37.7",
+    "sequelize-cli": "^6.6.3",
     "winston": "^3.17.0"
   },
   "name": "smart-panchayat",
@@ -20,7 +21,16 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "jest --detectOpenHandles --forceExit"
+    "test": "jest --detectOpenHandles --forceExit",
+    "db:create": "sequelize-cli db:create",
+    "db:drop": "sequelize-cli db:drop",
+    "migrate": "sequelize-cli db:migrate",
+    "migrate:undo": "sequelize-cli db:migrate:undo",
+    "seed": "sequelize-cli db:seed:all",
+    "seed:undo": "sequelize-cli db:seed:undo:all",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "eslint . --ext .js --fix",
+    "format": "prettier --write ."
   },
   "repository": {
     "type": "git",
@@ -33,7 +43,15 @@
   },
   "homepage": "https://github.com/devi5040/Smart-Panchayat#readme",
   "devDependencies": {
+    "@eslint/js": "^9.34.0",
+    "@eslint/json": "^0.13.2",
+    "@eslint/markdown": "^7.2.0",
+    "eslint": "^9.34.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "globals": "^16.3.0",
     "jest": "^30.0.5",
+    "prettier": "^3.6.2",
     "supertest": "^7.1.4"
   }
 }

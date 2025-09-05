@@ -8,13 +8,13 @@
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
 
-const express = require("express");
+const express = require('express');
 const router = express.Router(); // Use express.Router() for better modularity
 
-const agentController = require("../controllers/agent.controller");
+const agentController = require('../controllers/agent.controller');
 
-const validate = require("../middleware/validation.middleware");
-const schema = require("../utils/validation/user.validate");
+const validate = require('../middleware/validation.middleware');
+const schema = require('../utils/validation/user.validate');
 
 /**
  * @route POST /
@@ -28,9 +28,9 @@ const schema = require("../utils/validation/user.validate");
  * @see {@link agentController.createAgent}
  */
 router.post(
-  "/",
+  '/',
   validate(schema.createUserDataSchema), // Validates the request body against the specified schema before hitting the controller
-  agentController.createAgent
+  agentController.createAgent,
 );
 
 /**
@@ -44,7 +44,7 @@ router.post(
  * @returns {object} - On success, may return updated user data or a success message. Error responses are determined by agentController.changeRoleToAgent.
  * @see {@link agentController.changeRoleToAgent}
  */
-router.patch("/:userId", agentController.changeRoleToAgent);
+router.patch('/:userId', agentController.changeRoleToAgent);
 
 /**
  * @route DELETE /:agentId
@@ -57,6 +57,6 @@ router.patch("/:userId", agentController.changeRoleToAgent);
  * @returns {object} - On success, may return a success message or confirmation. Error responses are handled by agentController.removeAgent.
  * @see {@link agentController.removeAgent}
  */
-router.delete("/:agentId", agentController.removeAgent);
+router.delete('/:agentId', agentController.removeAgent);
 
 module.exports = router;

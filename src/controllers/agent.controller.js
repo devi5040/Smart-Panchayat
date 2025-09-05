@@ -8,8 +8,8 @@
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
 
-const agentServices = require("../services/agent.services");
-const logger = require("../utils/logger");
+const agentServices = require('../services/agent.services');
+const logger = require('../utils/logger');
 
 /**
  * Creates a new agent.
@@ -26,8 +26,7 @@ const logger = require("../utils/logger");
  * @returns {Promise<void>}
  */
 exports.createAgent = async (req, res) => {
-  const { mobileNumber, name, latitude, longitude, languagePreference } =
-    req.body;
+  const { mobileNumber, name, latitude, longitude, languagePreference } = req.body;
   try {
     /** @type {import('../models/agent').Agent} user - The newly created agent object from the database (a Sequelize instance). */
     const user = await agentServices.addAgent(
@@ -35,17 +34,14 @@ exports.createAgent = async (req, res) => {
       name,
       latitude,
       longitude,
-      languagePreference
+      languagePreference,
     );
-    res
-      .status(201)
-      .json({ message: "Agent created successfully!", user: user.toJSON() }); // Use toJSON() for safer JSON serialization
+    res.status(201).json({ message: 'Agent created successfully!', user: user.toJSON() }); // Use toJSON() for safer JSON serialization
   } catch (error) {
     const status = error.statusCode || 500;
     logger.error(`Internal error while creating agent: ${error}`);
     res.status(status).json({
-      message:
-        "⚠️ An internal error occurred while creating the agent. Please try again later.",
+      message: '⚠️ An internal error occurred while creating the agent. Please try again later.',
       error: error.message,
     });
   }
@@ -66,13 +62,12 @@ exports.removeAgent = async (req, res) => {
   try {
     /** @type {boolean} success - True if the agent was successfully removed, false otherwise. */
     const success = await agentServices.removeAgent(agentId);
-    res.status(200).json({ message: "Agent successfully removed!", success });
+    res.status(200).json({ message: 'Agent successfully removed!', success });
   } catch (error) {
     const status = error.statusCode || 500;
     logger.error(`Internal error while removing the agent: ${error}`);
     res.status(status).json({
-      message:
-        "⚠️ An internal error occurred while removing the agent. Please try again later!",
+      message: '⚠️ An internal error occurred while removing the agent. Please try again later!',
       error: error.message,
     });
   }
@@ -94,14 +89,14 @@ exports.changeRoleToAgent = async (req, res) => {
     /** @type {import('../models/user').User} user - The updated user object from the database (a Sequelize instance) after role change. */
     const user = await agentServices.changeToAgent(userId);
     res.status(200).json({
-      message: "Change role to agent successfully!",
+      message: 'Change role to agent successfully!',
       user: user.toJSON(),
     }); // Use toJSON() for safer JSON serialization
   } catch (error) {
     const status = error.statusCode || 500;
     logger.error(`Internal error while changing user role to agent: ${error}`);
     res.status(status).json({
-      message: "Internal error while changing user role",
+      message: 'Internal error while changing user role',
       error: error.message,
     });
   }

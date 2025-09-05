@@ -11,12 +11,12 @@
  */
 
 // Importing required packages
-require("dotenv").config();
-const express = require("express");
-const helmet = require("helmet");
-const morgan = require("morgan");
-const logger = require("./utils/logger");
-const routes = require("./routes");
+require('dotenv').config();
+const express = require('express');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const logger = require('./utils/logger');
+const routes = require('./routes');
 
 const app = express();
 
@@ -27,21 +27,19 @@ app.use(express.json());
 app.use(helmet());
 // stream morgan logs to winston's http level
 app.use(
-  morgan("combined", {
+  morgan('combined', {
     stream: {
       write: (message) => logger.http(message.trim()),
     },
-  })
+  }),
 );
-app.use("/api/v1/", routes);
+app.use('/api/v1/', routes);
 
 // ===============
 // health check endpoint
 // ===============
-app.get("/health", (req, res) => {
-  res
-    .status(200)
-    .json({ status: "OK", uptime: process.uptime, timestamp: new Date() });
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK', uptime: process.uptime, timestamp: new Date() });
 });
 
 module.exports = app;

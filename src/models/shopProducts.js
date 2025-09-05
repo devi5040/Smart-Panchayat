@@ -7,11 +7,11 @@
  * @created 18-08-2025
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
-const Sequelize = require("sequelize");
-const sequelize = require("../config/db");
+const Sequelize = require('sequelize');
+const sequelize = require('../config/db');
 
 const ShopProducts = sequelize.define(
-  "shop-products",
+  'shop-products',
   {
     id: {
       type: Sequelize.INTEGER,
@@ -27,9 +27,9 @@ const ShopProducts = sequelize.define(
       },
     },
     status: {
-      type: Sequelize.ENUM("accepted", "rejected", "pending"),
+      type: Sequelize.ENUM('accepted', 'rejected', 'pending'),
       allowNull: false,
-      defaultValue: "pending",
+      defaultValue: 'pending',
     },
     price: {
       type: Sequelize.DECIMAL(10, 2),
@@ -39,16 +39,16 @@ const ShopProducts = sequelize.define(
       },
     },
     quality: {
-      type: Sequelize.ENUM("premium", "medium", "low"),
+      type: Sequelize.ENUM('premium', 'medium', 'low'),
       allowNull: false,
-      defaultValue: "medium",
+      defaultValue: 'medium',
     },
     date: {
       type: Sequelize.DATE,
       defaultValue: Date.now(),
     },
   },
-  { indexes: [] }
+  { indexes: [] },
 );
 
 module.exports = ShopProducts;

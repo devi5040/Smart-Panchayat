@@ -8,10 +8,10 @@
  * @created August 19, 2025
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
-const Sequelize = require("sequelize");
-const sequelize = require("../config/db");
+const Sequelize = require('sequelize');
+const sequelize = require('../config/db');
 
-const ShipmentShops = sequelize.define("shipment-shops", {
+const ShipmentShops = sequelize.define('shipment-shops', {
   id: {
     type: Sequelize.INTEGER,
     allowNull: false,
@@ -19,9 +19,9 @@ const ShipmentShops = sequelize.define("shipment-shops", {
     autoIncrement: true,
   },
   status: {
-    type: Sequelize.ENUM("pending", "delivered"),
+    type: Sequelize.ENUM('pending', 'delivered'),
     allowNull: false,
-    defaultValue: "pending",
+    defaultValue: 'pending',
   },
   remarks: {
     type: Sequelize.TEXT,

@@ -8,8 +8,8 @@
  * @updated Sep 01 2025
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
-const shopServices = require("../services/shop.service");
-const logger = require("../utils/logger");
+const shopServices = require('../services/shop.service');
+const logger = require('../utils/logger');
 
 /**
  * Adds a new shop.
@@ -27,22 +27,13 @@ exports.addShop = async (req, res) => {
   const { name, pin_code, latitude, longitude } = req.body;
   try {
     /** @type {Object} shop - The newly created shop object from the service layer.*/
-    const shop = await shopServices.addShop(
-      name,
-      pin_code,
-      latitude,
-      longitude,
-      userId
-    );
-    res
-      .status(201)
-      .json({ message: "Shop has been created successfully! 🚀", shop });
+    const shop = await shopServices.addShop(name, pin_code, latitude, longitude, userId);
+    res.status(201).json({ message: 'Shop has been created successfully! 🚀', shop });
   } catch (error) {
     logger.error(`Internal error while creating the shop: ${error}`);
     const status = error.statusCode || 500;
     res.status(status).json({
-      message:
-        "⚠️ An internal error occurred while creating the shop. Please try again later.",
+      message: '⚠️ An internal error occurred while creating the shop. Please try again later.',
       error: error.message,
     });
   }
@@ -58,12 +49,11 @@ exports.getShops = async (req, res) => {
   try {
     /** @type {Array<Object>} shops - An array of shop objects. */
     const shops = await shopServices.getShops();
-    res.status(200).json({ message: "✅ Shops fetched successfully!", shops });
+    res.status(200).json({ message: '✅ Shops fetched successfully!', shops });
   } catch (error) {
     logger.error(`Internal error while fetching the shops: ${error}`);
     res.status(500).json({
-      message:
-        "⚠️ An internal error occurred while fetching the shops. Please try again later.",
+      message: '⚠️ An internal error occurred while fetching the shops. Please try again later.',
       error: error.message,
     });
   }
@@ -81,15 +71,12 @@ exports.getShopDetails = async (req, res) => {
   try {
     /** @type {Object} shop - The shop object corresponding to the provided shopId. */
     const shop = await shopServices.getShopDetails(shopId);
-    res
-      .status(200)
-      .json({ message: "✅ Shop details fetched successfully!", shop });
+    res.status(200).json({ message: '✅ Shop details fetched successfully!', shop });
   } catch (error) {
     logger.error(`Internal error while fetching shop details: ${error}`);
     const status = error.statusCode || 500;
     res.status(status).json({
-      message:
-        "⚠️ An internal error occurred while fetching shop details. Please try again later.",
+      message: '⚠️ An internal error occurred while fetching shop details. Please try again later.',
       error: error.message,
     });
   }
@@ -119,17 +106,14 @@ exports.updateShopDetails = async (req, res) => {
       name,
       pinCode,
       latitude,
-      longitude
+      longitude,
     );
-    res
-      .status(200)
-      .json({ message: "✅ Shop details updated successfully!", shopDetails });
+    res.status(200).json({ message: '✅ Shop details updated successfully!', shopDetails });
   } catch (error) {
     logger.error(`Internal error while updating the shop: ${error}`);
     const status = error.statusCode || 500;
     res.status(status).json({
-      message:
-        "⚠️ An internal error occurred while updating the shop. Please try again later.",
+      message: '⚠️ An internal error occurred while updating the shop. Please try again later.',
       error: error.message,
     });
   }
@@ -145,25 +129,20 @@ exports.updateShopDetails = async (req, res) => {
  */
 exports.addRemarks = async (req, res) => {
   const { shipmentId } = req.params;
-  const { remarks } = req.body;
+  const { remarks, shopId } = req.body;
   try {
     /** @type {Object} shipment - The updated shipment object including remarks. */
-    const shipment = await shopServices.addRemarksToShipments(
-      shipmentId,
-      remarks
-    );
+    const shipment = await shopServices.addRemarksToShipments(shopId, shipmentId, remarks);
     res.status(200).json({
-      message: "✅ Remarks added to the shipment successfully!",
+      message: '✅ Remarks added to the shipment successfully!',
       shipment,
     });
   } catch (error) {
-    logger.error(
-      `Internal error while updating the shipment remarks: ${error}`
-    );
+    logger.error(`Internal error while updating the shipment remarks: ${error}`);
     const status = error.statusCode;
     res.status(status).json({
       message:
-        "⚠️ An internal error occurred while updating the shipment remarks. Please try again later.",
+        '⚠️ An internal error occurred while updating the shipment remarks. Please try again later.',
       error: error.message,
     });
   }

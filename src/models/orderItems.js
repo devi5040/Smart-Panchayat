@@ -7,10 +7,10 @@
  * @created 18-08-2025
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
-const Sequelize = require("sequelize");
-const sequelize = require("../config/db");
+const Sequelize = require('sequelize');
+const sequelize = require('../config/db');
 
-const OrderItems = sequelize.define("order-items", {
+const OrderItems = sequelize.define('order-items', {
   id: {
     type: Sequelize.INTEGER,
     allowNull: false,
@@ -32,9 +32,9 @@ const OrderItems = sequelize.define("order-items", {
     },
   },
   product_quality: {
-    type: Sequelize.ENUM("premium", "medium", "low"),
+    type: Sequelize.ENUM('premium', 'medium', 'low'),
     allowNull: false,
-    defaultValue: "medium",
+    defaultValue: 'medium',
   },
 });
 

@@ -20,9 +20,7 @@ module.exports = (roles = []) => {
     // Check if the user's role is included in the allowed roles.
     if (!roles.includes(req.user.role)) {
       // If the user's role is not allowed, return a 403 Forbidden error.
-      return res
-        .status(403)
-        .json({ message: "This action is prohibited for you." });
+      return res.status(403).json({ message: 'This action is prohibited for you.' });
     }
     // If the user's role is allowed, proceed to the next middleware.
     next();

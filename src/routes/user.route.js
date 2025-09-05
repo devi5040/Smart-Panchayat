@@ -9,65 +9,57 @@
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
 
-const router = require("express").Router();
-const userController = require("../controllers/user.controller");
+const router = require('express').Router();
+const userController = require('../controllers/user.controller');
 
-const authMiddleware = require("../middleware/firebaseAuthMiddleware");
+const authMiddleware = require('../middleware/firebaseAuthMiddleware');
 //import validation middleware and schemas
-const validate = require("../middleware/validation.middleware");
-const fileUploadValidation = require("../utils/validation/fileUploadValidation");
-const userDataValidation = require("../utils/validation/user.validate");
+const validate = require('../middleware/validation.middleware');
+const fileUploadValidation = require('../utils/validation/fileUploadValidation');
+const userDataValidation = require('../utils/validation/user.validate');
 
-router.post(
-  "/signed-url",
-  validate(fileUploadValidation),
-  userController.getSignedURL
-);
+router.post('/signed-url', validate(fileUploadValidation), userController.getSignedURL);
 
-router.get("/", authMiddleware, userController.getAllUsers);
+router.get('/', authMiddleware, userController.getAllUsers);
 
-router.post(
-  "/",
-  validate(userDataValidation.createUserDataSchema),
-  userController.addUser
-);
+router.post('/', validate(userDataValidation.createUserDataSchema), userController.addUser);
 
-router.get("/:userId", authMiddleware, userController.getUserDetails);
+router.get('/:userId', authMiddleware, userController.getUserDetails);
 
-router.get("/status/:status", userController.getUsersByStatus);
+router.get('/status/:status', userController.getUsersByStatus);
 
-router.get("/role/:role", userController.getUsersByRole);
+router.get('/role/:role', userController.getUsersByRole);
 
 router.put(
-  "/update-profile/:userId",
+  '/update-profile/:userId',
   authMiddleware,
   validate(userDataValidation.updateUserDataSchema),
-  userController.updateProfile
+  userController.updateProfile,
 );
 
 router.patch(
-  "/language-change",
+  '/language-change',
   authMiddleware,
   validate(userDataValidation.updateLanguageSchema),
-  userController.updateLanguagePreferrence
+  userController.updateLanguagePreferrence,
 );
 
-router.patch("/change-role", authMiddleware, userController.changeUserRole);
+router.patch('/change-role', authMiddleware, userController.changeUserRole);
 
 router.patch(
-  "/add-password",
+  '/add-password',
   authMiddleware,
   validate(userDataValidation.passwordSchema),
-  userController.addPassword
+  userController.addPassword,
 );
 
 router.patch(
-  "/update-password",
+  '/update-password',
   authMiddleware,
   validate(userDataValidation.updatePasswordSchema),
-  userController.updatePassword
+  userController.updatePassword,
 );
 
-router.post("/logout", authMiddleware, userController.logout);
+router.post('/logout', authMiddleware, userController.logout);
 
 module.exports = router;

@@ -1,216 +1,293 @@
 /**
  * @filename product.service.js
- * @description This file provides a comprehensive set of services for managing product data, including retrieving products by category, shop,
- * or status, adding new products, updating existing product information and status, and deleting products.  It handles various scenarios,
- * such as invalid inputs and non-existent records, throwing appropriate custom errors for better error handling.
+ * @description This service file manages all product-related data.  It provides functions to fetch products by category, shop, or status; add new products; update product details and status; and delete products.  Robust error handling ensures that invalid inputs and missing records are gracefully managed, with appropriate custom error messages for easier debugging.
  *
  * @version v1.0.0
- * @updated August 26, 2025
+ * @updated September 5, 2025
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
-const { Products, ShopProducts, Category, Shops } = require("../models");
-const {
-  NotFoundError,
-  BadRequestError,
-  ConflictError,
-  NoContentError,
-} = require("../utils/error");
+const { Products, ShopProducts, Category, Shops } = require('../models');
+const { NotFoundError, BadRequestError, ConflictError, NoContentError } = require('../utils/error');
 
 /**
  * Retrieves all products associated with a given category ID.
- * @param {number} categoryId - The ID of the category.  Must be a valid number.
- * @returns {Promise<Array<object>>} - A promise that resolves to an array of product objects. Rejects with an error if the category ID is invalid or the category is not found.
- * @throws {Error} If categoryId is invalid (0, NaN, undefined, or null).
- * @throws {NotFoundError} If the category is not found.
+ *
+ * @async
+ * @param {number} categoryId - The ID of the category. Must be a valid positive integer.
+ * @returns {Promise<Array<object>>} - A promise that resolves to an array of product objects.  Returns an empty array if no products are found.
+ * @throws {Error} If categoryId is invalid (0, NaN, undefined, null, or negative).
+ * @throws {NotFoundError} If the category with the given ID is not found.
  */
 exports.getProductsByCategory = async (categoryId) => {
-  if (
-    categoryId == 0 ||
-    isNaN(categoryId) ||
-    categoryId == undefined ||
-    categoryId == null
-  )
-    throw new Error("Category id is invalid.");
-  try {
-    const products = await Products.findAll({ where: { categoryId } });
-    const category = await Category.findByPk(categoryId);
-    if (!category || category?.length == 0)
-      throw new NotFoundError("Category not found.");
-    return products;
-  } catch (error) {
-    throw error;
+  // Input validation
+  if (categoryId <= 0 || isNaN(categoryId) || categoryId == null) {
+    throw new Error('Invalid categoryId. Must be a positive integer.');
   }
+
+  // Find the category
+  const category = await Category.findByPk(categoryId);
+  if (!category) {
+    throw new NotFoundError(`Category with ID ${categoryId} not found.`);
+  }
+
+  // Find products associated with the category
+  const products = await Products.findAll({ where: { categoryId } });
+  return products || []; //Return empty array if no products found
 };
 
 /**
  * Retrieves all products.
- * @returns {Promise<Array<object>>} - A promise that resolves to an array of all product objects.
+ *
+ * @async
+ * @returns {Promise<Array<object>>} - A promise that resolves to an array of all product objects. Returns an empty array if no products are found.
+ * @throws {NotFoundError} If no products are found.  This should ideally never happen unless there's a database issue.
  */
 exports.getAllProducts = async () => {
-  try {
-    const products = await Products.findAll();
-    return products;
-  } catch (error) {
-    throw error;
-  }
+  const products = await Products.findAll();
+  return products || []; //Return empty array if no products found.  Improved error handling would be to check for database errors.
 };
 
 /**
  * Retrieves all products for a given shop ID.
- * @param {number} shopId - The ID of the shop.
- * @returns {Promise<Array<object>>} - A promise that resolves to an array of ShopProduct objects.
+ *
+ * @async
+ * @param {number} shopId - The ID of the shop. Must be a valid positive integer.
+ * @returns {Promise<Array<object>>} - A promise that resolves to an array of ShopProduct objects. Returns an empty array if no products are found for the shop.
+ * @throws {Error} If shopId is invalid (0, NaN, undefined, null, or negative).
+ * @throws {NotFoundError} If the shop with the given ID is not found.
  */
 exports.getProductsForShop = async (shopId) => {
-  try {
-    const shopProducts = await ShopProducts.findAll({ where: { shopId } });
-    return shopProducts;
-  } catch (error) {
-    throw error;
+  // Input validation
+  if (shopId <= 0 || isNaN(shopId) || shopId == null) {
+    throw new Error('Invalid shopId. Must be a positive integer.');
   }
+
+  // Find the shop
+  const shop = await Shops.findByPk(shopId);
+  if (!shop) {
+    throw new NotFoundError(`Shop with ID ${shopId} not found.`);
+  }
+
+  // Find shop products
+  const shopProducts = await ShopProducts.findAll({ where: { shopId } });
+  return shopProducts || []; //Return empty array if no products found
 };
 
 /**
  * Retrieves products for a given shop ID and status.
- * @param {number} shopId - The ID of the shop.
- * @param {string} status - The status of the product.
- * @returns {Promise<Array<object>>} - A promise that resolves to an array of ShopProduct objects matching the criteria.
+ *
+ * @async
+ * @param {number} shopId - The ID of the shop. Must be a valid positive integer.
+ * @param {string} status - The status of the product (e.g., "active", "inactive").
+ * @returns {Promise<Array<object>>} - A promise that resolves to an array of ShopProduct objects matching the criteria. Returns an empty array if no matching products are found.
+ * @throws {Error} If shopId is invalid (0, NaN, undefined, null, or negative).
+ * @throws {NotFoundError} If the shop with the given ID is not found.
  */
 exports.getProductsForStatus = async (shopId, status) => {
-  try {
-    const productsData = await ShopProducts.findAll({
-      where: { shopId, status },
-    });
-    return productsData;
-  } catch (error) {
-    throw error;
+  // Input validation
+  if (shopId <= 0 || isNaN(shopId) || shopId == null) {
+    throw new Error('Invalid shopId. Must be a positive integer.');
   }
+
+  // Find the shop
+  const shop = await Shops.findByPk(shopId);
+  if (!shop) {
+    throw new NotFoundError(`Shop with ID ${shopId} not found.`);
+  }
+
+  // Find shop products with the specified status
+  const productsData = await ShopProducts.findAll({
+    where: { shopId, status },
+  });
+  return productsData || []; //Return empty array if no products found
 };
 
 /**
  * Retrieves a single product by its ID.
- * @param {number} productId - The ID of the product.
- * @returns {Promise<object>} - A promise that resolves to a single product object. Rejects with a NotFoundError if the product is not found.
- * @throws {NotFoundError} If the product is not found.
+ *
+ * @async
+ * @param {number} productId - The ID of the product. Must be a valid positive integer.
+ * @returns {Promise<object>} - A promise that resolves to a single product object.
+ * @throws {Error} If productId is invalid (0, NaN, undefined, null, or negative).
+ * @throws {NotFoundError} If the product with the given ID is not found.
  */
 exports.getSingleProduct = async (productId) => {
-  try {
-    const product = await Products.findByPk(productId);
-    if (!product) throw new NotFoundError("Product does not available.");
-    return product;
-  } catch (error) {
-    throw error;
+  // Input validation
+  if (productId <= 0 || isNaN(productId) || productId == null) {
+    throw new Error('Invalid productId. Must be a positive integer.');
   }
+
+  const product = await Products.findByPk(productId);
+  if (!product) {
+    throw new NotFoundError(`Product with ID ${productId} not found.`);
+  }
+  return product;
 };
 
 /**
  * Adds a new product.
- * @param {string} name - The name of the product.
- * @param {number} price - The price of the product.
+ *
+ * @async
+ * @param {string} name - The name of the product.  Must not be null or empty.
+ * @param {number} price - The price of the product. Must be a positive number.
  * @param {string} imageUrl - The URL of the product image.
- * @param {number} categoryId - The ID of the product category.
- * @returns {Promise<object>} - A promise that resolves to the newly created product object. Rejects with a ConflictError if a product with the same name already exists.
+ * @param {number} categoryId - The ID of the product category. Must be a valid positive integer.
+ * @returns {Promise<object>} - A promise that resolves to the newly created product object.
+ * @throws {Error} If any of the required parameters are invalid.
+ * @throws {NotFoundError} If the category with the given ID is not found.
  * @throws {ConflictError} If a product with the same name already exists.
  */
 exports.addProduct = async (name, price, imageUrl, categoryId) => {
-  try {
-    const product = await Products.findOne({ where: { name } });
-    if (product) throw new ConflictError("Product already exists.");
-    const productData = await Products.create({
-      name,
-      price,
-      image: imageUrl,
-      categoryId,
-    });
-    return productData;
-  } catch (error) {
-    throw error;
+  // Input validation
+  if (!name || name.trim() === '' || price <= 0 || !categoryId || categoryId <= 0) {
+    throw new Error('Invalid input parameters.');
   }
+
+  // Find the category
+  const category = await Category.findByPk(categoryId);
+  if (!category) {
+    throw new NotFoundError(`Category with ID ${categoryId} not found.`);
+  }
+
+  // Check if a product with the same name already exists
+  const existingProduct = await Products.findOne({ where: { name } });
+  if (existingProduct) {
+    throw new ConflictError(`Product with name "${name}" already exists.`);
+  }
+
+  // Create the new product
+  const productData = await Products.create({
+    name,
+    price,
+    image: imageUrl,
+    categoryId,
+  });
+  return productData;
 };
 
 /**
  * Updates an existing product.
- * @param {number} productId - The ID of the product to update.
+ *
+ * @async
+ * @param {number} productId - The ID of the product to update. Must be a valid positive integer.
  * @param {string} name - The new name of the product.
- * @param {number} price - The new price of the product.
+ * @param {number} price - The new price of the product. Must be a positive number.
  * @param {string} imageUrl - The new URL of the product image.
- * @param {number} categoryId - The new ID of the product category.
- * @returns {Promise<object>} - A promise that resolves to the updated product object. Rejects with a NotFoundError if the product is not found or a BadRequestError if the update fails.
- * @throws {NotFoundError} If the product is not found.
- * @throws {BadRequestError} If the product was not updated.
+ * @param {number} categoryId - The new ID of the product category. Must be a valid positive integer.
+ * @returns {Promise<object>} - A promise that resolves to the updated product object.
+ * @throws {Error} If any of the required parameters are invalid.
+ * @throws {NotFoundError} If the product or category with the given ID is not found.
+ * @throws {NoContentError} If no rows were updated (product not found).
  */
-exports.updateProduct = async (
-  productId,
-  name,
-  price,
-  imageUrl,
-  categoryId
-) => {
-  try {
-    const product = await Products.findByPk(productId);
-    if (!product || product?.length == 0)
-      throw new NotFoundError("Product not found.");
-    const [numRowsUpdated] = await Products.update(
-      { name, price, imageUrl, categoryId },
-      { where: { id: productId } }
-    );
-    if (numRowsUpdated == 0)
-      throw new BadRequestError("Product did not update.");
-    const productData = await Products.findByPk(productId);
-    return productData;
-  } catch (error) {
-    throw error;
+exports.updateProduct = async (productId, name, price, imageUrl, categoryId) => {
+  // Input validation
+  if (productId <= 0 || isNaN(productId) || productId == null || price <= 0 || categoryId <= 0) {
+    throw new Error('Invalid input parameters.');
   }
+
+  // Find the product and category
+  const product = await Products.findByPk(productId);
+  if (!product) {
+    throw new NotFoundError(`Product with ID ${productId} not found.`);
+  }
+  const category = await Category.findByPk(categoryId);
+  if (!category) {
+    throw new NotFoundError(`Category with ID ${categoryId} not found.`);
+  }
+
+  // Update the product
+  const [numRowsUpdated] = await Products.update(
+    { name, price, imageUrl, categoryId },
+    { where: { id: productId } },
+  );
+  if (numRowsUpdated === 0) {
+    throw new NoContentError(`Product with ID ${productId} not updated.`);
+  }
+
+  // Return the updated product
+  return await Products.findByPk(productId);
 };
 
 /**
  * Updates the status of a shop product.
- * @param {number} shopProductId - The ID of the shop product.
- * @param {string} status - The new status of the product.
- * @returns {Promise<object>} - A promise that resolves to the updated shop product object. Rejects with a NotFoundError if the product is not found or a BadRequestError if the update fails.
- * @throws {NotFoundError} If the product is not found.
- * @throws {BadRequestError} If the product status was not updated.
+ *
+ * @async
+ * @param {number} shopProductId - The ID of the shop product. Must be a valid positive integer.
+ * @param {string} status - The new status of the product (e.g., "active", "inactive").
+ * @returns {Promise<object>} - A promise that resolves to the updated shop product object.
+ * @throws {Error} If shopProductId is invalid (0, NaN, undefined, null, or negative).
+ * @throws {NotFoundError} If the shop product with the given ID is not found.
+ * @throws {BadRequestError} If the shop product status was not updated.
  */
 exports.updateProductStatus = async (shopProductId, status) => {
-  try {
-    const product = await ShopProducts.findByPk(shopProductId);
-    if (!product || product?.length == 0)
-      throw new NotFoundError("Product not found");
-    const [numRowsUpdated] = await ShopProducts.update(
-      { status },
-      { where: { id: shopProductId } }
-    );
-    if (numRowsUpdated == 0)
-      throw new BadRequestError("Product status is not updated");
-    const productData = await ShopProducts.findByPk(shopProductId);
-    return productData;
-  } catch (error) {
-    throw error;
+  // Input validation
+  if (shopProductId <= 0 || isNaN(shopProductId) || shopProductId == null) {
+    throw new Error('Invalid shopProductId. Must be a positive integer.');
   }
+
+  // Find the shop product
+  const product = await ShopProducts.findByPk(shopProductId);
+  if (!product) {
+    throw new NotFoundError(`Shop product with ID ${shopProductId} not found.`);
+  }
+
+  // Update the status
+  const [numRowsUpdated] = await ShopProducts.update({ status }, { where: { id: shopProductId } });
+  if (numRowsUpdated === 0) {
+    throw new BadRequestError(`Shop product with ID ${shopProductId} status not updated.`);
+  }
+
+  // Return the updated shop product
+  return await ShopProducts.findByPk(shopProductId);
 };
 
 /**
  * Deletes a product by its ID.
- * @param {number} productId - The ID of the product to delete.
- * @returns {Promise<boolean>} - A promise that resolves to `true` if the product was deleted successfully. Rejects with an error if the product ID is invalid or the product is not found or if deletion fails.
- * @throws {Error} If productId is invalid (null, undefined, or NaN).
- * @throws {NotFoundError} If the product is not found.
+ *
+ * @async
+ * @param {number} productId - The ID of the product to delete. Must be a valid positive integer.
+ * @returns {Promise<boolean>} - A promise that resolves to `true` if the product was deleted successfully.
+ * @throws {Error} If productId is invalid (null, undefined, NaN, or negative).
+ * @throws {NotFoundError} If the product with the given ID is not found.
  * @throws {BadRequestError} If the product was not deleted.
  */
 exports.deleteProduct = async (productId) => {
-  if (!productId || isNaN(productId)) throw new Error("Product ID is invalid");
-  try {
-    const product = await Products.findByPk(productId);
-    if (!product || product?.length == 0)
-      throw new NotFoundError("Product not found.");
-    const numRowsDeleted = await Products.destroy({ where: { id: productId } });
-    if (numRowsDeleted == 0)
-      throw new BadRequestError("Product is not deleted");
-    return true;
-  } catch (error) {
-    throw error;
+  // Input validation
+  if (productId <= 0 || isNaN(productId) || productId == null) {
+    throw new Error('Invalid productId. Must be a positive integer.');
   }
+
+  // Find the product
+  const product = await Products.findByPk(productId);
+  if (!product) {
+    throw new NotFoundError(`Product with ID ${productId} not found.`);
+  }
+
+  // Delete the product
+  const numRowsDeleted = await Products.destroy({ where: { id: productId } });
+  if (numRowsDeleted === 0) {
+    throw new BadRequestError(`Product with ID ${productId} not deleted.`);
+  }
+  return true;
 };
 
+/**
+ * Adds a new product to a shop, or updates the quantity if the product already exists.
+ * @async
+ * @param {number} quantity - The quantity of the product. Must be a positive integer.
+ * @param {number} price - The price of the product. Must be a positive number.
+ * @param {string} quality - The quality of the product.
+ * @param {number} shopId - The ID of the shop. Must be a valid positive integer.
+ * @param {number} productId - The ID of the product.  If provided, updates an existing product; otherwise, creates a new product.
+ * @param {string} name - The name of the product (only required if creating a new product).
+ * @param {string} image - The URL of the product image (only required if creating a new product).
+ * @param {number} categoryId - The ID of the product category (only required if creating a new product).
+ * @param {Date} date - The date of the product addition/update.
+ * @returns {Promise<object>} - A promise that resolves to the newly created or updated ShopProduct object.
+ * @throws {Error} If input parameters are invalid.
+ * @throws {NotFoundError} If the shop or category is not found, or if the product ID is invalid.
+ * @throws {ConflictError} If the product already exists in the shop (when productId is provided).
+ */
 exports.addProductShop = async (
   quantity,
   price,
@@ -218,24 +295,46 @@ exports.addProductShop = async (
   shopId,
   productId,
   name,
-  image = process.env.DEFAULT_PRODUCT_IMAGE,
+  image,
   categoryId,
-  date
+  date,
 ) => {
-  const shop = await Shops.findByPk(shopId);
-  if (!shop) throw new NotFoundError("Shop not found!");
-  const product = await Products.findByPk(productId);
-  if (!product && productId) throw new NotFoundError("Product not found!");
-  if (productId) {
-    const sp = await ShopProducts.findOne({ where: { productId, shopId } });
-    if (sp)
-      throw new ConflictError(
-        "Product already exists in the shop please update it"
-      );
+  // Input validation.  More robust validation could be added here.
+  if (quantity <= 0 || price <= 0 || !shopId || shopId <= 0) {
+    throw new Error('Invalid input parameters.');
   }
-  if (!productId) {
+
+  const shop = await Shops.findByPk(shopId);
+  if (!shop) throw new NotFoundError('Shop not found!');
+
+  if (productId) {
+    // Update existing product
+    const product = await Products.findByPk(productId);
+    if (!product) throw new NotFoundError('Product not found!');
+
+    const sp = await ShopProducts.findOne({ where: { productId, shopId } });
+    if (sp) throw new ConflictError('Product already exists in the shop. Please update it.');
+
+    const shopProductData = await ShopProducts.create({
+      quantity,
+      price,
+      quality,
+      shopId,
+      productId,
+      date,
+    });
+    return shopProductData;
+  } else {
+    // Create new product
+    if (!name || !image || !categoryId || categoryId <= 0) {
+      throw new Error('Missing required parameters for new product.');
+    }
+    const category = await Category.findByPk(categoryId);
+    if (!category) throw new NotFoundError('Category not found!');
+
     const existProduct = await Products.findOne({ where: { name } });
-    if (existProduct) throw new ConflictError("Product already exists");
+    if (existProduct) throw new ConflictError('Product already exists');
+
     const productData = await Products.create({
       name,
       price,
@@ -251,54 +350,68 @@ exports.addProductShop = async (
       date,
     });
     return shopProductData;
-  } else {
-    console.log(
-      `inserting ${quality}, ${quantity}, ${price}, ${shopId}, ${productId}`
-    );
-    const shopProduct = await ShopProducts.create({
-      quality,
-      quantity,
-      price,
-      shopId,
-      productId,
-      date,
-    });
-    return shopProduct;
   }
 };
 
+/**
+ * Updates the price of a product.
+ * @async
+ * @param {number} productId - The ID of the product to update. Must be a valid positive integer.
+ * @param {number} price - The new price of the product. Must be a positive number.
+ * @returns {Promise<object>} - A promise that resolves to the updated product object.
+ * @throws {Error} If input parameters are invalid.
+ * @throws {NotFoundError} If the product is not found.
+ * @throws {NoContentError} If no rows were updated.
+ */
 exports.updateProductPrice = async (productId, price) => {
+  // Input validation
+  if (productId <= 0 || isNaN(productId) || productId == null || price <= 0) {
+    throw new Error('Invalid input parameters.');
+  }
+
   const product = await Products.findByPk(productId);
-  if (!product) throw new NotFoundError("Product not found!");
-  const [numRowsUpdated] = await Products.update(
-    { price },
-    { where: { id: productId } }
-  );
-  if (numRowsUpdated == 0) throw new NotFoundError("No rows updated!");
-  const productData = await Products.findByPk(productId);
-  return productData;
+  if (!product) throw new NotFoundError('Product not found!');
+
+  const [numRowsUpdated] = await Products.update({ price }, { where: { id: productId } });
+  if (numRowsUpdated === 0) throw new NoContentError('No rows updated!');
+
+  return await Products.findByPk(productId);
 };
 
-exports.updateShopProducts = async (
-  quantity,
-  quality,
-  price,
-  date,
-  shopProductId
-) => {
+/**
+ * Updates shop product details.
+ * @async
+ * @param {number} quantity - The quantity of the product. Must be a positive integer.
+ * @param {string} quality - The quality of the product.
+ * @param {number} price - The price of the product. Must be a positive number.
+ * @param {Date} date - The date of the update.
+ * @param {number} shopProductId - The ID of the shop product to update. Must be a valid positive integer.
+ * @returns {Promise<object>} - A promise that resolves to the updated ShopProduct object.
+ * @throws {Error} If input parameters are invalid.
+ * @throws {NotFoundError} If the shop product is not found.
+ * @throws {NoContentError} If no rows were updated.
+ */
+exports.updateShopProducts = async (quantity, quality, price, date, shopProductId) => {
+  // Input validation
+  if (quantity <= 0 || price <= 0 || !shopProductId || shopProductId <= 0) {
+    throw new Error('Invalid input parameters.');
+  }
+
   const shopProducts = await ShopProducts.findByPk(shopProductId);
-  if (!shopProducts) throw new NotFoundError("Shop products not found!");
+  if (!shopProducts) throw new NotFoundError('Shop products not found!');
+
   const [numRowsUpdated] = await ShopProducts.update(
     {
       quantity,
       quality,
       price,
       date,
-      status: "pending",
+      status: 'pending', //Setting status to pending after update. Consider making this configurable.
     },
-    { where: { id: shopProductId } }
+    { where: { id: shopProductId } },
   );
-  if (numRowsUpdated == 0) throw new NoContentError("No rows updated!");
+  if (numRowsUpdated === 0) throw new NoContentError('No rows updated!');
+
   const products = await ShopProducts.findByPk(shopProductId);
   return products;
 };

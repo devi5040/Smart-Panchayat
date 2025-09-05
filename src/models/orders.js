@@ -6,10 +6,10 @@
  * @created 18-08-2025
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
-const Sequelize = require("sequelize");
-const sequelize = require("../config/db");
+const Sequelize = require('sequelize');
+const sequelize = require('../config/db');
 
-const Orders = sequelize.define("orders", {
+const Orders = sequelize.define('orders', {
   id: {
     type: Sequelize.INTEGER,
     allowNull: false,
@@ -28,9 +28,9 @@ const Orders = sequelize.define("orders", {
     allowNull: false,
   },
   payment_status: {
-    type: Sequelize.ENUM("paid", "pending"),
+    type: Sequelize.ENUM('paid', 'pending'),
     allowNull: false,
-    defaultValue: "pending",
+    defaultValue: 'pending',
   },
 });
 

@@ -8,9 +8,9 @@
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
 
-const app = require("./app");
-const logger = require("./utils/logger");
-const sequelize = require("./config/db");
+const app = require('./app');
+const logger = require('./utils/logger');
+const sequelize = require('./config/db');
 
 // Initialize PORT
 const PORT = process.env.PORT || 5050;
@@ -20,7 +20,7 @@ const startServer = async () => {
   try {
     // Verify db connection
     await sequelize.authenticate();
-    logger.info("The db is connected successfully");
+    logger.info('The db is connected successfully');
 
     // sync the db
     await sequelize.sync();
