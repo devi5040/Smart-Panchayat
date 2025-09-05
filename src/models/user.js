@@ -60,6 +60,7 @@ const Users = sequelize.define("users", {
     validate: {
       isUrl: true,
     },
+    defaultValue: process.env.DEFAULT_PROFILE_IMAGE,
   },
   password: {
     type: Sequelize.STRING(255),

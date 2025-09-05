@@ -31,6 +31,7 @@ const Products = sequelize.define("products", {
     validate: {
       isUrl: true,
     },
+    defaultValue: process.env.DEFAULT_PRODUCT_IMAGE,
   },
 });
 
