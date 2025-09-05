@@ -8,13 +8,8 @@
  * @updated August 26, 2025
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
-const { Products, ShopProducts, Category, Shops } = require("../models");
-const {
-  NotFoundError,
-  BadRequestError,
-  ConflictError,
-  NoContentError,
-} = require("../utils/error");
+const { Products, ShopProducts, Category, Shops } = require('../models');
+const { NotFoundError, BadRequestError, ConflictError, NoContentError } = require('../utils/error');
 
 /**
  * Retrieves all products associated with a given category ID.
@@ -24,18 +19,12 @@ const {
  * @throws {NotFoundError} If the category is not found.
  */
 exports.getProductsByCategory = async (categoryId) => {
-  if (
-    categoryId == 0 ||
-    isNaN(categoryId) ||
-    categoryId == undefined ||
-    categoryId == null
-  )
-    throw new Error("Category id is invalid.");
+  if (categoryId == 0 || isNaN(categoryId) || categoryId == undefined || categoryId == null)
+    throw new Error('Category id is invalid.');
   try {
     const products = await Products.findAll({ where: { categoryId } });
     const category = await Category.findByPk(categoryId);
-    if (!category || category?.length == 0)
-      throw new NotFoundError("Category not found.");
+    if (!category || category?.length == 0) throw new NotFoundError('Category not found.');
     return products;
   } catch (error) {
     throw error;
@@ -95,7 +84,7 @@ exports.getProductsForStatus = async (shopId, status) => {
 exports.getSingleProduct = async (productId) => {
   try {
     const product = await Products.findByPk(productId);
-    if (!product) throw new NotFoundError("Product does not available.");
+    if (!product) throw new NotFoundError('Product does not available.');
     return product;
   } catch (error) {
     throw error;
@@ -114,7 +103,7 @@ exports.getSingleProduct = async (productId) => {
 exports.addProduct = async (name, price, imageUrl, categoryId) => {
   try {
     const product = await Products.findOne({ where: { name } });
-    if (product) throw new ConflictError("Product already exists.");
+    if (product) throw new ConflictError('Product already exists.');
     const productData = await Products.create({
       name,
       price,
@@ -138,23 +127,15 @@ exports.addProduct = async (name, price, imageUrl, categoryId) => {
  * @throws {NotFoundError} If the product is not found.
  * @throws {BadRequestError} If the product was not updated.
  */
-exports.updateProduct = async (
-  productId,
-  name,
-  price,
-  imageUrl,
-  categoryId
-) => {
+exports.updateProduct = async (productId, name, price, imageUrl, categoryId) => {
   try {
     const product = await Products.findByPk(productId);
-    if (!product || product?.length == 0)
-      throw new NotFoundError("Product not found.");
+    if (!product || product?.length == 0) throw new NotFoundError('Product not found.');
     const [numRowsUpdated] = await Products.update(
       { name, price, imageUrl, categoryId },
-      { where: { id: productId } }
+      { where: { id: productId } },
     );
-    if (numRowsUpdated == 0)
-      throw new BadRequestError("Product did not update.");
+    if (numRowsUpdated == 0) throw new BadRequestError('Product did not update.');
     const productData = await Products.findByPk(productId);
     return productData;
   } catch (error) {
@@ -173,14 +154,12 @@ exports.updateProduct = async (
 exports.updateProductStatus = async (shopProductId, status) => {
   try {
     const product = await ShopProducts.findByPk(shopProductId);
-    if (!product || product?.length == 0)
-      throw new NotFoundError("Product not found");
+    if (!product || product?.length == 0) throw new NotFoundError('Product not found');
     const [numRowsUpdated] = await ShopProducts.update(
       { status },
-      { where: { id: shopProductId } }
+      { where: { id: shopProductId } },
     );
-    if (numRowsUpdated == 0)
-      throw new BadRequestError("Product status is not updated");
+    if (numRowsUpdated == 0) throw new BadRequestError('Product status is not updated');
     const productData = await ShopProducts.findByPk(shopProductId);
     return productData;
   } catch (error) {
@@ -197,14 +176,12 @@ exports.updateProductStatus = async (shopProductId, status) => {
  * @throws {BadRequestError} If the product was not deleted.
  */
 exports.deleteProduct = async (productId) => {
-  if (!productId || isNaN(productId)) throw new Error("Product ID is invalid");
+  if (!productId || isNaN(productId)) throw new Error('Product ID is invalid');
   try {
     const product = await Products.findByPk(productId);
-    if (!product || product?.length == 0)
-      throw new NotFoundError("Product not found.");
+    if (!product || product?.length == 0) throw new NotFoundError('Product not found.');
     const numRowsDeleted = await Products.destroy({ where: { id: productId } });
-    if (numRowsDeleted == 0)
-      throw new BadRequestError("Product is not deleted");
+    if (numRowsDeleted == 0) throw new BadRequestError('Product is not deleted');
     return true;
   } catch (error) {
     throw error;
@@ -220,22 +197,19 @@ exports.addProductShop = async (
   name,
   image,
   categoryId,
-  date
+  date,
 ) => {
   const shop = await Shops.findByPk(shopId);
-  if (!shop) throw new NotFoundError("Shop not found!");
+  if (!shop) throw new NotFoundError('Shop not found!');
   const product = await Products.findByPk(productId);
-  if (!product && productId) throw new NotFoundError("Product not found!");
+  if (!product && productId) throw new NotFoundError('Product not found!');
   if (productId) {
     const sp = await ShopProducts.findOne({ where: { productId, shopId } });
-    if (sp)
-      throw new ConflictError(
-        "Product already exists in the shop please update it"
-      );
+    if (sp) throw new ConflictError('Product already exists in the shop please update it');
   }
   if (!productId) {
     const existProduct = await Products.findOne({ where: { name } });
-    if (existProduct) throw new ConflictError("Product already exists");
+    if (existProduct) throw new ConflictError('Product already exists');
     const productData = await Products.create({
       name,
       price,
@@ -252,9 +226,7 @@ exports.addProductShop = async (
     });
     return shopProductData;
   } else {
-    console.log(
-      `inserting ${quality}, ${quantity}, ${price}, ${shopId}, ${productId}`
-    );
+    console.log(`inserting ${quality}, ${quantity}, ${price}, ${shopId}, ${productId}`);
     const shopProduct = await ShopProducts.create({
       quality,
       quantity,
@@ -269,36 +241,27 @@ exports.addProductShop = async (
 
 exports.updateProductPrice = async (productId, price) => {
   const product = await Products.findByPk(productId);
-  if (!product) throw new NotFoundError("Product not found!");
-  const [numRowsUpdated] = await Products.update(
-    { price },
-    { where: { id: productId } }
-  );
-  if (numRowsUpdated == 0) throw new NotFoundError("No rows updated!");
+  if (!product) throw new NotFoundError('Product not found!');
+  const [numRowsUpdated] = await Products.update({ price }, { where: { id: productId } });
+  if (numRowsUpdated == 0) throw new NotFoundError('No rows updated!');
   const productData = await Products.findByPk(productId);
   return productData;
 };
 
-exports.updateShopProducts = async (
-  quantity,
-  quality,
-  price,
-  date,
-  shopProductId
-) => {
+exports.updateShopProducts = async (quantity, quality, price, date, shopProductId) => {
   const shopProducts = await ShopProducts.findByPk(shopProductId);
-  if (!shopProducts) throw new NotFoundError("Shop products not found!");
+  if (!shopProducts) throw new NotFoundError('Shop products not found!');
   const [numRowsUpdated] = await ShopProducts.update(
     {
       quantity,
       quality,
       price,
       date,
-      status: "pending",
+      status: 'pending',
     },
-    { where: { id: shopProductId } }
+    { where: { id: shopProductId } },
   );
-  if (numRowsUpdated == 0) throw new NoContentError("No rows updated!");
+  if (numRowsUpdated == 0) throw new NoContentError('No rows updated!');
   const products = await ShopProducts.findByPk(shopProductId);
   return products;
 };

@@ -9,8 +9,8 @@
  * @updated August 26, 2025
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
-const productServices = require("../services/product.service");
-const logger = require("../utils/logger");
+const productServices = require('../services/product.service');
+const logger = require('../utils/logger');
 
 /**
  * @async
@@ -25,16 +25,12 @@ exports.getAllProductsByCategory = async (req, res) => {
   const { categoryId } = req.params;
   try {
     const products = await productServices.getProductsByCategory(categoryId);
-    res
-      .status(200)
-      .json({ message: "Products fetched successfully.", products });
+    res.status(200).json({ message: 'Products fetched successfully.', products });
   } catch (error) {
     const status = error.statusCode || 500;
-    logger.error(
-      `Internal error while retrieving products by category ${categoryId}. ${error}`
-    );
+    logger.error(`Internal error while retrieving products by category ${categoryId}. ${error}`);
     res.status(status).json({
-      message: "Internal error while retrieving products.",
+      message: 'Internal error while retrieving products.',
       error: error.message,
     });
   }
@@ -51,13 +47,11 @@ exports.getAllProductsByCategory = async (req, res) => {
 exports.getAllProducts = async (req, res) => {
   try {
     const products = await productServices.getAllProducts();
-    res
-      .status(200)
-      .json({ message: "Products fetched successfully.", products });
+    res.status(200).json({ message: 'Products fetched successfully.', products });
   } catch (error) {
     logger.error(`Internal error while fetching all products: ${error}`);
     res.status(500).json({
-      message: "Internal error while fetching products.",
+      message: 'Internal error while fetching products.',
       error: error.message,
     });
   }
@@ -74,20 +68,17 @@ exports.getAllProducts = async (req, res) => {
  */
 exports.getProductForShops = async (req, res) => {
   const shopId = req.user?.shop;
-  if (!shopId)
-    return res.status(500).json({ message: "The shop ID is not valid." });
+  if (!shopId) return res.status(500).json({ message: 'The shop ID is not valid.' });
   try {
     const products = await productServices.getProductsForShop(shopId);
     res.status(200).json({
-      message: "Products fetched for the shop successfully.",
+      message: 'Products fetched for the shop successfully.',
       products,
     });
   } catch (error) {
-    logger.error(
-      `Internal error while fetching products for the shop: ${shopId}. ${error}`
-    );
+    logger.error(`Internal error while fetching products for the shop: ${shopId}. ${error}`);
     res.status(500).json({
-      message: "Internal error while fetching products for the shop.",
+      message: 'Internal error while fetching products for the shop.',
       error: error.message,
     });
   }
@@ -108,14 +99,12 @@ exports.getProductForStatus = async (req, res) => {
   const { status } = req.params;
   try {
     const products = await productServices.getProductsForStatus(shopId, status);
-    res.status(200).json({ message: "Fetched data successfully.", products });
+    res.status(200).json({ message: 'Fetched data successfully.', products });
   } catch (error) {
     const status = error.statusCode || 500;
-    logger.error(
-      `Internal error while fetching products for status ${status}: ${error}`
-    );
+    logger.error(`Internal error while fetching products for status ${status}: ${error}`);
     res.status(status).json({
-      message: "Internal error while fetching products.",
+      message: 'Internal error while fetching products.',
       error: error.message,
     });
   }
@@ -134,14 +123,12 @@ exports.getProductDetails = async (req, res) => {
   const { productId } = req.params;
   try {
     const product = await productServices.getSingleProduct(productId);
-    res
-      .status(200)
-      .json({ message: "Product details fetched successfully.", product });
+    res.status(200).json({ message: 'Product details fetched successfully.', product });
   } catch (error) {
     logger.error(`Internal error while fetching product details: ${error}`);
     const status = error.statusCode || 500;
     res.status(status).json({
-      message: "Internal error while fetching product details.",
+      message: 'Internal error while fetching product details.',
       error: error.message,
     });
   }
@@ -162,18 +149,13 @@ exports.getProductDetails = async (req, res) => {
 exports.addProduct = async (req, res) => {
   const { name, price, imageUrl, categoryId } = req.body;
   try {
-    const product = await productServices.addProduct(
-      name,
-      price,
-      imageUrl,
-      categoryId
-    );
-    res.status(201).json({ message: "Product added successfully", product });
+    const product = await productServices.addProduct(name, price, imageUrl, categoryId);
+    res.status(201).json({ message: 'Product added successfully', product });
   } catch (error) {
     logger.error(`Internal error while adding the product: ${error}`);
     const status = error.statusCode || 500;
     res.status(status).json({
-      message: "Internal error while adding product.",
+      message: 'Internal error while adding product.',
       error: error.message,
     });
   }
@@ -201,14 +183,14 @@ exports.updateProduct = async (req, res) => {
       name,
       price,
       imageUrl,
-      categoryId
+      categoryId,
     );
-    res.status(200).json({ message: "Product updated successfully.", product });
+    res.status(200).json({ message: 'Product updated successfully.', product });
   } catch (error) {
     logger.error(`Internal error while updating the product: ${error}`);
     const status = error.statusCode || 500; //Default to 500 if no status code provided by error.
     res.status(status).json({
-      message: "Internal error while updating the product",
+      message: 'Internal error while updating the product',
       error: error.message,
     });
   }
@@ -228,18 +210,13 @@ exports.updateProductStatus = async (req, res) => {
   const { shopProductId } = req.params;
   const { status } = req.body;
   try {
-    const product = await productServices.updateProductStatus(
-      shopProductId,
-      status
-    );
-    res
-      .status(200)
-      .json({ message: "Product status updated successfully", product });
+    const product = await productServices.updateProductStatus(shopProductId, status);
+    res.status(200).json({ message: 'Product status updated successfully', product });
   } catch (error) {
     const status = error.statusCode || 500;
     logger.error(`Internal error while updating product status: ${error}`);
     res.status(status).json({
-      message: "Internal error while updating product status",
+      message: 'Internal error while updating product status',
       error: error.message,
     });
   }
@@ -258,29 +235,19 @@ exports.deleteProduct = async (req, res) => {
   const { productId } = req.params;
   try {
     await productServices.deleteProduct(productId);
-    res.status(200).json({ message: "Product deleted successfully" });
+    res.status(200).json({ message: 'Product deleted successfully' });
   } catch (error) {
     logger.error(`Internal error while deleting product: ${error}`);
     const status = error.statusCode || 500; //Default to 500 if no status code provided by error.
     res.status(status).json({
-      message: "Internal error while deleting the product",
+      message: 'Internal error while deleting the product',
       error: error.message,
     });
   }
 };
 
 exports.addShopProduct = async (req, res) => {
-  const {
-    quality,
-    quantity,
-    name,
-    price,
-    image,
-    categoryId,
-    shopId,
-    productId,
-    date,
-  } = req.body;
+  const { quality, quantity, name, price, image, categoryId, shopId, productId, date } = req.body;
   try {
     const product = await productServices.addProductShop(
       quantity,
@@ -291,14 +258,14 @@ exports.addShopProduct = async (req, res) => {
       name,
       image,
       categoryId,
-      date
+      date,
     );
-    res.status(201).json({ message: "Product created successfully!", product });
+    res.status(201).json({ message: 'Product created successfully!', product });
   } catch (error) {
     const status = error.statusCode || 500;
     logger.error(`Internal error while creating product for shop: ${error}`);
     res.status(status).json({
-      message: "Internal error while creating product",
+      message: 'Internal error while creating product',
       error: error.message,
     });
   }
@@ -309,15 +276,12 @@ exports.updateProductPrice = async (req, res) => {
   const { price } = req.body;
   try {
     const product = await productServices.updateProductPrice(productId, price);
-    res
-      .status(200)
-      .json({ message: "Product price updated successfully!", product });
+    res.status(200).json({ message: 'Product price updated successfully!', product });
   } catch (error) {
     const status = req.statusCode || 500;
     logger.error(`Internal error while updating the product price: ${error}`);
     res.status(status).json({
-      message:
-        "Internal error while updating the product price. Please try again later!",
+      message: 'Internal error while updating the product price. Please try again later!',
       error: error.message,
     });
   }
@@ -332,19 +296,15 @@ exports.updateShopProduct = async (req, res) => {
       quality,
       price,
       date,
-      shopProductId
+      shopProductId,
     );
-    res
-      .status(200)
-      .json({ message: "Shop products updated successfully!", data });
+    res.status(200).json({ message: 'Shop products updated successfully!', data });
   } catch (error) {
     const status = error.statusCode || 500;
     logger.error(`Internal error while updating the shop products: ${error}`);
-    res
-      .status(status)
-      .json({
-        message: "Internal error while updating the shop products.",
-        error: error.message,
-      });
+    res.status(status).json({
+      message: 'Internal error while updating the shop products.',
+      error: error.message,
+    });
   }
 };

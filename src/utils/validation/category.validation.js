@@ -7,13 +7,11 @@
  * @updated August 22, 2025
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
-const Joi = require("joi");
+const Joi = require('joi');
 
 exports.categoryValidationSchema = Joi.object({
-  name: Joi.string()
-    .required()
-    .messages({ "string.required": "Category name cannot be empty" }),
+  name: Joi.string().required().messages({ 'string.required': 'Category name cannot be empty' }),
   imageUrl: Joi.string().uri().messages({
-    "string.uri": "The imageUrl should be an url.",
+    'string.uri': 'The imageUrl should be an url.',
   }),
 });

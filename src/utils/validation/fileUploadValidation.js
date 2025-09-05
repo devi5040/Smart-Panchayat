@@ -9,13 +9,11 @@
  * @author <User name>
  */
 
-const Joi = require("joi");
+const Joi = require('joi');
 
 exports.fileUploadSchema = Joi.object({
   fileName: Joi.string().required(),
-  fileType: Joi.string()
-    .valid("image/jpeg", "image/png", "image/jpg", "image/webp")
-    .required(),
+  fileType: Joi.string().valid('image/jpeg', 'image/png', 'image/jpg', 'image/webp').required(),
   fileSize: Joi.number()
     .max(10 * 1024 * 1024)
     .required(),

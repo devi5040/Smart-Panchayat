@@ -9,19 +9,9 @@
  * @updated Sep 3, 2025
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
-const sequelize = require("../config/db");
-const {
-  Shipments,
-  ShipmentShops,
-  ShipmentShopProducts,
-  Shops,
-  Products,
-} = require("../models");
-const {
-  ConflictError,
-  NotFoundError,
-  NoContentError,
-} = require("../utils/error");
+const sequelize = require('../config/db');
+const { Shipments, ShipmentShops, ShipmentShopProducts, Shops, Products } = require('../models');
+const { ConflictError, NotFoundError, NoContentError } = require('../utils/error');
 
 /**
  * Retrieves a list of all shipments.
@@ -33,28 +23,22 @@ const {
  */
 exports.getShipmentList = async () => {
   const shipments = await Shipments.findAll({
-    attributes: [
-      "id",
-      "date",
-      "location",
-      "collection_centre",
-      "transportation_mode",
-    ],
-    include: { model: Shops, through: { attributes: ["status"] } },
+    attributes: ['id', 'date', 'location', 'collection_centre', 'transportation_mode'],
+    include: { model: Shops, through: { attributes: ['status'] } },
   });
   if (!shipments) {
     //Returning empty array instead of throwing error for better error handling.
     return [];
   }
   const shipmentData = shipments.flatMap((shipment) =>
-    shipment["shops"].map((sh) => ({
+    shipment['shops'].map((sh) => ({
       id: shipment.id,
       collectionCentre: shipment.collection_centre,
       mode: shipment.transportation_mode,
       date: shipment.date,
       location: shipment.location,
-      status: sh["shipment-shops"].status,
-    }))
+      status: sh['shipment-shops'].status,
+    })),
   );
   return shipmentData;
 };
@@ -79,8 +63,7 @@ exports.getShipmentList = async () => {
  * @throws {Error} If an error occurs during shipment creation.
  */
 exports.createShipment = async (shipmentDetails, shops) => {
-  const { date, location, collectionCentre, transportationMode } =
-    shipmentDetails;
+  const { date, location, collectionCentre, transportationMode } = shipmentDetails;
   return await sequelize.transaction(async (t) => {
     const existingShipment = await Shipments.findAll({
       where: {
@@ -93,7 +76,7 @@ exports.createShipment = async (shipmentDetails, shops) => {
     });
     if (existingShipment && existingShipment?.length > 0)
       throw new ConflictError(
-        "❌ The shipment already exists. Please update the existing shipment."
+        '❌ The shipment already exists. Please update the existing shipment.',
       );
     const shipment = await Shipments.create(
       {
@@ -102,50 +85,49 @@ exports.createShipment = async (shipmentDetails, shops) => {
         collection_centre: collectionCentre,
         transportation_mode: transportationMode,
       },
-      { transaction: t }
+      { transaction: t },
     );
-    if (!shipment) throw new Error("❌ Shipment not created.");
+    if (!shipment) throw new Error('❌ Shipment not created.');
     for (const shop of shops) {
       const shopId = shop.shopId;
       const shopData = await Shops.findByPk(shopId, { transaction: t });
-      if (!shopData) throw new NotFoundError("❌ Shop does not exist.");
+      if (!shopData) throw new NotFoundError('❌ Shop does not exist.');
       const shipmentShops = await ShipmentShops.create(
         {
           shopId,
           shipmentId: shipment.id,
         },
-        { transaction: t }
+        { transaction: t },
       );
-      if (!shipmentShops) throw new Error("❌ Shipment shops not created.");
+      if (!shipmentShops) throw new Error('❌ Shipment shops not created.');
 
       for (const product of shop.products) {
         const { quantity, productId } = product;
         const productData = await Products.findByPk(productId, {
           transaction: t,
         });
-        if (!productData) throw new NotFoundError("❌ Product does not exist.");
+        if (!productData) throw new NotFoundError('❌ Product does not exist.');
         const shipmentShopProduct = await ShipmentShopProducts.create(
           {
             quantity,
             productId,
             shipmentShopId: shipmentShops.id,
           },
-          { transaction: t }
+          { transaction: t },
         );
-        if (!shipmentShopProduct)
-          throw new Error("❌ Shipment shops not created.");
+        if (!shipmentShopProduct) throw new Error('❌ Shipment shops not created.');
       }
     }
     const shipmentData = await Shipments.findAll({
-      attributes: ["id", "date", "collection_centre", "transportation_mode"],
+      attributes: ['id', 'date', 'collection_centre', 'transportation_mode'],
       include: {
         model: Shops,
-        attributes: ["shop_name", "id", "latitude", "longitude", "pin_code"],
-        through: { attributes: ["status"] },
+        attributes: ['shop_name', 'id', 'latitude', 'longitude', 'pin_code'],
+        through: { attributes: ['status'] },
       },
       transaction: t,
     });
-    if (!shipmentData) throw new Error("Error finding shipments");
+    if (!shipmentData) throw new Error('Error finding shipments');
     return shipmentData;
   });
 };
@@ -163,23 +145,18 @@ exports.createShipment = async (shipmentDetails, shops) => {
  * @throws {NoContentError} If no rows were updated.
  * @throws {Error} If an error occurs during the update.
  */
-exports.updateShipmentProduct = async (
-  shipmentId,
-  shopId,
-  productId,
-  quantity
-) => {
+exports.updateShipmentProduct = async (shipmentId, shopId, productId, quantity) => {
   return await sequelize.transaction(async (t) => {
     const shipment = await Shipments.findByPk(shipmentId, { transaction: t });
-    if (!shipment) throw new NotFoundError("Shipment Not found");
+    if (!shipment) throw new NotFoundError('Shipment Not found');
     const shop = await Shops.findByPk(shopId, { transaction: t });
-    if (!shop) throw new NotFoundError("Shop not found!");
+    if (!shop) throw new NotFoundError('Shop not found!');
     const product = await Products.findByPk(productId, { transaction: t });
-    if (!product) throw new NotFoundError("Product not found");
+    if (!product) throw new NotFoundError('Product not found');
     const shipmentShop = await ShipmentShops.findOne({
       where: { shipmentId, shopId },
       transaction: t,
-      attributes: ["id"],
+      attributes: ['id'],
     });
     let shipmentShopProduct = await ShipmentShopProducts.findOne({
       where: { shipmentShopId: shipmentShop.id, productId },
@@ -188,13 +165,13 @@ exports.updateShipmentProduct = async (
     if (shipmentShopProduct) {
       const [numRowsUpdated] = await ShipmentShopProducts.update(
         { quantity },
-        { where: { id: shipmentShopProduct.id }, transaction: t }
+        { where: { id: shipmentShopProduct.id }, transaction: t },
       );
-      if (numRowsUpdated == 0) throw new NoContentError("No rows updateds");
+      if (numRowsUpdated == 0) throw new NoContentError('No rows updateds');
     } else {
       await ShipmentShopProducts.create(
         { quantity, productId, shipmentShopId: shipmentShop.id },
-        { transaction: t }
+        { transaction: t },
       );
     }
     const data = await ShipmentShopProducts.findOne({
@@ -222,49 +199,43 @@ exports.updateShipmentProduct = async (
 exports.addShopsToShipments = async (shipmentId, shopId, products) => {
   return await sequelize.transaction(async (t) => {
     const shop = await Shops.findByPk(shopId, { transaction: t });
-    if (!shop) throw new NotFoundError("❌ Shop does not exist.");
+    if (!shop) throw new NotFoundError('❌ Shop does not exist.');
     const shipment = await Shipments.findByPk(shipmentId, { transaction: t });
-    if (!shipment) throw new NotFoundError("❌ Shipment does not exist");
+    if (!shipment) throw new NotFoundError('❌ Shipment does not exist');
     const existsData = await ShipmentShops.findAll({
       where: { shopId, shipmentId },
       transaction: t,
     });
     if (existsData && existsData?.length > 0)
-      throw new ConflictError("Shop already exists in the given shipment");
-    const shipmentShops = await ShipmentShops.create(
-      { shopId, shipmentId },
-      { transaction: t }
-    );
+      throw new ConflictError('Shop already exists in the given shipment');
+    const shipmentShops = await ShipmentShops.create({ shopId, shipmentId }, { transaction: t });
     for (const product of products) {
       const { quantity, productId } = product;
       const existingProduct = await Products.findByPk(productId, {
         transaction: t,
       });
       if (!existingProduct)
-        throw new NotFoundError(
-          `Product with product id ${productId} not found`
-        );
+        throw new NotFoundError(`Product with product id ${productId} not found`);
       const shipmentShopProduct = await ShipmentShopProducts.create(
         {
           quantity,
           productId,
           shipmentShopId: shipmentShops.id,
         },
-        { transaction: t }
+        { transaction: t },
       );
-      if (!shipmentShopProduct)
-        throw new Error("shipment shop product not created");
+      if (!shipmentShopProduct) throw new Error('shipment shop product not created');
     }
     const shipmentData = await Shipments.findByPk(shipmentId, {
-      attributes: ["id", "date", "collection_centre", "transportation_mode"],
+      attributes: ['id', 'date', 'collection_centre', 'transportation_mode'],
       include: {
         model: Shops,
-        attributes: ["shop_name", "id", "latitude", "longitude", "pin_code"],
-        through: { attributes: ["status"] },
+        attributes: ['shop_name', 'id', 'latitude', 'longitude', 'pin_code'],
+        through: { attributes: ['status'] },
       },
       transaction: t,
     });
-    if (!shipmentData) throw new Error("Error finding shipments");
+    if (!shipmentData) throw new Error('Error finding shipments');
     return shipmentData;
   });
 };
@@ -280,14 +251,14 @@ exports.addShopsToShipments = async (shipmentId, shopId, products) => {
  */
 exports.getShipmentForShop = async (shopId) => {
   const shop = await Shops.findByPk(shopId);
-  if (!shop) throw new NotFoundError("Shop not found");
+  if (!shop) throw new NotFoundError('Shop not found');
   const shipmentProducts = await Products.findAll({
-    attributes: ["id", "name", "price"],
+    attributes: ['id', 'name', 'price'],
     include: [
       {
         model: ShipmentShops,
         where: { shopId },
-        attributes: ["id", "status"],
+        attributes: ['id', 'status'],
         through: { attributes: [] },
       },
     ],
@@ -295,13 +266,13 @@ exports.getShipmentForShop = async (shopId) => {
   //Returning empty array instead of throwing error for better error handling.
   if (!shipmentProducts) return [];
   const products = shipmentProducts.flatMap((shipmentProduct) =>
-    shipmentProduct["shipment-shops"].map((sh) => ({
+    shipmentProduct['shipment-shops'].map((sh) => ({
       id: shipmentProduct.id,
       name: shipmentProduct.name,
       price: shipmentProduct.price,
       shipmentShopId: sh.id,
       status: sh.status,
-    }))
+    })),
   );
   return products;
 };
@@ -316,28 +287,22 @@ exports.getShipmentForShop = async (shopId) => {
  */
 exports.getShipmentsByStatus = async (status) => {
   const shipmentData = await Shipments.findAll({
-    attributes: [
-      "id",
-      "date",
-      "location",
-      "collection_centre",
-      "transportation_mode",
-    ],
+    attributes: ['id', 'date', 'location', 'collection_centre', 'transportation_mode'],
     include: {
       model: Shops,
-      through: { attributes: ["status"], where: { status } },
+      through: { attributes: ['status'], where: { status } },
     },
   });
   //Returning empty array instead of throwing error for better error handling.
   if (!shipmentData) return [];
   const shipments = shipmentData.flatMap((shipment) =>
-    shipment["shops"].map((sh) => ({
+    shipment['shops'].map((sh) => ({
       id: shipment.id,
       location: shipment.location,
       mode: shipment.transportation_mode,
       collectionCentre: shipment.collection_centre,
-      status: sh["shipment-shops"].status,
-    }))
+      status: sh['shipment-shops'].status,
+    })),
   );
   return shipments;
 };
@@ -353,18 +318,12 @@ exports.getShipmentsByStatus = async (status) => {
 exports.getShipmentsByMode = async (mode) => {
   const shipmentData = await Shipments.findAll({
     where: { transportation_mode: mode },
-    attributes: [
-      "id",
-      "date",
-      "collection_centre",
-      "transportation_mode",
-      "location",
-    ],
+    attributes: ['id', 'date', 'collection_centre', 'transportation_mode', 'location'],
     include: [
       {
         model: Shops,
         through: {
-          attributes: ["status"],
+          attributes: ['status'],
         },
       },
     ],
@@ -372,13 +331,13 @@ exports.getShipmentsByMode = async (mode) => {
   //Returning empty array instead of throwing error for better error handling.
   if (!shipmentData) return [];
   const shipments = shipmentData.flatMap((shipment) =>
-    shipment["shops"].map((sh) => ({
+    shipment['shops'].map((sh) => ({
       id: shipment.id,
       date: shipment.date,
       mode: shipment.transportation_mode,
       collectionCentre: shipment.collection_centre,
-      status: sh["shipment-shops"].status,
-    }))
+      status: sh['shipment-shops'].status,
+    })),
   );
   return shipments;
 };
@@ -398,22 +357,22 @@ exports.getShipmentsByMode = async (mode) => {
 exports.removeProductFromShipment = async (shipmentId, shopId, productId) => {
   return await sequelize.transaction(async (t) => {
     const shipment = await Shipments.findByPk(shipmentId, { transaction: t });
-    if (!shipment) throw new NotFoundError("shipment not found");
+    if (!shipment) throw new NotFoundError('shipment not found');
     const shop = await Shops.findByPk(shopId, { transaction: t });
-    if (!shop) throw new NotFoundError("Shop not found");
+    if (!shop) throw new NotFoundError('Shop not found');
     const product = await Products.findByPk(productId, { transaction: t });
-    if (!product) throw new NotFoundError("Product not found!");
+    if (!product) throw new NotFoundError('Product not found!');
     const shipmentShop = await ShipmentShops.findOne({
       where: { shopId, shipmentId },
-      attributes: ["id"],
+      attributes: ['id'],
       transaction: t,
     });
-    if (!shipmentShop) throw new Error("shipment shop not found");
+    if (!shipmentShop) throw new Error('shipment shop not found');
     const rowsDeleted = await ShipmentShopProducts.destroy({
       where: { shipmentShopId: shipmentShop.id, productId },
       transaction: t,
     });
-    if (rowsDeleted == 0) throw new NoContentError("No rows deleted");
+    if (rowsDeleted == 0) throw new NoContentError('No rows deleted');
     const data = await ShipmentShopProducts.findOne({
       where: { shipmentShopId: shipmentShop.id, productId },
       transaction: t,
@@ -436,19 +395,19 @@ exports.removeProductFromShipment = async (shipmentId, shopId, productId) => {
 exports.removeShopFromShipment = async (shipmentId, shopId) => {
   return await sequelize.transaction(async (t) => {
     const shipment = await Shipments.findByPk(shipmentId, { transaction: t });
-    if (!shipment) throw new NotFoundError("Shipment not found!");
+    if (!shipment) throw new NotFoundError('Shipment not found!');
     const shop = await Shops.findByPk(shopId, { transaction: t });
-    if (!shop) throw new NotFoundError("Shop not found!");
+    if (!shop) throw new NotFoundError('Shop not found!');
     const shipmentShop = await ShipmentShops.findOne({
       where: { shipmentId, shopId },
       transaction: t,
     });
-    if (!shipmentShop) throw new NotFoundError("Shipment shop not exists");
+    if (!shipmentShop) throw new NotFoundError('Shipment shop not exists');
     const numRowsDeleted = await ShipmentShops.destroy({
       where: { id: shipmentShop.id },
       transaction: t,
     });
-    if (numRowsDeleted == 0) throw new NoContentError("No rows deleted");
+    if (numRowsDeleted == 0) throw new NoContentError('No rows deleted');
     const shops = await ShipmentShops.findAll({
       where: { shipmentId },
       transaction: t,

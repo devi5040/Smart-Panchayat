@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -9,7 +9,7 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.createTable("orders", {
+    await queryInterface.createTable('orders', {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -25,26 +25,26 @@ module.exports = {
         allowNull: false,
       },
       payment_status: {
-        type: Sequelize.ENUM("paid", "pending"),
+        type: Sequelize.ENUM('paid', 'pending'),
         allowNull: false,
-        defaultValue: "pending",
+        defaultValue: 'pending',
       },
       userId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: "users", key: "id" },
-        onDelete: "CASCADE",
-        onUpdate: "CASCADE",
+        references: { model: 'users', key: 'id' },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
     });
   },

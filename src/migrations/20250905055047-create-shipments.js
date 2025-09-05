@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -9,7 +9,7 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.createTable("shipments", {
+    await queryInterface.createTable('shipments', {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -25,9 +25,9 @@ module.exports = {
         allowNull: false,
       },
       transportation_mode: {
-        type: Sequelize.ENUM("truck", "bus", "train", "others"),
+        type: Sequelize.ENUM('truck', 'bus', 'train', 'others'),
         allowNull: false,
-        defaultValue: "truck",
+        defaultValue: 'truck',
       },
       location: {
         type: Sequelize.STRING(255),
@@ -36,12 +36,12 @@ module.exports = {
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
     });
   },
@@ -53,6 +53,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.dropTable("shipments");
+    await queryInterface.dropTable('shipments');
   },
 };

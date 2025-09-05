@@ -7,7 +7,7 @@
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
 
-const winston = require("winston");
+const winston = require('winston');
 const { combine, timestamp, printf } = winston.format;
 
 // Define custom log format
@@ -17,20 +17,20 @@ const logFormat = printf(({ level, message, timestamp }) => {
 
 // create the logger for logging messages
 const logger = winston.createLogger({
-  level: "http",
+  level: 'http',
   format: combine(
     timestamp({
-      format: new Date().toLocaleString("en-IN", {
+      format: new Date().toLocaleString('en-IN', {
         hour12: false,
-        timeZone: "Asia/Kolkata",
+        timeZone: 'Asia/Kolkata',
       }),
     }),
-    logFormat
+    logFormat,
   ),
   transports: [
     new winston.transports.Console(),
-    new winston.transports.File({ filename: "logs/error.log", level: "error" }),
-    new winston.transports.File({ filename: "logs/combined.log" }),
+    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'logs/combined.log' }),
   ],
 });
 

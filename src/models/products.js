@@ -7,10 +7,10 @@
  * @created 14-08-2025
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
-const Sequelize = require("sequelize");
-const sequelize = require("../config/db");
+const Sequelize = require('sequelize');
+const sequelize = require('../config/db');
 
-const Products = sequelize.define("products", {
+const Products = sequelize.define('products', {
   id: {
     type: Sequelize.INTEGER,
     primaryKey: true,

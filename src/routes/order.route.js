@@ -8,10 +8,10 @@
  * @updated August 29, 2025
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
-const express = require("express");
+const express = require('express');
 const router = express.Router(); // Use express.Router() for better organization
 
-const auth = require("../middleware/firebaseAuthMiddleware");
+const auth = require('../middleware/firebaseAuthMiddleware');
 /**
  * @type {import('express').Router}
  * @description Express Router instance for handling order-related routes.
@@ -21,26 +21,26 @@ const auth = require("../middleware/firebaseAuthMiddleware");
  * @description Middleware for validating incoming requests based on defined schemas.
  * @type {import('express').RequestHandler}
  */
-const validate = require("../middleware/validation.middleware");
+const validate = require('../middleware/validation.middleware');
 
 /**
  * @description Order validation schemas.  These define the expected structure of requests.
  * @type {object}
  */
-const orderSchema = require("../utils/validation/order.validation");
+const orderSchema = require('../utils/validation/order.validation');
 
 /**
  * @description Controller functions for handling order-related operations.
  * @type {object}
  */
-const orderController = require("../controllers/order.controller");
+const orderController = require('../controllers/order.controller');
 
 /**
  * @route GET /
  * @description Retrieves a list of orders.  Note:  This may be subject to pagination or filtering in a production environment.
  * @returns {Promise<Array<Object>>} An array of order objects, or an empty array if no orders are found.  The structure of the order objects is defined in the `order.controller.getOrders` function.  Error handling should be implemented in the controller to return appropriate error responses for database or other issues.
  */
-router.get("/", orderController.getOrders);
+router.get('/', orderController.getOrders);
 
 /**
  * @route GET /history
@@ -49,7 +49,7 @@ router.get("/", orderController.getOrders);
  * @param {import('express').Response} res - Express response object.
  * @returns {Promise<Array<Object>>} An array of order history objects, or an empty array if no order history is found for the user.  Error handling is implemented in the controller.
  */
-router.get("/history", auth, orderController.getOrderHistory);
+router.get('/history', auth, orderController.getOrderHistory);
 
 /**
  * @route GET /:orderId
@@ -58,7 +58,7 @@ router.get("/history", auth, orderController.getOrderHistory);
  * @param {import('express').Response} res - Express response object.
  * @returns {Promise<Object|null>} A single order object if found, or null if not found. Error handling is implemented in the controller.
  */
-router.get("/:orderId", orderController.getOrderByID);
+router.get('/:orderId', orderController.getOrderByID);
 
 /**
  * @route GET /collection-centre/:collectionCentre
@@ -67,10 +67,7 @@ router.get("/:orderId", orderController.getOrderByID);
  * @param {import('express').Response} res - Express response object.
  * @returns {Promise<Array<Object>>} An array of order objects associated with the specified collection centre.  Returns an empty array if no orders are found. Error handling is implemented in the controller.
  */
-router.get(
-  "/collection-centre/:collectionCentre",
-  orderController.getOrdersByCollectionCentre
-);
+router.get('/collection-centre/:collectionCentre', orderController.getOrdersByCollectionCentre);
 
 /**
  * @route GET /payment-status/:paymentStatus
@@ -80,9 +77,9 @@ router.get(
  * @returns {Promise<Array<Object>>} An array of order objects matching the specified payment status. Returns an empty array if no orders are found. Error handling is implemented in the controller.
  */
 router.get(
-  "/payment-status/:paymentStatus",
-  validate(orderSchema.paymentStatusOrderSchema, "params"),
-  orderController.getOrdersByPaymentStatus
+  '/payment-status/:paymentStatus',
+  validate(orderSchema.paymentStatusOrderSchema, 'params'),
+  orderController.getOrdersByPaymentStatus,
 );
 
 /**
@@ -92,7 +89,7 @@ router.get(
  * @param {import('express').Response} res - Express response object.
  * @returns {Promise<Object>} The newly created order object. Error handling (e.g., database errors, validation errors) is implemented in the controller.
  */
-router.post("/", validate(orderSchema.orderSchema), orderController.addOrder);
+router.post('/', validate(orderSchema.orderSchema), orderController.addOrder);
 
 /**
  * @route PATCH /:orderId
@@ -102,9 +99,9 @@ router.post("/", validate(orderSchema.orderSchema), orderController.addOrder);
  * @returns {Promise<Object>} The updated order object. Error handling is implemented in the controller.
  */
 router.patch(
-  "/:orderId",
+  '/:orderId',
   validate(orderSchema.paymentStatusOrderSchema),
-  orderController.updateOrderPaymentStatus
+  orderController.updateOrderPaymentStatus,
 );
 
 /**

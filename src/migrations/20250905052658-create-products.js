@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -9,7 +9,7 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.createTable("products", {
+    await queryInterface.createTable('products', {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -31,19 +31,19 @@ module.exports = {
       },
       categoryId: {
         type: Sequelize.INTEGER,
-        references: { model: "categories", key: "id" },
-        onDelete: "CASCADE",
-        onUpdate: "CASCADE",
+        references: { model: 'categories', key: 'id' },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
     });
   },
@@ -55,6 +55,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.dropTable("products");
+    await queryInterface.dropTable('products');
   },
 };

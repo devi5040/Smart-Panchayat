@@ -8,10 +8,10 @@
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
 
-const Sequelize = require("sequelize");
-const sequelize = require("../config/db");
+const Sequelize = require('sequelize');
+const sequelize = require('../config/db');
 
-const Users = sequelize.define("users", {
+const Users = sequelize.define('users', {
   id: {
     type: Sequelize.INTEGER,
     allowNull: false,
@@ -52,9 +52,9 @@ const Users = sequelize.define("users", {
     },
   },
   language_preference: {
-    type: Sequelize.ENUM("English", "Kannada"),
+    type: Sequelize.ENUM('English', 'Kannada'),
     allowNull: false,
-    defaultValue: "English",
+    defaultValue: 'English',
   },
   profile_image: {
     type: Sequelize.STRING(255),
@@ -69,14 +69,14 @@ const Users = sequelize.define("users", {
     allowNull: true,
   },
   account_status: {
-    type: Sequelize.ENUM("active", "inactive"),
+    type: Sequelize.ENUM('active', 'inactive'),
     allowNull: false,
-    defaultValue: "active",
+    defaultValue: 'active',
   },
   user_role: {
-    type: Sequelize.ENUM("admin", "user", "shop", "agent"),
+    type: Sequelize.ENUM('admin', 'user', 'shop', 'agent'),
     allowNull: false,
-    defaultValue: "user",
+    defaultValue: 'user',
   },
   latitude: {
     type: Sequelize.DECIMAL(9, 6),

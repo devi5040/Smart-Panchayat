@@ -9,9 +9,9 @@
  * @updated August 29, 2025
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
-const sequelize = require("../config/db");
-const { OrderItems, Orders, Users, Products } = require("../models");
-const { NotFoundError } = require("../utils/error");
+const sequelize = require('../config/db');
+const { OrderItems, Orders, Users, Products } = require('../models');
+const { NotFoundError } = require('../utils/error');
 
 /**
  * Adds a new order to the database.  Handles creation of associated order items.
@@ -27,12 +27,12 @@ const { NotFoundError } = require("../utils/error");
  * @returns {Promise<Order>} The created order instance with associated products.  Includes quantity and product_quality from the OrderItems join table.
  */
 exports.addOrder = async (orderData, items) => {
-  const { collectionCentre, paymentStatus = "pending", userId } = orderData;
+  const { collectionCentre, paymentStatus = 'pending', userId } = orderData;
 
   return await sequelize.transaction(async (t) => {
     // Check if user exists
     const user = await Users.findByPk(userId, { transaction: t });
-    if (!user) throw new NotFoundError("❌ User not found!");
+    if (!user) throw new NotFoundError('❌ User not found!');
 
     // Create order
     const order = await Orders.create(
@@ -42,7 +42,7 @@ exports.addOrder = async (orderData, items) => {
         payment_status: paymentStatus,
         userId,
       },
-      { transaction: t }
+      { transaction: t },
     );
 
     let totalPrice = 0;
@@ -52,7 +52,7 @@ exports.addOrder = async (orderData, items) => {
 
       // Check if product exists
       const product = await Products.findByPk(productId, { transaction: t });
-      if (!product) throw new NotFoundError("❌ Product not found!");
+      if (!product) throw new NotFoundError('❌ Product not found!');
 
       totalPrice += product.price * quantity; // Accumulate total price
 
@@ -65,22 +65,22 @@ exports.addOrder = async (orderData, items) => {
           productId,
           orderId: order.id,
         },
-        { transaction: t }
+        { transaction: t },
       );
     }
 
     // Update order price with calculated total
     const [numRowsUpdated] = await Orders.update(
       { price: totalPrice },
-      { where: { id: order.id }, transaction: t }
+      { where: { id: order.id }, transaction: t },
     );
-    if (numRowsUpdated === 0) throw new Error("No rows updated");
+    if (numRowsUpdated === 0) throw new Error('No rows updated');
 
     // Return the order with included products
     const orderData = await Orders.findByPk(order.id, {
       include: {
         model: Products,
-        through: { attributes: ["quantity", "product_quality"] },
+        through: { attributes: ['quantity', 'product_quality'] },
       },
       transaction: t,
     });
@@ -98,10 +98,10 @@ exports.getOrders = async () => {
   const orders = await Orders.findAll({
     include: {
       model: Products,
-      through: { attributes: ["quantity", "product_quality"] },
+      through: { attributes: ['quantity', 'product_quality'] },
     },
   });
-  if (!orders) throw new Error("Order is undefined/null"); //Improved error message
+  if (!orders) throw new Error('Order is undefined/null'); //Improved error message
   return orders;
 };
 
@@ -115,15 +115,15 @@ exports.getOrders = async () => {
  */
 exports.getOrderHistory = async (userId) => {
   const user = await Users.findByPk(userId);
-  if (!user) throw new NotFoundError("User not found!");
+  if (!user) throw new NotFoundError('User not found!');
   const orders = await Orders.findAll({
     where: { userId },
     include: {
       model: Products,
-      through: { attributes: ["quantity", "product_quality"] },
+      through: { attributes: ['quantity', 'product_quality'] },
     },
   });
-  if (!orders) throw new Error("Order data is undefined/null");
+  if (!orders) throw new Error('Order data is undefined/null');
   return orders;
 };
 
@@ -140,11 +140,11 @@ exports.getOrderByCollectionCentre = async (collectionCentre) => {
     include: {
       model: Products,
       through: {
-        attributes: ["quantity", "product_quality"],
+        attributes: ['quantity', 'product_quality'],
       },
     },
   });
-  if (orders?.length === 0) throw new NotFoundError("Order not found");
+  if (orders?.length === 0) throw new NotFoundError('Order not found');
   return orders;
 };
 
@@ -162,7 +162,7 @@ exports.getOrderByPaymentStatus = async (paymentStatus) => {
     include: {
       model: Products,
       through: {
-        attributes: ["quantity", "product_quality"],
+        attributes: ['quantity', 'product_quality'],
       },
     },
   });
@@ -180,19 +180,19 @@ exports.getOrderByPaymentStatus = async (paymentStatus) => {
  */
 exports.updatePaymentStatus = async (orderId, paymentStatus) => {
   const order = await Orders.findByPk(orderId);
-  if (!order) throw new NotFoundError("Order not found!");
+  if (!order) throw new NotFoundError('Order not found!');
   const [numRowsUpdated] = await Orders.update(
     {
       payment_status: paymentStatus,
     },
-    { where: { id: orderId } }
+    { where: { id: orderId } },
   );
-  if (numRowsUpdated === 0) throw new Error("No rows are updated!");
+  if (numRowsUpdated === 0) throw new Error('No rows are updated!');
   const orderData = await Orders.findByPk(orderId, {
     include: {
       model: Products,
       through: {
-        attributes: ["quantity", "product_quality"],
+        attributes: ['quantity', 'product_quality'],
       },
     },
   });
@@ -210,9 +210,9 @@ exports.getOrderById = async (orderId) => {
   const order = await Orders.findByPk(orderId, {
     include: {
       model: Products,
-      through: { attributes: ["quantity", "product_quality"] },
+      through: { attributes: ['quantity', 'product_quality'] },
     },
   });
-  if (!order) throw new NotFoundError("Order not found");
+  if (!order) throw new NotFoundError('Order not found');
   return order;
 };

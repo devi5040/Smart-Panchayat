@@ -9,28 +9,28 @@
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
 
-const express = require("express");
+const express = require('express');
 const router = express.Router(); // Use express.Router() for better readability
 
-const auth = require("../middleware/firebaseAuthMiddleware");
+const auth = require('../middleware/firebaseAuthMiddleware');
 /**
  * @type {import('express').RequestHandler}
  * @description Middleware for Firebase authentication.  Ensures requests are authenticated.
  */
 
-const validation = require("../middleware/validation.middleware");
+const validation = require('../middleware/validation.middleware');
 /**
  * @type {import('express').RequestHandler}
  * @param {object} schema - Joi validation schema.
  * @description Middleware for validating request data against a Joi schema.
  */
 
-const shopController = require("../controllers/shop.controller");
+const shopController = require('../controllers/shop.controller');
 /**
  * @description Controller for shop-related actions.
  */
 
-const shopValidator = require("../utils/validation/shop.validation");
+const shopValidator = require('../utils/validation/shop.validation');
 /**
  * @description Contains Joi validation schemas for shop data.
  */
@@ -41,7 +41,7 @@ const shopValidator = require("../utils/validation/shop.validation");
  * @middleware {auth} Firebase Authentication middleware
  * @middleware {shopController.getShops} Shop controller method to handle the request.
  */
-router.get("/", auth, shopController.getShops);
+router.get('/', auth, shopController.getShops);
 
 /**
  * @route GET /:shopId
@@ -49,7 +49,7 @@ router.get("/", auth, shopController.getShops);
  * @param {string} shopId - The ID of the shop to retrieve.
  * @middleware {shopController.getShopDetails} Shop controller method to handle the request.
  */
-router.get("/:shopId", shopController.getShopDetails);
+router.get('/:shopId', shopController.getShopDetails);
 
 /**
  * @route POST /
@@ -58,12 +58,7 @@ router.get("/:shopId", shopController.getShopDetails);
  * @middleware {validation(shopValidator.productDataSchema)} Input validation middleware using Joi schema.
  * @middleware {shopController.addShop} Shop controller method to handle the request.
  */
-router.post(
-  "/",
-  auth,
-  validation(shopValidator.productDataSchema),
-  shopController.addShop
-);
+router.post('/', auth, validation(shopValidator.productDataSchema), shopController.addShop);
 
 /**
  * @route PUT /:shopId
@@ -74,10 +69,10 @@ router.post(
  * @middleware {shopController.updateShopDetails} Shop controller method to handle the request.
  */
 router.put(
-  "/:shopId",
+  '/:shopId',
   auth,
   validation(shopValidator.productDataSchema),
-  shopController.updateShopDetails
+  shopController.updateShopDetails,
 );
 
 /**
@@ -88,9 +83,9 @@ router.put(
  * @middleware {shopController.addRemarks} Shop controller method to handle the request.
  */
 router.patch(
-  "/shipment/:shipmentId",
+  '/shipment/:shipmentId',
   validation(shopValidator.remarksSchema),
-  shopController.addRemarks
+  shopController.addRemarks,
 );
 
 module.exports = router;

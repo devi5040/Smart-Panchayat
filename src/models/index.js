@@ -9,21 +9,21 @@
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
 
-const Users = require("./user");
-const Shops = require("./shop");
-const Products = require("./products");
-const ShopProducts = require("./shopProducts");
-const Orders = require("./orders");
-const OrderItems = require("./orderItems");
-const Shipments = require("./shipments");
-const ShipmentShops = require("./shipmentShops");
-const ShipmentShopProducts = require("./shipmentShopsProducts");
-const Category = require("./category");
+const Users = require('./user');
+const Shops = require('./shop');
+const Products = require('./products');
+const ShopProducts = require('./shopProducts');
+const Orders = require('./orders');
+const OrderItems = require('./orderItems');
+const Shipments = require('./shipments');
+const ShipmentShops = require('./shipmentShops');
+const ShipmentShopProducts = require('./shipmentShopsProducts');
+const Category = require('./category');
 
 // One-to-One: User <-> Shop
 // A User has exactly one Shop.
 // OnDelete: NULL and onUpdate: CASCADE -> defaults for one-to-one relationships.
-Users.hasOne(Shops, { onDelete: "CASCADE" });
+Users.hasOne(Shops, { onDelete: 'CASCADE' });
 Shops.belongsTo(Users);
 
 // Many-to-Many: Shops <-> Products.
@@ -41,7 +41,7 @@ Products.belongsToMany(Orders, { through: OrderItems });
 // One-to-Many: Users <-> Orders
 // An user can have multiple orders. An order belongs to only one user.
 // Defaults: onDelete: NULL and onUpdate: CASCADE
-Users.hasMany(Orders, { onDelete: "CASCADE" });
+Users.hasMany(Orders, { onDelete: 'CASCADE' });
 Orders.belongsTo(Users);
 
 // Many-to-Many: Shipments <-> Shops
@@ -59,7 +59,7 @@ Products.belongsToMany(ShipmentShops, { through: ShipmentShopProducts });
 // One-to-Many: Products <-> Category
 // A category can have multiple products. A product belong to one category.
 // Defaults: onDelete: NULL and onUpdate: CASCADE
-Category.hasMany(Products, { onDelete: "CASCADE" });
+Category.hasMany(Products, { onDelete: 'CASCADE' });
 Products.belongsTo(Category);
 
 module.exports = {

@@ -9,10 +9,10 @@
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
 
-const Sequelize = require("sequelize");
-const sequelize = require("../config/db");
+const Sequelize = require('sequelize');
+const sequelize = require('../config/db');
 
-const Shipments = sequelize.define("shipments", {
+const Shipments = sequelize.define('shipments', {
   id: {
     type: Sequelize.INTEGER,
     allowNull: false,
@@ -28,9 +28,9 @@ const Shipments = sequelize.define("shipments", {
     allowNull: false,
   },
   transportation_mode: {
-    type: Sequelize.ENUM("truck", "bus", "train", "others"),
+    type: Sequelize.ENUM('truck', 'bus', 'train', 'others'),
     allowNull: false,
-    defaultValue: "truck",
+    defaultValue: 'truck',
   },
   location: {
     type: Sequelize.STRING(255),

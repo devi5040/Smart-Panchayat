@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -9,7 +9,7 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.createTable("shipment-shops", {
+    await queryInterface.createTable('shipment-shops', {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -19,21 +19,21 @@ module.exports = {
       shipmentId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: "shipments", key: "id" },
-        onDelete: "CASCADE",
-        onUpdate: "CASCADE",
+        references: { model: 'shipments', key: 'id' },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       },
       shopId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: "shops", key: "id" },
-        onDelete: "CASCADE",
-        onUpdate: "CASCADE",
+        references: { model: 'shops', key: 'id' },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       },
       status: {
-        type: Sequelize.ENUM("pending", "delivered"),
+        type: Sequelize.ENUM('pending', 'delivered'),
         allowNull: false,
-        defaultValue: "pending",
+        defaultValue: 'pending',
       },
       remarks: {
         type: Sequelize.TEXT,
@@ -42,12 +42,12 @@ module.exports = {
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
     });
   },
@@ -59,6 +59,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.dropTable("shipment-shops");
+    await queryInterface.dropTable('shipment-shops');
   },
 };

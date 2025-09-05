@@ -9,14 +9,14 @@
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
 
-const router = require("express").Router();
+const router = require('express').Router();
 
 // Import middleware and schemas for validation.
-const validate = require("../middleware/validation.middleware");
-const schema = require("../utils/validation/shipment.validation");
+const validate = require('../middleware/validation.middleware');
+const schema = require('../utils/validation/shipment.validation');
 
 // Import shipment controller functions.
-const shipmentController = require("../controllers/shipment.controller");
+const shipmentController = require('../controllers/shipment.controller');
 
 /**
  * @route GET /
@@ -24,7 +24,7 @@ const shipmentController = require("../controllers/shipment.controller");
  * @returns {Array<Object>} An array of shipment objects.  Each object represents a shipment and should contain relevant fields as defined in the database model.  See Sequelize documentation for details on retrieving data.
  * @throws {Error} An error if the request fails.  Error handling should be implemented within the controller.
  */
-router.get("/", shipmentController.getShipmentList);
+router.get('/', shipmentController.getShipmentList);
 
 /**
  * @route POST /
@@ -33,11 +33,7 @@ router.get("/", shipmentController.getShipmentList);
  * @returns {Object} The newly created shipment object.
  * @throws {Error} 400 Bad Request - If input validation fails.  Error details should be provided in the response.  See Sequelize documentation for details on creating data.
  */
-router.post(
-  "/",
-  validate(schema.shipmentSchema),
-  shipmentController.createShipment
-);
+router.post('/', validate(schema.shipmentSchema), shipmentController.createShipment);
 
 /**
  * @route PATCH /:shipmentId
@@ -48,9 +44,9 @@ router.post(
  * @throws {Error} 400 Bad Request - If input validation fails. 404 Not Found - If the shipment is not found.  See Sequelize documentation for details on updating data.
  */
 router.patch(
-  "/:shipmentId",
+  '/:shipmentId',
   validate(schema.shipmentProductUpdateSchema),
-  shipmentController.updateShipmentProduct
+  shipmentController.updateShipmentProduct,
 );
 
 /**
@@ -60,11 +56,7 @@ router.patch(
  * @returns {Object} The updated shipment object.
  * @throws {Error} 400 Bad Request - If input validation fails.  See Sequelize documentation for details on updating data.
  */
-router.put(
-  "/",
-  validate(schema.addShopToShipmentSchema),
-  shipmentController.addShopToShipment
-);
+router.put('/', validate(schema.addShopToShipmentSchema), shipmentController.addShopToShipment);
 
 /**
  * @route GET /shop/:shopId
@@ -73,7 +65,7 @@ router.put(
  * @returns {Array<Object>} An array of shipment objects associated with the shop.
  * @throws {Error} 404 Not Found - If no shipments are found for the given shop ID.
  */
-router.get("/shop/:shopId", shipmentController.getShipmentForShops);
+router.get('/shop/:shopId', shipmentController.getShipmentForShops);
 
 /**
  * @route GET /status/:status
@@ -83,9 +75,9 @@ router.get("/shop/:shopId", shipmentController.getShipmentForShops);
  * @throws {Error} 400 Bad Request - If input validation fails. 404 Not Found - If no shipments are found for the given status.
  */
 router.get(
-  "/status/:status",
-  validate(schema.shipmentStatus, "params"),
-  shipmentController.getShipmentByStatus
+  '/status/:status',
+  validate(schema.shipmentStatus, 'params'),
+  shipmentController.getShipmentByStatus,
 );
 
 /**
@@ -96,9 +88,9 @@ router.get(
  * @throws {Error} 400 Bad Request - If input validation fails. 404 Not Found - If no shipments are found for the given mode.
  */
 router.get(
-  "/mode/:mode",
-  validate(schema.shipmentModeSchema, "params"),
-  shipmentController.getShipmentByTransportationMode
+  '/mode/:mode',
+  validate(schema.shipmentModeSchema, 'params'),
+  shipmentController.getShipmentByTransportationMode,
 );
 
 /**
@@ -111,8 +103,8 @@ router.get(
  * @throws {Error} 404 Not Found - If the shipment, shop, or product is not found. See Sequelize documentation for details on deleting data.
  */
 router.delete(
-  "/:shipmentId/shop/:shopId/product/:productId",
-  shipmentController.removeShipmentProduct
+  '/:shipmentId/shop/:shopId/product/:productId',
+  shipmentController.removeShipmentProduct,
 );
 
 /**
@@ -123,9 +115,6 @@ router.delete(
  * @returns {Object} A success message or status indicating successful deletion.
  * @throws {Error} 404 Not Found - If the shipment or shop is not found. See Sequelize documentation for details on deleting data.
  */
-router.delete(
-  "/:shipmentId/shop/:shopId",
-  shipmentController.removeShipmentShop
-);
+router.delete('/:shipmentId/shop/:shopId', shipmentController.removeShipmentShop);
 
 module.exports = router;

@@ -9,37 +9,37 @@
  * @updated August 26, 2025
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
-const router = require("express").Router();
+const router = require('express').Router();
 
 /**
  * @description Middleware for Firebase authentication.  Verifies user authentication.
  * @type {function}
  */
-const authentication = require("../middleware/firebaseAuthMiddleware");
+const authentication = require('../middleware/firebaseAuthMiddleware');
 
 /**
  * @description Middleware for authorization. Checks if the user has the required roles.
  * @type {function}
  */
-const authorization = require("../middleware/authorization.middleware");
+const authorization = require('../middleware/authorization.middleware');
 
 /**
  * @description Middleware for validating request data.
  * @type {function}
  */
-const validate = require("../middleware/validation.middleware");
+const validate = require('../middleware/validation.middleware');
 
 /**
  * @description Validation schema for product data.
  * @type {object}
  */
-const productValidator = require("../utils/validation/product.validation");
+const productValidator = require('../utils/validation/product.validation');
 
 /**
  * @description Controller for product-related operations.
  * @type {object}
  */
-const productController = require("../controllers/product.controller");
+const productController = require('../controllers/product.controller');
 
 /**
  * @swagger
@@ -57,12 +57,7 @@ const productController = require("../controllers/product.controller");
  *       '403':
  *         description: Forbidden
  */
-router.get(
-  "/shop",
-  authentication,
-  authorization(["shop"]),
-  productController.getProductForShops
-);
+router.get('/shop', authentication, authorization(['shop']), productController.getProductForShops);
 
 /**
  * @swagger
@@ -88,10 +83,10 @@ router.get(
  *         description: Forbidden
  */
 router.get(
-  "/shop/:status",
+  '/shop/:status',
   authentication,
-  authorization(["shop", "admin"]),
-  productController.getProductForStatus
+  authorization(['shop', 'admin']),
+  productController.getProductForStatus,
 );
 
 /**
@@ -108,7 +103,7 @@ router.get(
  *       '401':
  *         description: Unauthorized
  */
-router.get("/", authentication, productController.getAllProducts);
+router.get('/', authentication, productController.getAllProducts);
 
 /**
  * @swagger
@@ -133,7 +128,7 @@ router.get("/", authentication, productController.getAllProducts);
  *       '404':
  *         description: Product not found
  */
-router.get("/:productId", authentication, productController.getProductDetails);
+router.get('/:productId', authentication, productController.getProductDetails);
 
 /**
  * @swagger
@@ -158,23 +153,23 @@ router.get("/:productId", authentication, productController.getProductDetails);
  *         description: Unauthorized
  */
 router.post(
-  "/shop",
+  '/shop',
   validate(productValidator.productShopSchema),
-  productController.addShopProduct
+  productController.addShopProduct,
 );
 router.post(
-  "/",
+  '/',
   authentication,
   validate(productValidator.productValidation),
-  productController.addProduct
+  productController.addProduct,
 );
 
-router.patch("/shop/:productId", productController.updateProductPrice);
+router.patch('/shop/:productId', productController.updateProductPrice);
 
 router.put(
-  "/shop/:shopProductId",
+  '/shop/:shopProductId',
   validate(productValidator.updateProductShopSchema),
-  productController.updateShopProduct
+  productController.updateShopProduct,
 );
 /**
  * @swagger
@@ -208,10 +203,10 @@ router.put(
  *         description: Product not found
  */
 router.patch(
-  "/:shopProductId/status",
+  '/:shopProductId/status',
   authentication,
   validate(productValidator.statusValidation),
-  productController.updateProductStatus
+  productController.updateProductStatus,
 );
 
 /**
@@ -246,10 +241,10 @@ router.patch(
  *         description: Product not found
  */
 router.put(
-  "/:productId",
+  '/:productId',
   authentication,
   validate(productValidator.productValidation),
-  productController.updateProduct
+  productController.updateProduct,
 );
 
 /**
@@ -275,6 +270,6 @@ router.put(
  *       '404':
  *         description: Product not found
  */
-router.delete("/:productId", authentication, productController.deleteProduct);
+router.delete('/:productId', authentication, productController.deleteProduct);
 
 module.exports = router;

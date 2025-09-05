@@ -10,28 +10,24 @@
  */
 
 // Import necessary modules
-const express = require("express");
+const express = require('express');
 const router = express.Router(); // Create a router instance
 
-const productController = require("../controllers/product.controller");
-const categoryController = require("../controllers/category.controller"); // Import category controller
-const validate = require("../middleware/validation.middleware"); // Import validation middleware
-const authMiddleware = require("../middleware/firebaseAuthMiddleware"); // Import Firebase authentication middleware
+const productController = require('../controllers/product.controller');
+const categoryController = require('../controllers/category.controller'); // Import category controller
+const validate = require('../middleware/validation.middleware'); // Import validation middleware
+const authMiddleware = require('../middleware/firebaseAuthMiddleware'); // Import Firebase authentication middleware
 
 // Import validation schemas
-const {
-  fileUploadSchema,
-} = require("../utils/validation/fileUploadValidation");
-const {
-  categoryValidationSchema,
-} = require("../utils/validation/category.validation");
+const { fileUploadSchema } = require('../utils/validation/fileUploadValidation');
+const { categoryValidationSchema } = require('../utils/validation/category.validation');
 
 /**
  * @route GET /
  * @description Retrieves all categories.
  * @access Private (requires Firebase authentication)
  */
-router.get("/", authMiddleware, categoryController.getAllCategories);
+router.get('/', authMiddleware, categoryController.getAllCategories);
 
 /**
  * @route POST /signed-url
@@ -40,10 +36,10 @@ router.get("/", authMiddleware, categoryController.getAllCategories);
  * @middleware validate(fileUploadSchema): Validates file upload request body.
  */
 router.post(
-  "/signed-url",
+  '/signed-url',
   authMiddleware,
   validate(fileUploadSchema),
-  categoryController.getSignedUrl
+  categoryController.getSignedUrl,
 );
 
 /**
@@ -53,17 +49,13 @@ router.post(
  * @middleware validate(categoryValidationSchema): Validates category creation request body.
  */
 router.post(
-  "/",
+  '/',
   authMiddleware,
   validate(categoryValidationSchema),
-  categoryController.addCategory
+  categoryController.addCategory,
 );
 
-router.get(
-  "/:categoryId/products",
-  authMiddleware,
-  productController.getAllProductsByCategory
-);
+router.get('/:categoryId/products', authMiddleware, productController.getAllProductsByCategory);
 
 /**
  * @route PUT /:categoryId
@@ -73,10 +65,10 @@ router.get(
  * @middleware validate(categoryValidationSchema): Validates category update request body.
  */
 router.put(
-  "/:categoryId",
+  '/:categoryId',
   authMiddleware,
   validate(categoryValidationSchema),
-  categoryController.updateCatogory
+  categoryController.updateCatogory,
 );
 
 /**
@@ -85,11 +77,7 @@ router.put(
  * @access Private (requires Firebase authentication)
  * @param {string} categoryId - The ID of the category to delete.
  */
-router.delete(
-  "/:categoryId",
-  authMiddleware,
-  categoryController.deleteCategory
-);
+router.delete('/:categoryId', authMiddleware, categoryController.deleteCategory);
 
 // Export the router
 module.exports = router;

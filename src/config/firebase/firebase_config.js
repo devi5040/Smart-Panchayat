@@ -8,10 +8,10 @@
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
 
-const admin = require("firebase-admin");
+const admin = require('firebase-admin');
 
 // Path to the json service key file exported from firebase.
-const serviceAccount = require("./smart-panchayat-firebase-secret-key.json");
+const serviceAccount = require('./smart-panchayat-firebase-secret-key.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),

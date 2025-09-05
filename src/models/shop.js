@@ -6,10 +6,10 @@
  * @created 14-08-2025
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
-const Sequelize = require("sequelize");
-const sequelize = require("../config/db");
+const Sequelize = require('sequelize');
+const sequelize = require('../config/db');
 
-const Shops = sequelize.define("shops", {
+const Shops = sequelize.define('shops', {
   id: {
     type: Sequelize.INTEGER,
     allowNull: false,
@@ -28,8 +28,8 @@ const Shops = sequelize.define("shops", {
     },
   },
   priority: {
-    type: Sequelize.ENUM("1", "2", "3", "4"),
-    defaultValue: "4",
+    type: Sequelize.ENUM('1', '2', '3', '4'),
+    defaultValue: '4',
     allowNull: false,
   },
   latitude: {

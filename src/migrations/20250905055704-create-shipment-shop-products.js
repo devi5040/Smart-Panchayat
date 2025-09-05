@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -9,7 +9,7 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.createTable("shipment-shop-products", {
+    await queryInterface.createTable('shipment-shop-products', {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -19,16 +19,16 @@ module.exports = {
       shipmentShopId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: "shipment_shops", key: "id" },
-        onDelete: "CASCADE",
-        onUpdate: "CASCADE",
+        references: { model: 'shipment_shops', key: 'id' },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       },
       productId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: "products", key: "id" },
-        onDelete: "CASCADE",
-        onUpdate: "CASCADE",
+        references: { model: 'products', key: 'id' },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       },
       quantity: {
         type: Sequelize.INTEGER,
@@ -38,12 +38,12 @@ module.exports = {
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
     });
   },
@@ -55,6 +55,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.dropTable("shipment-shop-products");
+    await queryInterface.dropTable('shipment-shop-products');
   },
 };
