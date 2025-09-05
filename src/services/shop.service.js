@@ -59,6 +59,7 @@ exports.addShop = async (name, pinCode, latitude, longitude, userId) => {
  */
 exports.getShops = async () => {
   const shops = await Shops.findAll();
+  if (!shops) throw new Error('Shops not found');
   return shops;
 };
 
@@ -118,12 +119,15 @@ exports.updateShopDetails = async (userId, shopId, name, pinCode, latitude, long
  * @throws {Error} if no records are updated.
  * @returns {Promise<object>} A promise that resolves to the updated Sequelize ShipmentShops instance.
  */
-exports.addRemarksToShipments = async (shipmentId, remarks) => {
-  if (!shipmentId) throw new Error('shipment id is invalid');
-  const shipment = await ShipmentShops.findByPk(shipmentId);
+exports.addRemarksToShipments = async (shopId, shipmentId, remarks) => {
+  if (!shipmentId) throw new BadRequestError('shipment id is invalid');
+  const shipment = await ShipmentShops.findOne({ where: { shipmentId, shopId } });
   if (!shipment) throw new NotFoundError('Shipment not found');
-  const [numRowsUpdated] = await ShipmentShops.update({ remarks }, { where: { id: shipmentId } });
+  const [numRowsUpdated] = await ShipmentShops.update(
+    { remarks },
+    { where: { shipmentId, shopId } },
+  );
   if (numRowsUpdated == 0) throw new Error('No records are updated.');
-  const shipmentData = await ShipmentShops.findByPk(shipmentId);
+  const shipmentData = await ShipmentShops.findOne({ where: { shipmentId, shopId } });
   return shipmentData;
 };
