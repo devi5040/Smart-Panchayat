@@ -218,7 +218,7 @@ exports.addProductShop = async (
   shopId,
   productId,
   name,
-  image = process.env.DEFAULT_PRODUCT_IMAGE,
+  image,
   categoryId,
   date
 ) => {
