@@ -1,25 +1,25 @@
 /**
  * @filename product.controller.js
- * @description This controller handles all product-related requests, acting as an intermediary between the client and the product service.  It
- * manages requests for retrieving product lists (all products, products by category, products for a specific shop, products with a given status),
- * retrieving individual product details, adding new products, updating existing product information (including status), and deleting products.
- * Error handling is implemented throughout to provide informative responses to client requests.
+ * @description This controller manages all interactions with product data.  It acts as the intermediary between client requests (e.g., fetching
+ * product lists, adding new products, updating product details) and the underlying product service.  The controller handles various scenarios,
+ * including retrieving products by category, shop, or status, and includes comprehensive error handling to ensure robust and informative responses
  *
  * @version v1.0.0
- * @updated August 26, 2025
+ * @updated September 5, 2025
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
 const productServices = require('../services/product.service');
 const logger = require('../utils/logger');
 
 /**
+ * Retrieves all products belonging to a specific category.
  * @async
- * @function getAllProductsByCategory
+ * @route {GET} /products/category/:categoryId
  * @param {object} req - Express request object.
  * @param {object} res - Express response object.
  * @param {string} req.params.categoryId - The ID of the category to fetch products for.
- * @description Retrieves all products belonging to a specific category.
- * @throws {Error} If there's an error retrieving products from the database.  Returns an appropriate HTTP status code based on the error.
+ * @returns {object} An object containing a message and an array of products.  Returns a 200 status code on success.
+ * @throws {Error} If there's an error retrieving products from the database. Returns an appropriate HTTP status code (e.g., 500) and error message.
  */
 exports.getAllProductsByCategory = async (req, res) => {
   const { categoryId } = req.params;
@@ -28,96 +28,90 @@ exports.getAllProductsByCategory = async (req, res) => {
     res.status(200).json({ message: 'Products fetched successfully.', products });
   } catch (error) {
     const status = error.statusCode || 500;
-    logger.error(`Internal error while retrieving products by category ${categoryId}. ${error}`);
-    res.status(status).json({
-      message: 'Internal error while retrieving products.',
-      error: error.message,
-    });
+    logger.error(`Error retrieving products by category ${categoryId}: ${error}`);
+    res.status(status).json({ message: 'Failed to retrieve products.', error: error.message });
   }
 };
 
 /**
+ * Retrieves all products.
  * @async
- * @function getAllProducts
+ * @route {GET} /products
  * @param {object} req - Express request object.
  * @param {object} res - Express response object.
- * @description Retrieves all products.
- * @throws {Error} If there's an error retrieving products from the database. Returns a 500 status code.
+ * @returns {object} An object containing a message and an array of products. Returns a 200 status code on success.
+ * @throws {Error} If there's an error retrieving products from the database. Returns a 500 status code and error message.
  */
 exports.getAllProducts = async (req, res) => {
   try {
     const products = await productServices.getAllProducts();
     res.status(200).json({ message: 'Products fetched successfully.', products });
   } catch (error) {
-    logger.error(`Internal error while fetching all products: ${error}`);
-    res.status(500).json({
-      message: 'Internal error while fetching products.',
-      error: error.message,
-    });
+    logger.error(`Error fetching all products: ${error}`);
+    res.status(500).json({ message: 'Failed to fetch products.', error: error.message });
   }
 };
 
 /**
+ * Retrieves all products associated with a specific shop. Requires authentication.
  * @async
- * @function getProductForShops
+ * @route {GET} /products/shop
  * @param {object} req - Express request object.
  * @param {object} res - Express response object.
- * @param {number} req.user.shop - The ID of the shop to fetch products for.  Obtained from the authenticated user.
- * @description Retrieves all products associated with a specific shop.  Requires authentication.
- * @throws {Error} If the shop ID is invalid or there's an error retrieving products. Returns a 500 status code.
+ * @param {number} req.user.shop - The ID of the shop to fetch products for. Obtained from the authenticated user.
+ * @returns {object} An object containing a message and an array of products. Returns a 200 status code on success.
+ * @throws {Error} If the shop ID is invalid or there's an error retrieving products. Returns a 500 status code and error message.
  */
 exports.getProductForShops = async (req, res) => {
   const shopId = req.user?.shop;
-  if (!shopId) return res.status(500).json({ message: 'The shop ID is not valid.' });
+  if (!shopId) {
+    return res.status(400).json({ message: 'Shop ID is required.' }); //More appropriate status code
+  }
   try {
     const products = await productServices.getProductsForShop(shopId);
-    res.status(200).json({
-      message: 'Products fetched for the shop successfully.',
-      products,
-    });
+    res.status(200).json({ message: 'Products fetched successfully.', products });
   } catch (error) {
-    logger.error(`Internal error while fetching products for the shop: ${shopId}. ${error}`);
+    logger.error(`Error fetching products for shop ${shopId}: ${error}`);
     res.status(500).json({
-      message: 'Internal error while fetching products for the shop.',
+      message: 'Failed to fetch products for shop.',
       error: error.message,
     });
   }
 };
 
 /**
+ * Retrieves products based on shop ID and status. Requires authentication.
  * @async
- * @function getProductForStatus
+ * @route {GET} /products/shop/:status
  * @param {object} req - Express request object.
  * @param {object} res - Express response object.
  * @param {number} req.user.shop - The ID of the shop. Obtained from the authenticated user.
  * @param {string} req.params.status - The status of the products to fetch.
- * @description Retrieves products based on shop ID and status. Requires authentication.
- * @throws {Error} If there's an error retrieving products. Returns an appropriate HTTP status code.
+ * @returns {object} An object containing a message and an array of products. Returns a 200 status code on success.
+ * @throws {Error} If there's an error retrieving products. Returns an appropriate HTTP status code and error message.
  */
 exports.getProductForStatus = async (req, res) => {
   const shopId = req.user?.shop;
   const { status } = req.params;
   try {
     const products = await productServices.getProductsForStatus(shopId, status);
-    res.status(200).json({ message: 'Fetched data successfully.', products });
+    res.status(200).json({ message: 'Products fetched successfully.', products });
   } catch (error) {
     const status = error.statusCode || 500;
-    logger.error(`Internal error while fetching products for status ${status}: ${error}`);
-    res.status(status).json({
-      message: 'Internal error while fetching products.',
-      error: error.message,
-    });
+    logger.error(`Error fetching products for status ${status}: ${error}`);
+    res.status(status).json({ message: 'Failed to fetch products.', error: error.message });
   }
 };
 
 /**
+ * Retrieves details for a single product.
  * @async
- * @function getProductDetails
+ * @route {GET} /products/:productId
  * @param {object} req - Express request object.
  * @param {object} res - Express response object.
  * @param {string} req.params.productId - The ID of the product to fetch details for.
- * @description Retrieves details for a single product.
- * @throws {Error} If there's an error retrieving product details. Returns an appropriate HTTP status code.
+ * @returns {object} An object containing a message and the product details. Returns a 200 status code on success.
+ * @throws {Error} If there's an error retrieving product details. Returns an appropriate HTTP status code and error message.
  */
 exports.getProductDetails = async (req, res) => {
   const { productId } = req.params;
@@ -125,45 +119,44 @@ exports.getProductDetails = async (req, res) => {
     const product = await productServices.getSingleProduct(productId);
     res.status(200).json({ message: 'Product details fetched successfully.', product });
   } catch (error) {
-    logger.error(`Internal error while fetching product details: ${error}`);
     const status = error.statusCode || 500;
+    logger.error(`Error fetching product details: ${error}`);
     res.status(status).json({
-      message: 'Internal error while fetching product details.',
+      message: 'Failed to fetch product details.',
       error: error.message,
     });
   }
 };
 
 /**
+ * Adds a new product to the database.
  * @async
- * @function addProduct
+ * @route {POST} /products
  * @param {object} req - Express request object.
  * @param {object} res - Express response object.
  * @param {string} req.body.name - The name of the product.
  * @param {number} req.body.price - The price of the product.
  * @param {string} req.body.imageUrl - The URL of the product image.
  * @param {string} req.body.categoryId - The ID of the category the product belongs to.
- * @description Adds a new product to the database.
- * @throws {Error} If there's an error adding the product. Returns an appropriate HTTP status code.
+ * @returns {object} An object containing a message and the newly created product. Returns a 201 status code on success.
+ * @throws {Error} If there's an error adding the product. Returns an appropriate HTTP status code and error message.
  */
 exports.addProduct = async (req, res) => {
   const { name, price, imageUrl, categoryId } = req.body;
   try {
     const product = await productServices.addProduct(name, price, imageUrl, categoryId);
-    res.status(201).json({ message: 'Product added successfully', product });
+    res.status(201).json({ message: 'Product added successfully.', product });
   } catch (error) {
-    logger.error(`Internal error while adding the product: ${error}`);
     const status = error.statusCode || 500;
-    res.status(status).json({
-      message: 'Internal error while adding product.',
-      error: error.message,
-    });
+    logger.error(`Error adding product: ${error}`);
+    res.status(status).json({ message: 'Failed to add product.', error: error.message });
   }
 };
 
 /**
+ * Updates an existing product in the database.
  * @async
- * @function updateProduct
+ * @route {PUT} /products/:productId
  * @param {object} req - Express request object.
  * @param {object} res - Express response object.
  * @param {string} req.params.productId - The ID of the product to update.
@@ -171,8 +164,8 @@ exports.addProduct = async (req, res) => {
  * @param {number} req.body.price - The updated price of the product.
  * @param {string} req.body.imageUrl - The updated URL of the product image.
  * @param {string} req.body.categoryId - The updated ID of the category the product belongs to.
- * @description Updates an existing product in the database.
- * @throws {Error} If there's an error updating the product. Returns an appropriate HTTP status code.
+ * @returns {object} An object containing a message and the updated product. Returns a 200 status code on success.
+ * @throws {Error} If there's an error updating the product. Returns an appropriate HTTP status code and error message.
  */
 exports.updateProduct = async (req, res) => {
   const { productId } = req.params;
@@ -187,67 +180,81 @@ exports.updateProduct = async (req, res) => {
     );
     res.status(200).json({ message: 'Product updated successfully.', product });
   } catch (error) {
-    logger.error(`Internal error while updating the product: ${error}`);
-    const status = error.statusCode || 500; //Default to 500 if no status code provided by error.
-    res.status(status).json({
-      message: 'Internal error while updating the product',
-      error: error.message,
-    });
+    const status = error.statusCode || 500;
+    logger.error(`Error updating product: ${error}`);
+    res.status(status).json({ message: 'Failed to update product.', error: error.message });
   }
 };
 
 /**
+ * Updates the status of a product.
  * @async
- * @function updateProductStatus
+ * @route {PUT} /products/:shopProductId/status
  * @param {object} req - Express request object.
  * @param {object} res - Express response object.
  * @param {string} req.params.shopProductId - The ID of the product to update the status for.
  * @param {string} req.body.status - The new status of the product.
- * @description Updates the status of a product.
- * @throws {Error} If there's an error updating the product status. Returns an appropriate HTTP status code.
+ * @returns {object} An object containing a message and the updated product. Returns a 200 status code on success.
+ * @throws {Error} If there's an error updating the product status. Returns an appropriate HTTP status code and error message.
  */
 exports.updateProductStatus = async (req, res) => {
   const { shopProductId } = req.params;
   const { status } = req.body;
   try {
     const product = await productServices.updateProductStatus(shopProductId, status);
-    res.status(200).json({ message: 'Product status updated successfully', product });
+    res.status(200).json({ message: 'Product status updated successfully.', product });
   } catch (error) {
     const status = error.statusCode || 500;
-    logger.error(`Internal error while updating product status: ${error}`);
+    logger.error(`Error updating product status: ${error}`);
     res.status(status).json({
-      message: 'Internal error while updating product status',
+      message: 'Failed to update product status.',
       error: error.message,
     });
   }
 };
 
 /**
+ * Deletes a product from the database.
  * @async
- * @function deleteProduct
+ * @route {DELETE} /products/:productId
  * @param {object} req - Express request object.
  * @param {object} res - Express response object.
  * @param {string} req.params.productId - The ID of the product to delete.
- * @description Deletes a product from the database.
- * @throws {Error} If there's an error deleting the product. Returns an appropriate HTTP status code.
+ * @returns {object} An object containing a success message. Returns a 200 status code on success.
+ * @throws {Error} If there's an error deleting the product. Returns an appropriate HTTP status code and error message.
  */
 exports.deleteProduct = async (req, res) => {
   const { productId } = req.params;
   try {
     await productServices.deleteProduct(productId);
-    res.status(200).json({ message: 'Product deleted successfully' });
+    res.status(200).json({ message: 'Product deleted successfully.' });
   } catch (error) {
-    logger.error(`Internal error while deleting product: ${error}`);
-    const status = error.statusCode || 500; //Default to 500 if no status code provided by error.
-    res.status(status).json({
-      message: 'Internal error while deleting the product',
-      error: error.message,
-    });
+    const status = error.statusCode || 500;
+    logger.error(`Error deleting product: ${error}`);
+    res.status(status).json({ message: 'Failed to delete product.', error: error.message });
   }
 };
 
+/**
+ * Adds a new product to a shop.
+ * @async
+ * @route {POST} /shopProducts
+ * @param {object} req - Express request object.
+ * @param {object} res - Express response object.
+ * @param {number} req.body.quantity - The quantity of the product.
+ * @param {number} req.body.price - The price of the product.
+ * @param {string} req.body.quality - The quality of the product.
+ * @param {number} req.body.shopId - The ID of the shop.
+ * @param {number} req.body.productId - The ID of the product.
+ * @param {string} req.body.name - The name of the product.
+ * @param {string} req.body.image - The image URL of the product.
+ * @param {number} req.body.categoryId - The ID of the category.
+ * @param {Date} req.body.date - The date added.
+ * @returns {object} An object containing a message and the newly created shop product. Returns a 201 status code on success.
+ * @throws {Error} If there's an error adding the shop product. Returns an appropriate HTTP status code and error message.
+ */
 exports.addShopProduct = async (req, res) => {
-  const { quality, quantity, name, price, image, categoryId, shopId, productId, date } = req.body;
+  const { quantity, price, quality, shopId, productId, name, image, categoryId, date } = req.body;
   try {
     const product = await productServices.addProductShop(
       quantity,
@@ -260,33 +267,58 @@ exports.addShopProduct = async (req, res) => {
       categoryId,
       date,
     );
-    res.status(201).json({ message: 'Product created successfully!', product });
+    res.status(201).json({ message: 'Shop product created successfully.', product });
   } catch (error) {
     const status = error.statusCode || 500;
-    logger.error(`Internal error while creating product for shop: ${error}`);
+    logger.error(`Error creating shop product: ${error}`);
     res.status(status).json({
-      message: 'Internal error while creating product',
+      message: 'Failed to create shop product.',
       error: error.message,
     });
   }
 };
 
+/**
+ * Updates the price of a product.
+ * @async
+ * @route {PUT} /products/:productId/price
+ * @param {object} req - Express request object.
+ * @param {object} res - Express response object.
+ * @param {string} req.params.productId - The ID of the product to update the price for.
+ * @param {number} req.body.price - The new price of the product.
+ * @returns {object} An object containing a message and the updated product. Returns a 200 status code on success.
+ * @throws {Error} If there's an error updating the product price. Returns an appropriate HTTP status code and error message.
+ */
 exports.updateProductPrice = async (req, res) => {
   const { productId } = req.params;
   const { price } = req.body;
   try {
     const product = await productServices.updateProductPrice(productId, price);
-    res.status(200).json({ message: 'Product price updated successfully!', product });
+    res.status(200).json({ message: 'Product price updated successfully.', product });
   } catch (error) {
-    const status = req.statusCode || 500;
-    logger.error(`Internal error while updating the product price: ${error}`);
+    const status = error.statusCode || 500;
+    logger.error(`Error updating product price: ${error}`);
     res.status(status).json({
-      message: 'Internal error while updating the product price. Please try again later!',
+      message: 'Failed to update product price.',
       error: error.message,
     });
   }
 };
 
+/**
+ * Updates a shop product.
+ * @async
+ * @route {PUT} /shopProducts/:shopProductId
+ * @param {object} req - Express request object.
+ * @param {object} res - Express response object.
+ * @param {string} req.params.shopProductId - The ID of the shop product to update.
+ * @param {number} req.body.quality - The updated quality of the product.
+ * @param {number} req.body.quantity - The updated quantity of the product.
+ * @param {Date} req.body.date - The updated date.
+ * @param {number} req.body.price - The updated price of the product.
+ * @returns {object} An object containing a message and the updated shop product. Returns a 200 status code on success.
+ * @throws {Error} If there's an error updating the shop product. Returns an appropriate HTTP status code and error message.
+ */
 exports.updateShopProduct = async (req, res) => {
   const { shopProductId } = req.params;
   const { quality, quantity, date, price } = req.body;
@@ -298,12 +330,12 @@ exports.updateShopProduct = async (req, res) => {
       date,
       shopProductId,
     );
-    res.status(200).json({ message: 'Shop products updated successfully!', data });
+    res.status(200).json({ message: 'Shop product updated successfully.', data });
   } catch (error) {
     const status = error.statusCode || 500;
-    logger.error(`Internal error while updating the shop products: ${error}`);
+    logger.error(`Error updating shop product: ${error}`);
     res.status(status).json({
-      message: 'Internal error while updating the shop products.',
+      message: 'Failed to update shop product.',
       error: error.message,
     });
   }
