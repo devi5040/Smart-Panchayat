@@ -52,8 +52,8 @@ exports.getSignedURL = async (req, res) => {
  * @throws {Error} If there's an error adding the user. Error details are logged and a 500 status code is returned.  Specific Sequelize errors might be handled differently depending on their nature.
  */
 exports.addUser = async (req, res) => {
-  const { firebaseUid, name, mobileNumber, languagePreference, latitude, longitude, role } =
-    req.body;
+  const firebaseUid = req.user.uid;
+  const { name, languagePreference, latitude, longitude, role } = req.body;
 
   try {
     const user = await userServices.addUser({
