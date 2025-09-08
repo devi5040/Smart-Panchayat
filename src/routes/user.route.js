@@ -18,11 +18,20 @@ const validate = require('../middleware/validation.middleware');
 const fileUploadValidation = require('../utils/validation/fileUploadValidation');
 const userDataValidation = require('../utils/validation/user.validate');
 
-router.post('/signed-url', validate(fileUploadValidation), userController.getSignedURL);
+router.post(
+  '/signed-url',
+  validate(fileUploadValidation.fileUploadSchema),
+  userController.getSignedURL,
+);
 
 router.get('/', authMiddleware, userController.getAllUsers);
 
-router.post('/', validate(userDataValidation.createUserDataSchema), userController.addUser);
+router.post(
+  '/',
+  validate(userDataValidation.createUserDataSchema),
+  authMiddleware,
+  userController.addUser,
+);
 
 router.get('/:userId', authMiddleware, userController.getUserDetails);
 
