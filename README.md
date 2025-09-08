@@ -1,7 +1,21 @@
-# Smart Panchayat
+<h1 align='center'>Smart Panchayat</h1>
+<p align='center'>
+  Smart Panchayat is a Node.js and Express-based backend system designed to streamline rural governance and commerce. It integrates Sequelize ORM for database management, Firebase Authentication for secure login via mobile OTP, and supports shops, products, orders, and shipment management in a scalable microservices-ready architecture.
+</p>
 
-[![Badge](https://img.shields.io/badge/Status-Completed-green)](https://github.com/yourusername/Smart-Panchayat)
-[![Badge](https://img.shields.io/badge/License-MIT-blue)](https://opensource.org/licenses/MIT)
+<div align='center'>
+<img src='https://img.shields.io/badge/Status-Completed-green'/>
+<img src='https://img.shields.io/badge/Node.js-18.x-brightgreen?logo=node.js'/>
+<img src='https://img.shields.io/badge/Express-4.x-blue?logo=express'/>
+<img src='https://img.shields.io/badge/Sequelize-ORM-orange?logo=sequelize'/>
+<img src='https://img.shields.io/badge/Firebase-Auth-yellow?logo=firebase)'/>
+<img src='https://img.shields.io/badge/License-Proprietary-red'/>
+<img src='https://img.shields.io/badge/Code%20Style-Prettier-ff69b4?logo=prettier' />
+<img src='https://img.shields.io/badge/Linting-ESLint-purple?logo=eslint'/>
+<img src='https://img.shields.io/badge/Database-MySQL-blue?logo=mysql' />
+<img src='https://img.shields.io/badge/ORM-Sequelize-orange?logo=sequelize' />
+<img src='https://img.shields.io/badge/Version-1.0.0-blue'/>
+</div>
 
 ---
 
@@ -41,6 +55,20 @@ Smart Panchayat is a comprehensive platform designed to streamline and optimize 
 - AWS S3 Integration for file storage
 - Database Migrations (using Sequelize)
 - Unit Tests for various services
+
+## 📂 Project Structure
+```bash
+Smart-Panchayat/
+├── config/              # Database & Firebase configuration
+├── migrations/          # Sequelize migration files
+├── models/              # Sequelize models
+├── services/            # Business logic
+├── middleware/          # Auth & custom middlewares
+├── utils/               # Utility functions (e.g., logger)
+├── seeders/             # Sequelize seeders
+├── app.js               # Express app entry point
+└── package.json
+```
 
 ---
 
@@ -95,12 +123,20 @@ npm run lint
 
 Create a `.env` file in the root directory with the following variables:
 
-- `DATABASE_URL`: Your PostgreSQL database connection string.
-- `AWS_ACCESS_KEY_ID`: Your AWS access key ID.
-- `AWS_SECRET_ACCESS_KEY`: Your AWS secret access key.
-- `AWS_REGION`: Your AWS region.
-- `AWS_BUCKET_NAME`: Your AWS S3 bucket name.
-- Firebase Configuration Variables
+- # Database
+DB_HOST=localhost
+DB_USER=root
+DB_PASS=yourpassword
+DB_NAME=smart_panchayat
+DB_DIALECT=mysql
+
+- # Firebase
+FIREBASE_PROJECT_ID=your_project_id
+FIREBASE_PRIVATE_KEY=your_private_key
+FIREBASE_CLIENT_EMAIL=your_service_account_email
+
+- # Default profile image
+DEFAULT_PROFILE_IMAGE=https://example.com/default.png
 
 ---
 
@@ -128,7 +164,11 @@ The project uses ESLint for code linting. Run `npm run lint` to check for code s
 
 ## 11. License
 
-MIT License
+All Rights Reserved.
+
+Copyright (c) 2025, Deviprasad Rai P
+Unauthorized copying, modification, distribution, or use of this software, via any medium, is strictly prohibited.
+Proprietary and confidential.
 
 ---
 
