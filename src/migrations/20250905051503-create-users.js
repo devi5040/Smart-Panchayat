@@ -28,7 +28,7 @@ module.exports = {
       },
       user_name: {
         type: Sequelize.STRING(100),
-        allowNull: false,
+        allowNull: true,
       },
       home_address: {
         type: Sequelize.STRING(255),
