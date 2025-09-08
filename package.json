@@ -30,7 +30,8 @@
     "seed:undo": "sequelize-cli db:seed:undo:all",
     "lint": "eslint . --ext .js",
     "lint:fix": "eslint . --ext .js --fix",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test:user": "jest src/tests/integration/user.test.js --detectOpenHandles --silent=false"
   },
   "repository": {
     "type": "git",

@@ -13,6 +13,7 @@ const { Users } = require('../models'); // Sequelize model for Users
 const admin = require('firebase-admin');
 const { encryptPassword, comparePasswords } = require('../utils/hashPassword');
 const { NotFoundError, BadRequestError, NoContentError } = require('../utils/error');
+const sequelize = require('../config/db');
 
 /**
  * Generates a pre-signed URL for uploading a profile image to AWS S3.
@@ -23,6 +24,7 @@ const { NotFoundError, BadRequestError, NoContentError } = require('../utils/err
  * @throws {Error} - If the signed URL could not be generated.
  */
 exports.getSignedUrlS3 = async (fileName, fileType) => {
+  console.log('inside service fun>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
   const params = {
     Bucket: process.env.AWS_BUCKET_NAME,
     Key: `uploads/profiles/${Date.now()}-${fileName}`,
@@ -375,6 +377,8 @@ exports.getUserByRole = async (role) => {
  * @returns {Promise<object>} - The Sequelize User model instance.
  */
 exports.verifyUser = async (decodedToken) => {
+  console.log('connected to db:', sequelize.getDatabaseName());
+  console.log(decodedToken.uid);
   let user = await Users.findOne({ where: { firebaseUid: decodedToken.uid } });
   if (!user) {
     user = await Users.create({

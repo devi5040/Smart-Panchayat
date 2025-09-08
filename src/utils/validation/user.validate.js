@@ -13,14 +13,6 @@ const Joi = require('joi');
 
 exports.createUserDataSchema = Joi.object({
   name: Joi.string().required(),
-  mobileNumber: Joi.string()
-    .pattern(/^\+?[1-9]\d{1,14}$/)
-    .required()
-    .messages({
-      'string.empty': 'Mobile Number is required.',
-      'string.pattern.base': 'Mobile number must be a valid format with country code.',
-    }),
-
   languagePreference: Joi.string()
     .required()
     .messages({ 'string.empty': 'Language Preference is required.' }),

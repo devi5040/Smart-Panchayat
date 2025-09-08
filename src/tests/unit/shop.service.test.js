@@ -1,5 +1,5 @@
 // __tests__/shopService.test.js
-const shopService = require('../../services/shop.service'); // adjust path
+const shopService = require('../../services/shop.service'); // adjust path if needed
 const { Shops, Users, ShipmentShops } = require('../../models');
 const { ConflictError, NotFoundError, BadRequestError } = require('../../utils/error');
 
@@ -22,10 +22,10 @@ describe('Shop Service Edge Cases', () => {
       await expect(shopService.getShopIdbyUserId(1)).rejects.toThrow(NotFoundError);
     });
 
-    it('should throw error if user exists but shop does not', async () => {
+    it('should throw NotFoundError if shop does not exist', async () => {
       Users.findByPk.mockResolvedValue({ id: 1 });
       Shops.findOne.mockResolvedValue(null);
-      await expect(shopService.getShopIdbyUserId(1)).rejects.toThrow('Shop does not found');
+      await expect(shopService.getShopIdbyUserId(1)).rejects.toThrow(NotFoundError);
     });
 
     it('should return shop if found', async () => {
@@ -58,6 +58,11 @@ describe('Shop Service Edge Cases', () => {
   });
 
   describe('getShops', () => {
+    it('should throw error if no shops found (null)', async () => {
+      Shops.findAll.mockResolvedValue(null);
+      await expect(shopService.getShops()).rejects.toThrow('Shops not found');
+    });
+
     it('should return empty array if no shops exist', async () => {
       Shops.findAll.mockResolvedValue([]);
       const result = await shopService.getShops();
@@ -90,7 +95,7 @@ describe('Shop Service Edge Cases', () => {
   });
 
   describe('updateShopDetails', () => {
-    it('should throw NotFoundError if shop does not exist', async () => {
+    it('should throw NotFoundError if shop does not exist initially', async () => {
       Shops.findOne.mockResolvedValue(null);
       await expect(shopService.updateShopDetails(1, 1, 'Shop1', '12345', 0, 0)).rejects.toThrow(
         NotFoundError,
@@ -105,6 +110,15 @@ describe('Shop Service Edge Cases', () => {
       );
     });
 
+    it('should throw NotFoundError if updated shop not found in second fetch', async () => {
+      Shops.findOne.mockResolvedValueOnce({ id: 1 }); // initial
+      Shops.update.mockResolvedValue([1]);
+      Shops.findOne.mockResolvedValueOnce(null); // second fetch fails
+      await expect(shopService.updateShopDetails(1, 1, 'Shop1', '12345', 0, 0)).rejects.toThrow(
+        NotFoundError,
+      );
+    });
+
     it('should return updated shop if successful', async () => {
       Shops.findOne.mockResolvedValueOnce({ id: 1 }); // initial find
       Shops.update.mockResolvedValue([1]); // update returns 1 row updated
@@ -116,34 +130,36 @@ describe('Shop Service Edge Cases', () => {
   });
 
   describe('addRemarksToShipments', () => {
-    it('should throw error if shipmentId invalid', async () => {
-      await expect(shopService.addRemarksToShipments(null, 'remark')).rejects.toThrow(
-        'shipment id is invalid',
+    it('should throw BadRequestError if shipmentId invalid', async () => {
+      await expect(shopService.addRemarksToShipments(1, null, 'remark')).rejects.toThrow(
+        BadRequestError,
       );
     });
 
     it('should throw NotFoundError if shipment does not exist', async () => {
-      ShipmentShops.findByPk.mockResolvedValue(null);
-      await expect(shopService.addRemarksToShipments(1, 'remark')).rejects.toThrow(NotFoundError);
+      ShipmentShops.findOne.mockResolvedValue(null);
+      await expect(shopService.addRemarksToShipments(1, 1, 'remark')).rejects.toThrow(
+        NotFoundError,
+      );
     });
 
     it('should throw error if update fails (0 rows updated)', async () => {
-      ShipmentShops.findByPk.mockResolvedValueOnce({ id: 1, remarks: '' });
+      ShipmentShops.findOne.mockResolvedValueOnce({ id: 1, remarks: '' });
       ShipmentShops.update.mockResolvedValue([0]);
-      await expect(shopService.addRemarksToShipments(1, 'remark')).rejects.toThrow(
+      await expect(shopService.addRemarksToShipments(1, 1, 'remark')).rejects.toThrow(
         'No records are updated.',
       );
     });
 
     it('should return updated shipment if successful', async () => {
-      ShipmentShops.findByPk.mockResolvedValueOnce({ id: 1, remarks: '' });
+      ShipmentShops.findOne.mockResolvedValueOnce({ id: 1, remarks: '' });
       ShipmentShops.update.mockResolvedValue([1]);
-      ShipmentShops.findByPk.mockResolvedValueOnce({
+      ShipmentShops.findOne.mockResolvedValueOnce({
         id: 1,
         remarks: 'remark',
       });
 
-      const result = await shopService.addRemarksToShipments(1, 'remark');
+      const result = await shopService.addRemarksToShipments(1, 1, 'remark');
       expect(result).toEqual({ id: 1, remarks: 'remark' });
     });
   });

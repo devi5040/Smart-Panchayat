@@ -29,7 +29,7 @@ const firebaseAuthMiddleware = async (req, res, next) => {
   try {
     const decodedToken = await admin.auth().verifyIdToken(idToken, true);
     const user = await verifyUser(decodedToken);
-    req.user = { id: user.id, role: user.user_role };
+    req.user = { id: user.id, role: user.user_role, uid: user.firebaseUid };
     if (user.user_role === 'shop') {
       const shop = await getShopIdbyUserId(user.id);
       req.user.shop = shop.id;
