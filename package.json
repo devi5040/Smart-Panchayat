@@ -36,7 +36,8 @@
     "test:product": "jest src/tests/integration/product.test.js --detectOpenHandles --silent=false",
     "test:category": "jest src/tests/integration/category.test.js --detectOpenHandles --silent=false",
     "test:order": "jest src/tests/integration/order.test.js --detectOpenHandles --silent=false",
-    "test:shipment": "jest src/tests/integration/shipment.test.js --detectOpenHandles --silent=false"
+    "test:shipment": "jest src/tests/integration/shipment.test.js --detectOpenHandles --silent=false",
+    "test:agent": "jest src/tests/integration/agent.test.js --detectOpenHandles --silent=false"
   },
   "repository": {
     "type": "git",
