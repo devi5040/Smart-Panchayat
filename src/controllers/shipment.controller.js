@@ -233,3 +233,18 @@ exports.removeShipmentShop = async (req, res) => {
     });
   }
 };
+
+exports.updateShipmentStatus = async (req, res) => {
+  const { shipmentId } = req.params;
+  const { shopId, status } = req.body;
+  try {
+    const shipment = await shipmentServices.updateShipmentStatus(shipmentId, shopId, status);
+    res.status(200).json({ message: 'Status updated successfully.', shipment });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error wile updating the status: ${error}`);
+    res
+      .status(status)
+      .json({ message: 'Internal error while updating the shipment status', error: error.message });
+  }
+};
