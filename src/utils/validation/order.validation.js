@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 const itemsSchema = Joi.object({
-  quantity: Joi.string().required().min(1).messages({
+  quantity: Joi.number().required().min(1).messages({
     'string.requierd': 'The quantity should not be empty and it is required',
     'string.min': 'The minimum quantity should be 1',
   }),
