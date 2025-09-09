@@ -11,6 +11,9 @@
 
 const router = require('express').Router();
 
+const auth = require('../middleware/firebaseAuthMiddleware');
+const access = require('../middleware/authorization.middleware');
+
 // Import middleware and schemas for validation.
 const validate = require('../middleware/validation.middleware');
 const schema = require('../utils/validation/shipment.validation');
@@ -24,7 +27,7 @@ const shipmentController = require('../controllers/shipment.controller');
  * @returns {Array<Object>} An array of shipment objects.  Each object represents a shipment and should contain relevant fields as defined in the database model.  See Sequelize documentation for details on retrieving data.
  * @throws {Error} An error if the request fails.  Error handling should be implemented within the controller.
  */
-router.get('/', shipmentController.getShipmentList);
+router.get('/', auth, access(['agent', 'admin']), shipmentController.getShipmentList);
 
 /**
  * @route POST /
@@ -33,7 +36,13 @@ router.get('/', shipmentController.getShipmentList);
  * @returns {Object} The newly created shipment object.
  * @throws {Error} 400 Bad Request - If input validation fails.  Error details should be provided in the response.  See Sequelize documentation for details on creating data.
  */
-router.post('/', validate(schema.shipmentSchema), shipmentController.createShipment);
+router.post(
+  '/',
+  validate(schema.shipmentSchema),
+  auth,
+  access(['admin', 'agent']),
+  shipmentController.createShipment,
+);
 
 /**
  * @route PATCH /:shipmentId
@@ -46,7 +55,17 @@ router.post('/', validate(schema.shipmentSchema), shipmentController.createShipm
 router.patch(
   '/:shipmentId',
   validate(schema.shipmentProductUpdateSchema),
+  auth,
+  access(['admin', 'agent']),
   shipmentController.updateShipmentProduct,
+);
+
+router.patch(
+  '/:shipmentId/status',
+  validate(schema.shipmentStatus),
+  auth,
+  access(['admin', 'agent']),
+  shipmentController.updateShipmentStatus,
 );
 
 /**
@@ -56,7 +75,13 @@ router.patch(
  * @returns {Object} The updated shipment object.
  * @throws {Error} 400 Bad Request - If input validation fails.  See Sequelize documentation for details on updating data.
  */
-router.put('/', validate(schema.addShopToShipmentSchema), shipmentController.addShopToShipment);
+router.put(
+  '/',
+  validate(schema.addShopToShipmentSchema),
+  auth,
+  access(['admin', 'agent']),
+  shipmentController.addShopToShipment,
+);
 
 /**
  * @route GET /shop/:shopId
@@ -65,7 +90,12 @@ router.put('/', validate(schema.addShopToShipmentSchema), shipmentController.add
  * @returns {Array<Object>} An array of shipment objects associated with the shop.
  * @throws {Error} 404 Not Found - If no shipments are found for the given shop ID.
  */
-router.get('/shop/:shopId', shipmentController.getShipmentForShops);
+router.get(
+  '/shop/:shopId',
+  auth,
+  access(['admin', 'shop']),
+  shipmentController.getShipmentForShops,
+);
 
 /**
  * @route GET /status/:status
@@ -77,6 +107,8 @@ router.get('/shop/:shopId', shipmentController.getShipmentForShops);
 router.get(
   '/status/:status',
   validate(schema.shipmentStatus, 'params'),
+  auth,
+  access(['admin', 'agent']),
   shipmentController.getShipmentByStatus,
 );
 
@@ -90,6 +122,8 @@ router.get(
 router.get(
   '/mode/:mode',
   validate(schema.shipmentModeSchema, 'params'),
+  auth,
+  access(['admin']),
   shipmentController.getShipmentByTransportationMode,
 );
 
@@ -104,6 +138,8 @@ router.get(
  */
 router.delete(
   '/:shipmentId/shop/:shopId/product/:productId',
+  auth,
+  access(['admin']),
   shipmentController.removeShipmentProduct,
 );
 
@@ -115,6 +151,11 @@ router.delete(
  * @returns {Object} A success message or status indicating successful deletion.
  * @throws {Error} 404 Not Found - If the shipment or shop is not found. See Sequelize documentation for details on deleting data.
  */
-router.delete('/:shipmentId/shop/:shopId', shipmentController.removeShipmentShop);
+router.delete(
+  '/:shipmentId/shop/:shopId',
+  auth,
+  access(['admin']),
+  shipmentController.removeShipmentShop,
+);
 
 module.exports = router;
