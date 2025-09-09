@@ -415,3 +415,17 @@ exports.removeShopFromShipment = async (shipmentId, shopId) => {
     return shops;
   });
 };
+
+exports.updateShipmentStatus = async (shipmentId, shopId, status) => {
+  const shipment = await Shipments.findByPk(shipmentId);
+  if (!shipment) throw NotFoundError('Shipment not found!');
+  const shop = await Shops.findByPk(shopId);
+  if (!shop) throw NotFoundError('Shop not found!');
+  const [numRowsUpdated] = await ShipmentShops.update(
+    { status },
+    { where: { shipmentId, shopId } },
+  );
+  if (numRowsUpdated == 0) throw new NoContentError('No rows updated!');
+  const shipmentData = await ShipmentShops.findOne({ where: { shipmentId, shopId } });
+  return shipmentData;
+};
