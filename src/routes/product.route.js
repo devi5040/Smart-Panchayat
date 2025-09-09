@@ -154,20 +154,30 @@ router.get('/:productId', authentication, productController.getProductDetails);
  */
 router.post(
   '/shop',
+  authentication,
+  authorization(['shop']),
   validate(productValidator.productShopSchema),
   productController.addShopProduct,
 );
 router.post(
   '/',
   authentication,
+  authorization(['admin']),
   validate(productValidator.productValidation),
   productController.addProduct,
 );
 
-router.patch('/shop/:productId', productController.updateProductPrice);
+router.patch(
+  '/shop/:productId',
+  authentication,
+  authorization(['admin']),
+  productController.updateProductPrice,
+);
 
 router.put(
   '/shop/:shopProductId',
+  authentication,
+  authorization(['shop']),
   validate(productValidator.updateProductShopSchema),
   productController.updateShopProduct,
 );
@@ -205,6 +215,7 @@ router.put(
 router.patch(
   '/:shopProductId/status',
   authentication,
+  authorization(['admin']),
   validate(productValidator.statusValidation),
   productController.updateProductStatus,
 );
@@ -243,6 +254,7 @@ router.patch(
 router.put(
   '/:productId',
   authentication,
+  authorization(['admin']),
   validate(productValidator.productValidation),
   productController.updateProduct,
 );
@@ -270,6 +282,11 @@ router.put(
  *       '404':
  *         description: Product not found
  */
-router.delete('/:productId', authentication, productController.deleteProduct);
+router.delete(
+  '/:productId',
+  authentication,
+  authorization(['admin']),
+  productController.deleteProduct,
+);
 
 module.exports = router;

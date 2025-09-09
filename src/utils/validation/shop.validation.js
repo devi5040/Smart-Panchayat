@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
-exports.productDataSchema = Joi.object({
+exports.shopSchema = Joi.object({
   name: Joi.string().required().min(3).messages({
     'string.empty': 'Shop name should not be empty.',
     'string.min': 'Shop name should consist at least 3 letters',
@@ -20,6 +20,7 @@ exports.productDataSchema = Joi.object({
     'number.max': 'Longitude cannot be greater than 180',
     'any.required': 'Longitude is required',
   }),
+  userId: Joi.number(),
 });
 
 exports.remarksSchema = Joi.object({
@@ -27,4 +28,5 @@ exports.remarksSchema = Joi.object({
     'string.empty': 'Remarks should not be empty',
     'string.required': 'Remarks is required',
   }),
+  shopId: Joi.number(),
 });

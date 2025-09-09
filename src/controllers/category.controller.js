@@ -79,7 +79,8 @@ exports.deleteCategory = async (req, res) => {
     res.status(200).json({ message: 'Category has deleted successfully' });
   } catch (error) {
     logger.error(`Internal error while deleting the category: ${JSON.stringify(error)}`);
-    res.status(500).json({
+    const status = error.statusCode || 500;
+    res.status(status).json({
       message: 'Internal error while deleting the category.',
       error: error.message,
     });

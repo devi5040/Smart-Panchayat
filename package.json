@@ -31,7 +31,13 @@
     "lint": "eslint . --ext .js",
     "lint:fix": "eslint . --ext .js --fix",
     "format": "prettier --write .",
-    "test:user": "jest src/tests/integration/user.test.js --detectOpenHandles --silent=false"
+    "test:user": "jest src/tests/integration/user.test.js --detectOpenHandles --silent=false",
+    "test:shop": "jest src/tests/integration/shop.test.js --detectOpenHandles --silent=false",
+    "test:product": "jest src/tests/integration/product.test.js --detectOpenHandles --silent=false",
+    "test:category": "jest src/tests/integration/category.test.js --detectOpenHandles --silent=false",
+    "test:order": "jest src/tests/integration/order.test.js --detectOpenHandles --silent=false",
+    "test:shipment": "jest src/tests/integration/shipment.test.js --detectOpenHandles --silent=false",
+    "test:agent": "jest src/tests/integration/agent.test.js --detectOpenHandles --silent=false"
   },
   "repository": {
     "type": "git",

@@ -12,6 +12,7 @@ const express = require('express');
 const router = express.Router(); // Use express.Router() for better organization
 
 const auth = require('../middleware/firebaseAuthMiddleware');
+const access = require('../middleware/authorization.middleware');
 /**
  * @type {import('express').Router}
  * @description Express Router instance for handling order-related routes.
@@ -40,7 +41,7 @@ const orderController = require('../controllers/order.controller');
  * @description Retrieves a list of orders.  Note:  This may be subject to pagination or filtering in a production environment.
  * @returns {Promise<Array<Object>>} An array of order objects, or an empty array if no orders are found.  The structure of the order objects is defined in the `order.controller.getOrders` function.  Error handling should be implemented in the controller to return appropriate error responses for database or other issues.
  */
-router.get('/', orderController.getOrders);
+router.get('/', auth, access(['admin', 'agent']), orderController.getOrders);
 
 /**
  * @route GET /history
@@ -58,7 +59,7 @@ router.get('/history', auth, orderController.getOrderHistory);
  * @param {import('express').Response} res - Express response object.
  * @returns {Promise<Object|null>} A single order object if found, or null if not found. Error handling is implemented in the controller.
  */
-router.get('/:orderId', orderController.getOrderByID);
+router.get('/:orderId', auth, access(['admin', 'agent']), orderController.getOrderByID);
 
 /**
  * @route GET /collection-centre/:collectionCentre
@@ -67,7 +68,12 @@ router.get('/:orderId', orderController.getOrderByID);
  * @param {import('express').Response} res - Express response object.
  * @returns {Promise<Array<Object>>} An array of order objects associated with the specified collection centre.  Returns an empty array if no orders are found. Error handling is implemented in the controller.
  */
-router.get('/collection-centre/:collectionCentre', orderController.getOrdersByCollectionCentre);
+router.get(
+  '/collection-centre/:collectionCentre',
+  auth,
+  access(['admin', 'agent']),
+  orderController.getOrdersByCollectionCentre,
+);
 
 /**
  * @route GET /payment-status/:paymentStatus
@@ -79,6 +85,8 @@ router.get('/collection-centre/:collectionCentre', orderController.getOrdersByCo
 router.get(
   '/payment-status/:paymentStatus',
   validate(orderSchema.paymentStatusOrderSchema, 'params'),
+  auth,
+  access(['admin']),
   orderController.getOrdersByPaymentStatus,
 );
 
@@ -89,7 +97,13 @@ router.get(
  * @param {import('express').Response} res - Express response object.
  * @returns {Promise<Object>} The newly created order object. Error handling (e.g., database errors, validation errors) is implemented in the controller.
  */
-router.post('/', validate(orderSchema.orderSchema), orderController.addOrder);
+router.post(
+  '/',
+  validate(orderSchema.orderSchema),
+  auth,
+  access(['admin', 'agent']),
+  orderController.addOrder,
+);
 
 /**
  * @route PATCH /:orderId
@@ -101,6 +115,8 @@ router.post('/', validate(orderSchema.orderSchema), orderController.addOrder);
 router.patch(
   '/:orderId',
   validate(orderSchema.paymentStatusOrderSchema),
+  auth,
+  access(['admin', 'agent']),
   orderController.updateOrderPaymentStatus,
 );
 

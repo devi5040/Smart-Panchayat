@@ -17,6 +17,7 @@ const productController = require('../controllers/product.controller');
 const categoryController = require('../controllers/category.controller'); // Import category controller
 const validate = require('../middleware/validation.middleware'); // Import validation middleware
 const authMiddleware = require('../middleware/firebaseAuthMiddleware'); // Import Firebase authentication middleware
+const access = require('../middleware/authorization.middleware');
 
 // Import validation schemas
 const { fileUploadSchema } = require('../utils/validation/fileUploadValidation');
@@ -38,6 +39,7 @@ router.get('/', authMiddleware, categoryController.getAllCategories);
 router.post(
   '/signed-url',
   authMiddleware,
+  access(['admin']),
   validate(fileUploadSchema),
   categoryController.getSignedUrl,
 );
@@ -51,6 +53,7 @@ router.post(
 router.post(
   '/',
   authMiddleware,
+  access(['admin']),
   validate(categoryValidationSchema),
   categoryController.addCategory,
 );
@@ -67,6 +70,7 @@ router.get('/:categoryId/products', authMiddleware, productController.getAllProd
 router.put(
   '/:categoryId',
   authMiddleware,
+  access(['admin']),
   validate(categoryValidationSchema),
   categoryController.updateCatogory,
 );
@@ -77,7 +81,7 @@ router.put(
  * @access Private (requires Firebase authentication)
  * @param {string} categoryId - The ID of the category to delete.
  */
-router.delete('/:categoryId', authMiddleware, categoryController.deleteCategory);
+router.delete('/:categoryId', authMiddleware, access(['admin']), categoryController.deleteCategory);
 
 // Export the router
 module.exports = router;

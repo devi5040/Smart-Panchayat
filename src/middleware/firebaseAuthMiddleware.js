@@ -17,9 +17,7 @@ const firebaseAuthMiddleware = async (req, res, next) => {
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     logger.warn(
-      `Unauthorized request: No token provided or invalid format. Header:${{
-        headers: req.headers,
-      }}`,
+      `Unauthorized request: No token provided or invalid format. Header:${JSON.stringify(req.headers)}`,
     );
     return res.status(401).json({ message: 'Unauthorized: No token provided or invalid token' });
   }
@@ -32,6 +30,9 @@ const firebaseAuthMiddleware = async (req, res, next) => {
     req.user = { id: user.id, role: user.user_role, uid: user.firebaseUid };
     if (user.user_role === 'shop') {
       const shop = await getShopIdbyUserId(user.id);
+      if (!shop) {
+        return res.status(403).json({ message: 'Shop not found for this user' });
+      }
       req.user.shop = shop.id;
     }
     next();
