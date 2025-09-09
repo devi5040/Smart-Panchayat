@@ -10,7 +10,7 @@ exports.productValidation = Joi.object({
     'string.empty': 'The image url should not be empty',
     'string.uri': 'Product image should be an url',
   }),
-  categoryId: Joi.string()
+  categoryId: Joi.number()
     .required()
     .messages({ 'string.empty': 'Category id should not be empty' }),
   status: Joi.string().valid('accepted', 'rejected', 'pending').messages({
