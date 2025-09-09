@@ -16,6 +16,9 @@ const agentController = require('../controllers/agent.controller');
 const validate = require('../middleware/validation.middleware');
 const schema = require('../utils/validation/user.validate');
 
+const auth = require('../middleware/firebaseAuthMiddleware');
+const access = require('../middleware/authorization.middleware');
+
 /**
  * @route POST /
  * @description Creates a new agent.
@@ -29,7 +32,9 @@ const schema = require('../utils/validation/user.validate');
  */
 router.post(
   '/',
-  validate(schema.createUserDataSchema), // Validates the request body against the specified schema before hitting the controller
+  validate(schema.createAgentSchema), // Validates the request body against the specified schema before hitting the controller
+  auth,
+  access(['admin']),
   agentController.createAgent,
 );
 
@@ -44,7 +49,7 @@ router.post(
  * @returns {object} - On success, may return updated user data or a success message. Error responses are determined by agentController.changeRoleToAgent.
  * @see {@link agentController.changeRoleToAgent}
  */
-router.patch('/:userId', agentController.changeRoleToAgent);
+router.patch('/:userId', auth, access(['admin']), agentController.changeRoleToAgent);
 
 /**
  * @route DELETE /:agentId
@@ -57,6 +62,6 @@ router.patch('/:userId', agentController.changeRoleToAgent);
  * @returns {object} - On success, may return a success message or confirmation. Error responses are handled by agentController.removeAgent.
  * @see {@link agentController.removeAgent}
  */
-router.delete('/:agentId', agentController.removeAgent);
+router.delete('/:agentId', auth, access(['admin']), agentController.removeAgent);
 
 module.exports = router;
