@@ -14,6 +14,7 @@
 
 const { Category } = require('../models/'); // Import the Category model.
 const s3 = require('../config/aws/aws.s3.config'); // Import AWS S3 configuration.
+const { NotFoundError } = require('../utils/error');
 
 /**
  * Retrieves all categories from the database.
@@ -21,12 +22,8 @@ const s3 = require('../config/aws/aws.s3.config'); // Import AWS S3 configuratio
  * interaction fails.
  */
 exports.getCategories = async () => {
-  try {
-    const categories = await Category.findAll();
-    return categories;
-  } catch (error) {
-    throw error; // Re-throw the error to be handled by a higher-level error handler.
-  }
+  const categories = await Category.findAll();
+  return categories;
 };
 
 /**
@@ -42,15 +39,11 @@ exports.getSignedUrl = async (fileName, fileType) => {
     ContentType: fileType, // MIME type of the file.
     ACL: 'public-read', // Access Control List: makes the file publicly readable.
   };
-  try {
-    const signedURL = await s3.getSignedUrlPromise('putObject', params); // Get pre-signed URL from AWS S3.
-    return {
-      signedURL, // Pre-signed URL for uploading.
-      fileUrl: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${params.Key}`, //The complete URL of the uploaded file.
-    };
-  } catch (error) {
-    throw error; // Re-throw the error.
-  }
+  const signedURL = await s3.getSignedUrlPromise('putObject', params); // Get pre-signed URL from AWS S3.
+  return {
+    signedURL, // Pre-signed URL for uploading.
+    fileUrl: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${params.Key}`, //The complete URL of the uploaded file.
+  };
 };
 
 /**
@@ -60,12 +53,8 @@ exports.getSignedUrl = async (fileName, fileType) => {
  * Throws an error if database interaction fails.
  */
 exports.addCategory = async (name, imageUrl) => {
-  try {
-    await Category.create({ name, imageUrl }); // Create a new category in the database.
-    return true;
-  } catch (error) {
-    throw error; // Re-throw the error.
-  }
+  const category = await Category.create({ name, imageUrl }); // Create a new category in the database.
+  return category;
 };
 
 /**
@@ -77,17 +66,14 @@ exports.addCategory = async (name, imageUrl) => {
 exports.updateCategory = async (categoryId, name, imageUrl) => {
   if (categoryId === null || categoryId === 0 || isNaN(categoryId))
     throw new Error('Category ID is not valid'); // Validate categoryId.
-
-  try {
-    const updatedRows = await Category.update(
-      { name, imageUrl },
-      { where: { id: categoryId } }, // Update the category with the given ID.
-    );
-    if (updatedRows == 0) throw new Error('Category ID is not valid. No records updated.'); // Throw error if no rows were updated.
-    return true;
-  } catch (error) {
-    throw error; // Re-throw the error.
-  }
+  const category = await Category.findByPk(categoryId);
+  if (!category) throw new NotFoundError('Category not found!');
+  const updatedRows = await Category.update(
+    { name, imageUrl },
+    { where: { id: categoryId } }, // Update the category with the given ID.
+  );
+  if (updatedRows == 0) throw new Error('Category ID is not valid. No records updated.'); // Throw error if no rows were updated.
+  return true;
 };
 
 /**
@@ -98,14 +84,11 @@ exports.updateCategory = async (categoryId, name, imageUrl) => {
 exports.deleteCategory = async (categoryId) => {
   if (categoryId === null || categoryId === 0 || isNaN(categoryId))
     throw new Error('Category ID is not valid'); // Validate categoryId.
-
-  try {
-    const numOfDeletedRows = await Category.destroy({
-      where: { id: categoryId }, // Delete the category with the given ID.
-    });
-    if (numOfDeletedRows == 0) throw new Error('Category ID is invalid. No records deleted.'); // Throw error if no rows were deleted.
-    return true;
-  } catch (error) {
-    throw error; // Re-throw the error.
-  }
+  const category = await Category.findByPk(categoryId);
+  if (!category) throw new NotFoundError('Category not found!');
+  const numOfDeletedRows = await Category.destroy({
+    where: { id: categoryId }, // Delete the category with the given ID.
+  });
+  if (numOfDeletedRows == 0) throw new Error('Category ID is invalid. No records deleted.'); // Throw error if no rows were deleted.
+  return true;
 };
