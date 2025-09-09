@@ -13,6 +13,7 @@ const express = require('express');
 const router = express.Router(); // Use express.Router() for better readability
 
 const auth = require('../middleware/firebaseAuthMiddleware');
+const access = require('../middleware/authorization.middleware');
 /**
  * @type {import('express').RequestHandler}
  * @description Middleware for Firebase authentication.  Ensures requests are authenticated.
@@ -41,7 +42,7 @@ const shopValidator = require('../utils/validation/shop.validation');
  * @middleware {auth} Firebase Authentication middleware
  * @middleware {shopController.getShops} Shop controller method to handle the request.
  */
-router.get('/', auth, shopController.getShops);
+router.get('/', auth, access(['admin']), shopController.getShops);
 
 /**
  * @route GET /:shopId
@@ -49,7 +50,7 @@ router.get('/', auth, shopController.getShops);
  * @param {string} shopId - The ID of the shop to retrieve.
  * @middleware {shopController.getShopDetails} Shop controller method to handle the request.
  */
-router.get('/:shopId', shopController.getShopDetails);
+router.get('/:shopId', auth, access(['shop']), shopController.getShopDetails);
 
 /**
  * @route POST /
@@ -58,7 +59,7 @@ router.get('/:shopId', shopController.getShopDetails);
  * @middleware {validation(shopValidator.productDataSchema)} Input validation middleware using Joi schema.
  * @middleware {shopController.addShop} Shop controller method to handle the request.
  */
-router.post('/', auth, validation(shopValidator.productDataSchema), shopController.addShop);
+router.post('/', auth, validation(shopValidator.shopSchema), shopController.addShop);
 
 /**
  * @route PUT /:shopId
@@ -71,7 +72,8 @@ router.post('/', auth, validation(shopValidator.productDataSchema), shopControll
 router.put(
   '/:shopId',
   auth,
-  validation(shopValidator.productDataSchema),
+  access(['admin', 'shop']),
+  validation(shopValidator.shopSchema),
   shopController.updateShopDetails,
 );
 
@@ -84,6 +86,8 @@ router.put(
  */
 router.patch(
   '/shipment/:shipmentId',
+  auth,
+  access(['shop']),
   validation(shopValidator.remarksSchema),
   shopController.addRemarks,
 );
