@@ -91,6 +91,35 @@ router.post(
   userController.addUser,
 );
 
+/**
+ * @openapi
+ * /users/check-existence:
+ *   get:
+ *     summary: Check if the authenticated user exists and has required profile data.
+ *     tags: [Users]
+ *     security:
+ *       - Firebase: []
+ *     responses:
+ *       '200':
+ *         description: User existence status retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "User status fetched successfully."
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *       '401':
+ *         description: Unauthorized - Requires authentication.
+ *       '404':
+ *         description: User not found.
+ *       '500':
+ *         description: Internal server error.
+ */
 router.get('/check-existence', authMiddleware, userController.checkUserExists);
 
 /**
