@@ -328,3 +328,17 @@ exports.getUsersByRole = async (req, res) => {
     });
   }
 };
+
+exports.checkUserExists = async (req, res) => {
+  const firebaseUid = req.user.uid;
+  try {
+    const status = await userServices.checkUserExists(firebaseUid);
+    res.status(200).json({ message: 'User status fetched successfully.', status });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while searching user existence: ${error}`);
+    res
+      .status(status)
+      .json({ message: 'Internal error while searching user existence', error: error.message });
+  }
+};
