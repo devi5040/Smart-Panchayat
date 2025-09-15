@@ -389,6 +389,17 @@ exports.verifyUser = async (decodedToken) => {
   return user;
 };
 
+/**
+ * Checks if a user exists in the database based on their Firebase UID.
+ * Returns `true` if the user exists and has `user_name`, `latitude`, and `longitude` set.
+ * Returns `false` if the user exists but these fields are missing.
+ * Throws a `NotFoundError` if the user does not exist.
+ *
+ * @async
+ * @param {string} firebaseUid - The Firebase UID of the user to check.
+ * @returns {Promise<boolean>} - `true` if user exists and has required fields, `false` otherwise.
+ * @throws {NotFoundError} - If the user with the given `firebaseUid` does not exist.
+ */
 exports.checkUserExists = async (firebaseUid) => {
   const user = await Users.findOne({ where: { firebaseUid } });
   if (!user) throw new NotFoundError('User Not Found!');
