@@ -388,3 +388,10 @@ exports.verifyUser = async (decodedToken) => {
   }
   return user;
 };
+
+exports.checkUserExists = async (firebaseUid) => {
+  const user = await Users.findOne({ where: { firebaseUid } });
+  if (!user) throw new NotFoundError('User Not Found!');
+  if (!user.user_name && !user.latitude && !user.longitude) return false;
+  return true;
+};
