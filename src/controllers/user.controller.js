@@ -328,3 +328,29 @@ exports.getUsersByRole = async (req, res) => {
     });
   }
 };
+
+/**
+ * @async
+ * @function checkUserExists
+ * @description Checks if a user exists in the database based on their Firebase UID.
+ * Uses `userServices.checkUserExists` to determine existence.
+ * @param {object} req - The Express request object.
+ * @param {object} req.user - The authenticated user object provided by middleware (e.g., Firebase Auth).
+ * @param {string} req.user.uid - The Firebase UID of the user to check.
+ * @param {object} res - The Express response object.
+ * @returns {Promise<void>} Sends a JSON response with the user existence status.
+ * @throws {Error} If there's an error checking the user's existence. Logs the error and returns a 500 status code.
+ */
+exports.checkUserExists = async (req, res) => {
+  const firebaseUid = req.user.uid;
+  try {
+    const status = await userServices.checkUserExists(firebaseUid);
+    res.status(200).json({ message: 'User status fetched successfully.', status });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while searching user existence: ${error}`);
+    res
+      .status(status)
+      .json({ message: 'Internal error while searching user existence', error: error.message });
+  }
+};

@@ -93,6 +93,37 @@ router.post(
 
 /**
  * @openapi
+ * /users/check-existence:
+ *   get:
+ *     summary: Check if the authenticated user exists and has required profile data.
+ *     tags: [Users]
+ *     security:
+ *       - Firebase: []
+ *     responses:
+ *       '200':
+ *         description: User existence status retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "User status fetched successfully."
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *       '401':
+ *         description: Unauthorized - Requires authentication.
+ *       '404':
+ *         description: User not found.
+ *       '500':
+ *         description: Internal server error.
+ */
+router.get('/check-existence', authMiddleware, userController.checkUserExists);
+
+/**
+ * @openapi
  * /users/{userId}:
  *   get:
  *     summary: Get user details by ID.
@@ -156,7 +187,7 @@ router.get('/status/:status', userController.getUsersByStatus);
  *       '404':
  *         description: No users found with specified role.
  */
-router.get('/role/:role', userController.getUsersByRole);
+router.get('/role/:role', authMiddleware, userController.getUsersByRole);
 
 /**
  * @openapi

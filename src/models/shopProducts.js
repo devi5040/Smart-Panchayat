@@ -45,7 +45,7 @@ const ShopProducts = sequelize.define(
     },
     date: {
       type: Sequelize.DATE,
-      defaultValue: Date.now(),
+      defaultValue: Sequelize.NOW,
     },
   },
   { indexes: [] },
