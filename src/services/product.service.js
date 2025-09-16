@@ -415,3 +415,9 @@ exports.updateShopProducts = async (quantity, quality, price, date, shopProductI
   const products = await ShopProducts.findByPk(shopProductId);
   return products;
 };
+
+exports.getVerifiedProducts = async () => {
+  const products = await Products.findAll({ where: { isVerified: true } });
+  if (!products) throw new NotFoundError('Products fetch failed');
+  return products;
+};
