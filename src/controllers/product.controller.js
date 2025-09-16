@@ -340,3 +340,16 @@ exports.updateShopProduct = async (req, res) => {
     });
   }
 };
+
+exports.getVerifiedProducts = async (req, res) => {
+  try {
+    const products = await productServices.getVerifiedProducts();
+    res.status(200).json({ message: 'Products fetched successfully', products });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while fetching verified products`);
+    res
+      .status(status)
+      .json({ message: 'Internal error while fetching verified products', error: error.message });
+  }
+};
