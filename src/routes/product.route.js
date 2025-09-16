@@ -105,6 +105,8 @@ router.get(
  */
 router.get('/', authentication, productController.getAllProducts);
 
+router.get('/verified', productController.getVerifiedProducts);
+
 /**
  * @swagger
  * /{productId}:
