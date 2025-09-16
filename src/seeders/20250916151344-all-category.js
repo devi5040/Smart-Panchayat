@@ -12,18 +12,10 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
      */
-    await queryInterface.bulkInsert('users', [
+    await queryInterface.bulkInsert('categories', [
       {
-        phone_number: '+919113624552',
-        user_name: 'Deviprasad Rai',
-        home_address: '123, MG Road, Bangalore',
-        family_name: 'Rai',
-        pin_code: '560001',
-        language_preference: 'English',
-        user_role: 'admin',
-        latitude: '12.971598',
-        longitude: '77.594566',
-        firebaseUid: 'JWISI',
+        name: 'All',
+        imageUrl: 'https://infostoredeviprasadrai.s3.ap-southeast-2.amazonaws.com/uploads/all.png',
         createdAt: new Date(new Date()),
         updatedAt: new Date(new Date()),
       },
