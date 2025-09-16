@@ -29,6 +29,10 @@ module.exports = {
         allowNull: false,
         defaultValue: process.env.DEFAULT_PRODUCT_IMAGE || null,
       },
+      isVerified: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
       categoryId: {
         type: Sequelize.INTEGER,
         references: { model: 'categories', key: 'id' },

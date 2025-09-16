@@ -105,6 +105,15 @@ router.get(
  */
 router.get('/', authentication, productController.getAllProducts);
 
+router.get('/verified', authentication, productController.getVerifiedProducts);
+
+router.patch(
+  '/verified/:productId',
+  authentication,
+  authorization(['admin']),
+  productController.verifyProduct,
+);
+
 /**
  * @swagger
  * /{productId}:
