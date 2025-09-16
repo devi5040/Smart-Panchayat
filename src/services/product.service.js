@@ -421,3 +421,15 @@ exports.getVerifiedProducts = async () => {
   if (!products) throw new NotFoundError('Products fetch failed');
   return products;
 };
+
+exports.verifyProduct = async (productId) => {
+  const product = await Products.findByPk(productId);
+  if (!product) throw new NotFoundError('Product not found');
+  const [numRowsUpdated] = await Products.update(
+    { isVerified: true },
+    { where: { id: productId } },
+  );
+  if (numRowsUpdated == 0) throw new NoContentError('Product status not updated');
+  const productdata = await Products.findByPk(productId);
+  return productdata;
+};
