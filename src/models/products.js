@@ -33,6 +33,10 @@ const Products = sequelize.define('products', {
     },
     defaultValue: process.env.DEFAULT_PRODUCT_IMAGE,
   },
+  isVerified: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false,
+  },
 });
 
 module.exports = Products;
