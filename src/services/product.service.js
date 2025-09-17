@@ -433,3 +433,9 @@ exports.verifyProduct = async (productId) => {
   const productdata = await Products.findByPk(productId);
   return productdata;
 };
+
+exports.getRecentProducts = async () => {
+  const products = await Products.findAll({ order: [['updatedAt', 'DESC']], limit: 5 });
+  if (!products) throw NotFoundError("Couldn't get the products!");
+  return products;
+};
