@@ -367,3 +367,16 @@ exports.verifyProduct = async (req, res) => {
       .json({ message: 'Internal error while fetching verified products', error: error.message });
   }
 };
+
+exports.getRecentProducts = async (req, res) => {
+  try {
+    const product = await productServices.getRecentProducts();
+    res.status(200).json({ message: 'Fetched recent products successfully!', product });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while fetching products`);
+    res
+      .status(status)
+      .json({ message: 'Internal error while fetching products', error: error.message });
+  }
+};
