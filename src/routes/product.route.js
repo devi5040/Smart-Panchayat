@@ -107,6 +107,8 @@ router.get('/', authentication, productController.getAllProducts);
 
 router.get('/verified', authentication, productController.getVerifiedProducts);
 
+router.get('/recent', authentication, productController.getRecentProducts);
+
 router.patch(
   '/verified/:productId',
   authentication,
