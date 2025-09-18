@@ -30,8 +30,10 @@ exports.getProductsByCategory = async (categoryId) => {
     throw new NotFoundError(`Category with ID ${categoryId} not found.`);
   }
 
+  if (category.name === 'All') return this.getVerifiedProducts();
+
   // Find products associated with the category
-  const products = await Products.findAll({ where: { categoryId } });
+  const products = await Products.findAll({ where: { categoryId, isVerified: true } });
   return products || []; //Return empty array if no products found
 };
 
@@ -117,7 +119,9 @@ exports.getSingleProduct = async (productId) => {
     throw new Error('Invalid productId. Must be a positive integer.');
   }
 
-  const product = await Products.findByPk(productId);
+  const product = await Products.findByPk(productId, {
+    include: { model: Category, attributes: ['id', 'name'] },
+  });
   if (!product) {
     throw new NotFoundError(`Product with ID ${productId} not found.`);
   }
