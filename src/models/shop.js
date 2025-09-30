@@ -18,8 +18,7 @@ const Shops = sequelize.define('shops', {
   },
   shop_name: {
     type: Sequelize.STRING(255),
-    allowNull: false,
-    defaultValue: ' ',
+    allowNull: true,
   },
   pin_code: {
     type: Sequelize.STRING(10),
