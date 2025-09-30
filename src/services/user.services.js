@@ -9,7 +9,7 @@
  */
 
 const s3 = require('../config/aws/aws.s3.config');
-const { Users } = require('../models'); // Sequelize model for Users
+const { Users, Shops } = require('../models'); // Sequelize model for Users
 const admin = require('firebase-admin');
 const { encryptPassword, comparePasswords } = require('../utils/hashPassword');
 const { NotFoundError, BadRequestError, NoContentError } = require('../utils/error');
@@ -188,6 +188,7 @@ exports.setPreferredLanguage = async (userId, prefferedLanguage) => {
  * @throws {NoContentError} - If no rows were updated.
  */
 exports.changeUserRole = async (userId, currentRole) => {
+  console.log(':::::::::::::::', userId, currentRole);
   let userRole;
   if (userId === null || userId === undefined) {
     throw new Error('Invalid user ID: ID cannot be null or undefined');
@@ -209,6 +210,12 @@ exports.changeUserRole = async (userId, currentRole) => {
       'user_role',
       'account_status',
       'language_preference',
+      'home_address',
+      'family_name',
+      'pin_code',
+      'profile_image',
+      'latitude',
+      'longitude',
     ],
   });
   return data;
@@ -416,4 +423,16 @@ exports.deactivateAccount = async (userId) => {
   if (numRowsUpdated === 0) throw new NoContentError('No rows updated!');
   const userData = await Users.findByPk(userId);
   return userData;
+};
+
+exports.checkShopExists = async (userId) => {
+  const user = await Users.findByPk(userId);
+  if (!user) throw new NotFoundError('User Not Found!');
+  const shop = await Shops.findOne({ where: { userId } });
+  console.log(JSON.stringify(shop));
+  if (!shop.shop_name && shop.userId === userId) {
+    console.log(`inside the shop`);
+    return false;
+  }
+  return true;
 };
