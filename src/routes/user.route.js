@@ -122,6 +122,8 @@ router.post(
  */
 router.get('/check-existence', authMiddleware, userController.checkUserExists);
 
+router.get('/deactivate', authMiddleware, userController.deactivateAccount);
+
 /**
  * @openapi
  * /users/{userId}:
@@ -145,7 +147,7 @@ router.get('/check-existence', authMiddleware, userController.checkUserExists);
  *       '404':
  *         description: User not found.
  */
-router.get('/:userId', authMiddleware, userController.getUserDetails);
+router.get('/profile', authMiddleware, userController.getUserDetails);
 
 /**
  * @openapi
@@ -221,7 +223,7 @@ router.get('/role/:role', authMiddleware, userController.getUsersByRole);
  *         description: User not found.
  */
 router.put(
-  '/update-profile/:userId',
+  '/update-profile',
   authMiddleware,
   validate(userDataValidation.updateUserDataSchema),
   userController.updateProfile,
