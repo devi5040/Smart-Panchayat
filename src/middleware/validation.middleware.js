@@ -9,11 +9,14 @@
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
 
+const logger = require('../utils/logger');
+
 module.exports = (schema, property = 'body') => {
   return (req, res, next) => {
     const { error } = schema.validate(req[property], { abortEarly: false });
 
     if (error) {
+      logger.error(`Validation error: ${error.details.map((err) => err.message)}`);
       return res.status(400).json({
         success: false,
         message: 'Validation error',
