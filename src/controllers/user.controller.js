@@ -368,3 +368,17 @@ exports.deactivateAccount = async (req, res) => {
       .json({ message: 'Internal error while updating the user status', error: error.message });
   }
 };
+
+exports.checkShopExists = async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const shopStatus = await userServices.checkShopExists(userId);
+    res.status(200).json({ message: 'Shop status fetched successfully!', shopStatus });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while fetching the shop status: ${error}`);
+    res
+      .status(status)
+      .json({ message: 'Internal error while fetching shop status', error: error.message });
+  }
+};
