@@ -82,7 +82,7 @@ exports.addUser = async (req, res) => {
  * @throws {Error} If there's an error retrieving the user. Error details are logged and a 500 status code is returned.  Sequelize's `NotFoundError` might be handled separately for a more specific response.
  */
 exports.getUserDetails = async (req, res) => {
-  const userId = req.params.userId;
+  const userId = req.user.id;
   try {
     const user = await userServices.getUserByID(userId);
     res.status(200).json({ message: 'User details fetched successfully.', user });
@@ -352,5 +352,19 @@ exports.checkUserExists = async (req, res) => {
     res
       .status(status)
       .json({ message: 'Internal error while searching user existence', error: error.message });
+  }
+};
+
+exports.deactivateAccount = async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const user = await userServices.deactivateAccount(userId);
+    res.status(200).json({ message: 'User status changed successfully', user });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while updating the user status: ${error}`);
+    res
+      .status(status)
+      .json({ message: 'Internal error while updating the user status', error: error.message });
   }
 };
