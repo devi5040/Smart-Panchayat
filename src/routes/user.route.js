@@ -124,6 +124,8 @@ router.get('/check-existence', authMiddleware, userController.checkUserExists);
 
 router.get('/deactivate', authMiddleware, userController.deactivateAccount);
 
+router.get('/shop-existence', authMiddleware, userController.checkShopExists);
+
 /**
  * @openapi
  * /users/{userId}:
