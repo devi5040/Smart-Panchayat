@@ -29,6 +29,7 @@ exports.createUserDataSchema = Joi.object({
     'number.max': 'Longitude cannot be greater than 180',
     'any.required': 'Longitude is required',
   }),
+  role: Joi.string(),
 });
 
 exports.updateUserDataSchema = Joi.object({
