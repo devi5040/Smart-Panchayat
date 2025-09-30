@@ -24,12 +24,11 @@ const sequelize = require('../config/db');
  * @throws {Error} - If the signed URL could not be generated.
  */
 exports.getSignedUrlS3 = async (fileName, fileType) => {
-  console.log('inside service fun>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
   const params = {
     Bucket: process.env.AWS_BUCKET_NAME,
     Key: `uploads/profiles/${Date.now()}-${fileName}`,
     ContentType: fileType,
-    ACL: 'public-read',
+    // ACL: 'public-read',
   };
   const signedURL = await s3.getSignedUrlPromise('putObject', params);
   if (!signedURL) throw new Error('Could not generate signedUrl');
@@ -59,7 +58,7 @@ exports.addUser = async ({ name, firebaseUid, languagePreference, latitude, long
       language_preference: languagePreference,
       latitude,
       longitude,
-      role,
+      user_role: role,
     },
     { where: { firebaseUid } },
   );
@@ -405,4 +404,16 @@ exports.checkUserExists = async (firebaseUid) => {
   if (!user) throw new NotFoundError('User Not Found!');
   if (!user.user_name && !user.latitude && !user.longitude) return false;
   return true;
+};
+
+exports.deactivateAccount = async (userId) => {
+  const user = await Users.findByPk(userId);
+  if (!user) throw new NotFoundError('User not found!');
+  const [numRowsUpdated] = await Users.update(
+    { account_status: 'inactive' },
+    { where: { id: userId } },
+  );
+  if (numRowsUpdated === 0) throw new NoContentError('No rows updated!');
+  const userData = await Users.findByPk(userId);
+  return userData;
 };
