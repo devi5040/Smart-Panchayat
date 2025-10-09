@@ -380,3 +380,19 @@ exports.getRecentProducts = async (req, res) => {
       .json({ message: 'Internal error while fetching products', error: error.message });
   }
 };
+
+exports.searchProducts = async (req, res) => {
+  const { q } = req.query;
+  try {
+    const products = await productServices.searchProducts(q);
+    res.status(200).json({
+      message: 'Fetched product successfully',
+      products: products.hits.map((product) => product._source),
+    });
+  } catch (error) {
+    logger.error(`Internal error while fetching products: ${error}`);
+    res
+      .status(500)
+      .json({ message: 'Internal error while fetching products', error: error.message });
+  }
+};
