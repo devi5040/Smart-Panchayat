@@ -8,6 +8,7 @@
  */
 const { Products, ShopProducts, Category, Shops } = require('../models');
 const { NotFoundError, BadRequestError, ConflictError, NoContentError } = require('../utils/error');
+const esClient = require('../config/elasticsearch.config');
 
 /**
  * Retrieves all products associated with a given category ID.
@@ -442,4 +443,44 @@ exports.getRecentProducts = async () => {
   const products = await Products.findAll({ order: [['updatedAt', 'DESC']], limit: 5 });
   if (!products) throw NotFoundError("Couldn't get the products!");
   return products;
+};
+
+exports.searchProducts = async (q) => {
+  const { hits } = await esClient.search({
+    index: 'products',
+    size: 10,
+    query: {
+      bool: {
+        should: [
+          {
+            match_phrase_prefix: {
+              name: {
+                query: q,
+                boost: 3,
+              },
+            },
+          },
+          {
+            match_phrase_prefix: {
+              category: {
+                query: q,
+                boost: 2,
+              },
+            },
+          },
+          {
+            multi_match: {
+              query: q,
+              fields: ['name^3', 'category'],
+              fuzziness: 'AUTO',
+              boost: 1,
+            },
+          },
+        ],
+      },
+    },
+    fields: ['name^3', 'category'],
+  });
+
+  return hits;
 };
