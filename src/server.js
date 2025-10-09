@@ -11,6 +11,7 @@
 const app = require('./app');
 const logger = require('./utils/logger');
 const sequelize = require('./config/db');
+const syncProductsToElasticSearch = require('./utils/elasticsearch.sync');
 
 // Initialize PORT
 const PORT = process.env.PORT || 5050;
@@ -21,7 +22,7 @@ const startServer = async () => {
     // Verify db connection
     await sequelize.authenticate();
     logger.info('The db is connected successfully');
-
+    await syncProductsToElasticSearch();
     // sync the db
     await sequelize.sync();
 
