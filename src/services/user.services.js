@@ -188,7 +188,6 @@ exports.setPreferredLanguage = async (userId, prefferedLanguage) => {
  * @throws {NoContentError} - If no rows were updated.
  */
 exports.changeUserRole = async (userId, currentRole) => {
-  console.log(':::::::::::::::', userId, currentRole);
   let userRole;
   if (userId === null || userId === undefined) {
     throw new Error('Invalid user ID: ID cannot be null or undefined');
