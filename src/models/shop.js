@@ -16,7 +16,11 @@ const Shops = sequelize.define('shops', {
     autoIncrement: true,
     primaryKey: true,
   },
-  shop_name: {
+  shop_name_en: {
+    type: Sequelize.STRING(255),
+    allowNull: true,
+  },
+  shop_name_kn: {
     type: Sequelize.STRING(255),
     allowNull: true,
   },
