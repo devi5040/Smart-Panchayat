@@ -32,15 +32,27 @@ const Users = sequelize.define('users', {
       notEmpty: true,
     },
   },
-  user_name: {
+  user_name_en: {
     type: Sequelize.STRING(100),
     allowNull: true,
   },
-  home_address: {
+  user_name_kn: {
     type: Sequelize.STRING(255),
     allowNull: true,
   },
-  family_name: {
+  home_address_en: {
+    type: Sequelize.STRING(1000),
+    allowNull: true,
+  },
+  home_address_kn: {
+    type: Sequelize.STRING(1000),
+    allowNull: true,
+  },
+  family_name_en: {
+    type: Sequelize.STRING(255),
+    allowNull: true,
+  },
+  family_name_kn: {
     type: Sequelize.STRING(255),
     allowNull: true,
   },
