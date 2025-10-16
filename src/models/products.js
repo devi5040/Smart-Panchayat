@@ -19,7 +19,11 @@ const Products = sequelize.define('products', {
     allowNull: false,
     autoIncrement: true,
   },
-  name: {
+  name_en: {
+    type: Sequelize.STRING(255),
+    allowNull: false,
+  },
+  name_kn: {
     type: Sequelize.STRING(255),
     allowNull: false,
   },
@@ -43,18 +47,21 @@ const Products = sequelize.define('products', {
 
 const getCategoryName = async (categoryId) => {
   const category = await Category.findByPk(categoryId);
-  return category ? category.name : null;
+  return {
+    name_en: category ? category.name_en : null,
+    name_kn: category ? category.name_kn : null,
+  };
 };
 
 const syncProductsToES = async (product) => {
-  const categoryName = await getCategoryName(product.categoryId);
+  const { name_en, name_kn } = await getCategoryName(product.categoryId);
 
   await esClient.index({
     index: 'products',
     id: product.id,
     document: {
       ...product.toJSON(),
-      category: categoryName, // include category name for search
+      category: { name_en, name_kn }, // include category name for search
     },
   });
 };
