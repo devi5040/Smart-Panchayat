@@ -16,9 +16,13 @@ module.exports = {
         autoIncrement: true,
         primaryKey: true,
       },
-      shop_name: {
+      shop_name_en: {
         type: Sequelize.STRING(255),
-        allowNull: false,
+        allowNull: true,
+      },
+      shop_name_kn: {
+        type: Sequelize.STRING(255),
+        allowNull: true,
       },
       pin_code: {
         type: Sequelize.STRING(10),
