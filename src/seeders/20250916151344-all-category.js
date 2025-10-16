@@ -14,7 +14,8 @@ module.exports = {
      */
     await queryInterface.bulkInsert('categories', [
       {
-        name: 'All',
+        name_en: 'All',
+        name_kn: 'ಎಲ್ಲಾ',
         imageUrl: 'https://infostoredeviprasadrai.s3.ap-southeast-2.amazonaws.com/uploads/all.png',
         createdAt: new Date(new Date()),
         updatedAt: new Date(new Date()),
