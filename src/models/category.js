@@ -19,7 +19,11 @@ const Category = sequelize.define('category', {
     primaryKey: true,
     autoIncrement: true,
   },
-  name: {
+  name_en: {
+    type: Sequelize.STRING(255),
+    allowNull: false,
+  },
+  name_kn: {
     type: Sequelize.STRING(255),
     allowNull: false,
   },
