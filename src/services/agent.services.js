@@ -32,7 +32,8 @@ exports.addAgent = async (mobileNumber, name, latitude, longitude, languagePrefe
   if (userExist) throw new ConflictError('User already exists');
   const user = await Users.create({
     phone_number: mobileNumber,
-    user_name: name,
+    user_name_en: name,
+    user_name_kn: name,
     latitude,
     longitude,
     language_preference: languagePreference,
@@ -73,7 +74,14 @@ exports.changeToAgent = async (userId) => {
   const [numRowsUpdated] = await Users.update({ user_role: 'agent' }, { where: { id: userId } });
   if (numRowsUpdated == 0) throw new NoContentError('No rows updated!');
   const data = await Users.findByPk(userId, {
-    attributes: ['id', 'user_name', 'phone_number', 'user_role', 'language_preference'],
+    attributes: [
+      'id',
+      'user_name_en',
+      'user_name_kn',
+      'phone_number',
+      'user_role',
+      'language_preference',
+    ],
   });
   return data;
 };
