@@ -31,7 +31,7 @@ exports.getProductsByCategory = async (categoryId) => {
     throw new NotFoundError(`Category with ID ${categoryId} not found.`);
   }
 
-  if (category.name === 'All') return this.getVerifiedProducts();
+  if (category.name_en === 'All') return this.getVerifiedProducts();
 
   // Find products associated with the category
   const products = await Products.findAll({ where: { categoryId, isVerified: true } });
@@ -121,7 +121,7 @@ exports.getSingleProduct = async (productId) => {
   }
 
   const product = await Products.findByPk(productId, {
-    include: { model: Category, attributes: ['id', 'name'] },
+    include: { model: Category, attributes: ['id', 'name_en', 'name_kn'] },
   });
   if (!product) {
     throw new NotFoundError(`Product with ID ${productId} not found.`);
@@ -155,14 +155,15 @@ exports.addProduct = async (name, price, imageUrl, categoryId) => {
   }
 
   // Check if a product with the same name already exists
-  const existingProduct = await Products.findOne({ where: { name } });
+  const existingProduct = await Products.findOne({ where: { name_en: name } });
   if (existingProduct) {
     throw new ConflictError(`Product with name "${name}" already exists.`);
   }
 
   // Create the new product
   const productData = await Products.create({
-    name,
+    name_en: name,
+    name_kn: name,
     price,
     image: imageUrl,
     categoryId,
@@ -202,7 +203,7 @@ exports.updateProduct = async (productId, name, price, imageUrl, categoryId) => 
 
   // Update the product
   const [numRowsUpdated] = await Products.update(
-    { name, price, imageUrl, categoryId },
+    { name_en: name, name_kn: name, price, imageUrl, categoryId },
     { where: { id: productId } },
   );
   if (numRowsUpdated === 0) {
@@ -337,11 +338,12 @@ exports.addProductShop = async (
     const category = await Category.findByPk(categoryId);
     if (!category) throw new NotFoundError('Category not found!');
 
-    const existProduct = await Products.findOne({ where: { name } });
+    const existProduct = await Products.findOne({ where: { name_en: name } });
     if (existProduct) throw new ConflictError('Product already exists');
 
     const productData = await Products.create({
-      name,
+      name_en: name,
+      name_kn: name,
       price,
       image,
       categoryId,
@@ -452,9 +454,10 @@ exports.searchProducts = async (q) => {
     query: {
       bool: {
         should: [
+          // Match English and Kannada names
           {
             match_phrase_prefix: {
-              name: {
+              name_en: {
                 query: q,
                 boost: 3,
               },
@@ -462,16 +465,34 @@ exports.searchProducts = async (q) => {
           },
           {
             match_phrase_prefix: {
-              category: {
+              name_kn: {
+                query: q,
+                boost: 3,
+              },
+            },
+          },
+          // Match category fields (nested object fields)
+          {
+            match_phrase_prefix: {
+              'category.name_en': {
                 query: q,
                 boost: 2,
               },
             },
           },
           {
+            match_phrase_prefix: {
+              'category.name_kn': {
+                query: q,
+                boost: 2,
+              },
+            },
+          },
+          // Fuzzy match for flexibility
+          {
             multi_match: {
               query: q,
-              fields: ['name^3', 'category'],
+              fields: ['name_en^3', 'name_kn^3', 'category.name_en^2', 'category.name_kn^2'],
               fuzziness: 'AUTO',
               boost: 1,
             },
@@ -479,7 +500,7 @@ exports.searchProducts = async (q) => {
         ],
       },
     },
-    fields: ['name^3', 'category'],
+    fields: ['name_en', 'name_kn', 'category.name_en', 'category.name_kn'],
   });
 
   return hits;
