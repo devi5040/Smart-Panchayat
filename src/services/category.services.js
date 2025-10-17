@@ -53,7 +53,7 @@ exports.getSignedUrl = async (fileName, fileType) => {
  * Throws an error if database interaction fails.
  */
 exports.addCategory = async (name, imageUrl) => {
-  const category = await Category.create({ name, imageUrl }); // Create a new category in the database.
+  const category = await Category.create({ name_en: name, name_kn: name, imageUrl }); // Create a new category in the database.
   return category;
 };
 
@@ -69,7 +69,7 @@ exports.updateCategory = async (categoryId, name, imageUrl) => {
   const category = await Category.findByPk(categoryId);
   if (!category) throw new NotFoundError('Category not found!');
   const updatedRows = await Category.update(
-    { name, imageUrl },
+    { name_en: name, name_kn: name, imageUrl },
     { where: { id: categoryId } }, // Update the category with the given ID.
   );
   if (updatedRows == 0) throw new Error('Category ID is not valid. No records updated.'); // Throw error if no rows were updated.
