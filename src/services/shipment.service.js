@@ -122,7 +122,7 @@ exports.createShipment = async (shipmentDetails, shops) => {
       attributes: ['id', 'date', 'collection_centre', 'transportation_mode'],
       include: {
         model: Shops,
-        attributes: ['shop_name', 'id', 'latitude', 'longitude', 'pin_code'],
+        attributes: ['shop_name_en', 'shop_name_kn', 'id', 'latitude', 'longitude', 'pin_code'],
         through: { attributes: ['status'] },
       },
       transaction: t,
@@ -230,7 +230,7 @@ exports.addShopsToShipments = async (shipmentId, shopId, products) => {
       attributes: ['id', 'date', 'collection_centre', 'transportation_mode'],
       include: {
         model: Shops,
-        attributes: ['shop_name', 'id', 'latitude', 'longitude', 'pin_code'],
+        attributes: ['shop_name_en', 'shop_name_kn', 'id', 'latitude', 'longitude', 'pin_code'],
         through: { attributes: ['status'] },
       },
       transaction: t,
@@ -253,7 +253,7 @@ exports.getShipmentForShop = async (shopId) => {
   const shop = await Shops.findByPk(shopId);
   if (!shop) throw new NotFoundError('Shop not found');
   const shipmentProducts = await Products.findAll({
-    attributes: ['id', 'name', 'price'],
+    attributes: ['id', 'name_en', 'name_kn', 'price'],
     include: [
       {
         model: ShipmentShops,
@@ -268,7 +268,8 @@ exports.getShipmentForShop = async (shopId) => {
   const products = shipmentProducts.flatMap((shipmentProduct) =>
     shipmentProduct['shipment-shops'].map((sh) => ({
       id: shipmentProduct.id,
-      name: shipmentProduct.name,
+      name_en: shipmentProduct.name_en,
+      name_kn: shipmentProduct.name_kn,
       price: shipmentProduct.price,
       shipmentShopId: sh.id,
       status: sh.status,
