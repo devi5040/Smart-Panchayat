@@ -54,7 +54,8 @@ exports.getSignedUrlS3 = async (fileName, fileType) => {
 exports.addUser = async ({ name, firebaseUid, languagePreference, latitude, longitude, role }) => {
   const [numRowsUpdated] = await Users.update(
     {
-      user_name: name,
+      user_name_en: name,
+      user_name_kn: name,
       language_preference: languagePreference,
       latitude,
       longitude,
@@ -125,8 +126,10 @@ exports.updateUserDetails = async ({ userId, data }) => {
   }
   const [numRowsUpdated] = await Users.update(
     {
-      home_address: data.home,
-      family_name: data.familyName,
+      home_address_en: data.home,
+      home_address_kn: data.home,
+      family_name_en: data.familyName,
+      family_name_kn: data.familyName,
       pin_code: data.pinCode,
       profile_image: data.profileImage,
       password: data.password, // This will be handled by encryptPassword util
@@ -168,7 +171,8 @@ exports.setPreferredLanguage = async (userId, prefferedLanguage) => {
     attributes: [
       'id',
       'phone_number',
-      'user_name',
+      'user_name_en',
+      'user_name_kn',
       'user_role',
       'account_status',
       'language_preference',
@@ -205,12 +209,15 @@ exports.changeUserRole = async (userId, currentRole) => {
     attributes: [
       'id',
       'phone_number',
-      'user_name',
+      'user_name_en',
+      'user_name_kn',
       'user_role',
       'account_status',
       'language_preference',
-      'home_address',
-      'family_name',
+      'home_address_en',
+      'home_address_kn',
+      'family_name_en',
+      'family_name_kn',
       'pin_code',
       'profile_image',
       'latitude',
@@ -253,7 +260,8 @@ exports.addPassword = async (userId, password) => {
     attributes: [
       'id',
       'phone_number',
-      'user_name',
+      'user_name_en',
+      'user_name_kn',
       'user_role',
       'account_status',
       'language_preference',
@@ -304,7 +312,8 @@ exports.updatePassword = async (userId, oldPassword, newPassword) => {
     attributes: [
       'id',
       'phone_number',
-      'user_name',
+      'user_name_en',
+      'user_name_kn',
       'user_role',
       'account_status',
       'language_preference',
@@ -408,7 +417,7 @@ exports.verifyUser = async (decodedToken) => {
 exports.checkUserExists = async (firebaseUid) => {
   const user = await Users.findOne({ where: { firebaseUid } });
   if (!user) throw new NotFoundError('User Not Found!');
-  if (!user.user_name && !user.latitude && !user.longitude) return false;
+  if (!user.user_name_en && !user.user_name_kn && !user.latitude && !user.longitude) return false;
   return true;
 };
 
@@ -429,7 +438,7 @@ exports.checkShopExists = async (userId) => {
   if (!user) throw new NotFoundError('User Not Found!');
   const shop = await Shops.findOne({ where: { userId } });
   console.log(JSON.stringify(shop));
-  if (!shop.shop_name && shop.userId === userId) {
+  if (!shop.shop_name_en && !shop.shop_name_kn && shop.userId === userId) {
     console.log(`inside the shop`);
     return false;
   }
