@@ -249,33 +249,45 @@ exports.addShopsToShipments = async (shipmentId, shopId, products) => {
  * @throws {NotFoundError} If the shop does not exist.
  * @throws {Error} If an error occurs during data retrieval.
  */
-exports.getShipmentForShop = async (shopId) => {
-  const shop = await Shops.findByPk(shopId);
+exports.getShipmentForShop = async (userId, pageNo) => {
+  const shop = await Shops.findOne({ where: { userId: userId } });
   if (!shop) throw new NotFoundError('Shop not found');
-  const shipmentProducts = await Products.findAll({
-    attributes: ['id', 'name_en', 'name_kn', 'price'],
+  const shopId = shop.id.toString();
+
+  const page = parseInt(pageNo) || 1;
+  const limit = 10;
+  const offset = (page - 1) * limit;
+
+  const { count, rows: shipmentData } = await Shipments.findAndCountAll({
     include: [
       {
         model: ShipmentShops,
+        attributes: ['status'],
         where: { shopId },
-        attributes: ['id', 'status'],
-        through: { attributes: [] },
+        required: true,
       },
     ],
+    order: [['createdAt', 'DESC']],
+    limit,
+    offset,
   });
+
+  const totalPages = Math.ceil(count / limit);
+
+  const isLastPage = page >= totalPages;
+
   //Returning empty array instead of throwing error for better error handling.
-  if (!shipmentProducts) return [];
-  const products = shipmentProducts.flatMap((shipmentProduct) =>
-    shipmentProduct['shipment-shops'].map((sh) => ({
-      id: shipmentProduct.id,
-      name_en: shipmentProduct.name_en,
-      name_kn: shipmentProduct.name_kn,
-      price: shipmentProduct.price,
-      shipmentShopId: sh.id,
-      status: sh.status,
+  if (!shipmentData) return [];
+  const products = shipmentData.flatMap((shipment) =>
+    shipment['shipment-shops'].map((shop) => ({
+      id: shipment.id,
+      date: shipment.date,
+      collectionCentre: shipment.collection_centre,
+      transportationMode: shipment.transportation_mode,
+      status: shop.status,
     })),
   );
-  return products;
+  return { shipments: products, isLastPage };
 };
 
 /**
