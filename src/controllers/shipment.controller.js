@@ -90,13 +90,16 @@ exports.addShopToShipment = async (req, res) => {
  * @throws {Error} - Throws an error if there is an issue fetching the shipment. The error status code and message will be included in the response.
  */
 exports.getShipmentForShops = async (req, res) => {
-  const { shopId } = req.params;
+  const userId = req.user.id;
+  const { page } = req.query;
   try {
-    const shipment = await shipmentServices.getShipmentForShop(shopId);
+    const shipment = await shipmentServices.getShipmentForShop(userId, page);
     res.status(200).json({ message: 'Shipment fetched successfully!', shipment });
   } catch (error) {
     const status = error.statusCode || 500;
-    logger.error(`Internal error while fetching the shipment data for shops: ${shopId}`);
+    logger.error(
+      `Internal error while fetching the shipment data for shops: ${userId}, Error: ${error}`,
+    );
     res.status(status).json({
       message:
         '⚠️ An internal error occurred while fetching the shipment data for shops. Please try again later.',
