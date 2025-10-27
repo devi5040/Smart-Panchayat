@@ -62,6 +62,9 @@ Products.belongsToMany(ShipmentShops, { through: ShipmentShopProducts });
 Category.hasMany(Products, { onDelete: 'CASCADE' });
 Products.belongsTo(Category);
 
+ShipmentShops.belongsTo(Shipments);
+Shipments.hasMany(ShipmentShops);
+
 module.exports = {
   Users,
   Shops,
