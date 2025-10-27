@@ -90,12 +90,7 @@ router.put(
  * @returns {Array<Object>} An array of shipment objects associated with the shop.
  * @throws {Error} 404 Not Found - If no shipments are found for the given shop ID.
  */
-router.get(
-  '/shop/:shopId',
-  auth,
-  access(['admin', 'shop']),
-  shipmentController.getShipmentForShops,
-);
+router.get('/shop', auth, access(['admin', 'shop']), shipmentController.getShipmentForShops);
 
 /**
  * @route GET /status/:status
