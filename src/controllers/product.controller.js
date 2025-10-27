@@ -64,11 +64,12 @@ exports.getAllProducts = async (req, res) => {
  */
 exports.getProductForShops = async (req, res) => {
   const shopId = req.user?.shop;
+  const { page } = req.query;
   if (!shopId) {
     return res.status(400).json({ message: 'Shop ID is required.' }); //More appropriate status code
   }
   try {
-    const products = await productServices.getProductsForShop(shopId);
+    const products = await productServices.getProductsForShop(shopId, page);
     res.status(200).json({ message: 'Products fetched successfully.', products });
   } catch (error) {
     logger.error(`Error fetching products for shop ${shopId}: ${error}`);
