@@ -76,7 +76,7 @@ exports.getProductsForShop = async (shopId, pageNo) => {
   const offset = (page - 1) * limit;
 
   // Find shop products
-  const { count, rows: shopProducts } = await Products.findAndCountAll({
+  const { count, rows } = await Products.findAndCountAll({
     include: [
       {
         model: Shops,
@@ -94,6 +94,26 @@ exports.getProductsForShop = async (shopId, pageNo) => {
   const totalPages = Math.ceil(count / limit);
 
   const isLastPage = page >= totalPages;
+
+  const shopProducts = rows.map((product) => {
+    const shopData = product.shops?.[0]?.['shop-products'];
+
+    return {
+      id: product.id,
+      name_en: product.name_en,
+      name_kn: product.name_kn,
+      price: product.price,
+      isVerified: product.isVerified,
+      image: product.image,
+      createdAt: product.createdAt,
+      updatedAt: product.updatedAt,
+      categoryId: product.categoryId,
+      quantity: shopData?.quantity,
+      status: shopData?.status,
+      quality: shopData?.quality,
+    };
+  });
+
   return { products: shopProducts, isLastPage }; //Return empty array if no products found
 };
 
@@ -107,7 +127,7 @@ exports.getProductsForShop = async (shopId, pageNo) => {
  * @throws {Error} If shopId is invalid (0, NaN, undefined, null, or negative).
  * @throws {NotFoundError} If the shop with the given ID is not found.
  */
-exports.getProductsForStatus = async (shopId, status) => {
+exports.getProductsForStatus = async (shopId, status, pageNo) => {
   // Input validation
   if (shopId <= 0 || isNaN(shopId) || shopId == null) {
     throw new Error('Invalid shopId. Must be a positive integer.');
@@ -119,11 +139,22 @@ exports.getProductsForStatus = async (shopId, status) => {
     throw new NotFoundError(`Shop with ID ${shopId} not found.`);
   }
 
+  const page = parseInt(pageNo) || 1;
+  const limit = 10;
+  const offset = (page - 1) * limit;
+
   // Find shop products with the specified status
-  const productsData = await ShopProducts.findAll({
+  const { count, rows: productsData } = await ShopProducts.findAndCountAll({
     where: { shopId, status },
+    limit,
+    offset,
+    order: [['createdAt', 'DESC']],
   });
-  return productsData || []; //Return empty array if no products found
+
+  const totalPages = Math.ceil(count / limit);
+  const isLastPage = page >= totalPages;
+
+  return { productsData, isLastPage }; //Return empty array if no products found
 };
 
 /**
