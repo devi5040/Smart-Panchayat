@@ -93,9 +93,9 @@ exports.getProductForShops = async (req, res) => {
  */
 exports.getProductForStatus = async (req, res) => {
   const shopId = req.user?.shop;
-  const { status } = req.params;
+  const { status, page } = req.params;
   try {
-    const products = await productServices.getProductsForStatus(shopId, status);
+    const products = await productServices.getProductsForStatus(shopId, status, page);
     res.status(200).json({ message: 'Products fetched successfully.', products });
   } catch (error) {
     const status = error.statusCode || 500;
