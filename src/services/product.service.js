@@ -59,7 +59,7 @@ exports.getAllProducts = async () => {
  * @throws {Error} If shopId is invalid (0, NaN, undefined, null, or negative).
  * @throws {NotFoundError} If the shop with the given ID is not found.
  */
-exports.getProductsForShop = async (shopId, pageNo) => {
+exports.getProductsForShop = async (shopId, pageNo, status) => {
   // Input validation
   if (shopId <= 0 || isNaN(shopId) || shopId == null) {
     throw new Error('Invalid shopId. Must be a positive integer.');
@@ -70,6 +70,9 @@ exports.getProductsForShop = async (shopId, pageNo) => {
   if (!shop) {
     throw new NotFoundError(`Shop with ID ${shopId} not found.`);
   }
+
+  const whereClause = { shopId };
+  if (status) whereClause.status = status;
 
   const page = parseInt(pageNo) || 1;
   const limit = 10;
@@ -83,7 +86,7 @@ exports.getProductsForShop = async (shopId, pageNo) => {
         attributes: ['id'],
         through: {
           attributes: ['quantity', 'status', 'quality'],
-          where: { shopId },
+          where: whereClause,
         },
         required: true,
       },
