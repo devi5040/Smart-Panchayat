@@ -53,7 +53,7 @@ router.post(
 router.post(
   '/',
   authMiddleware,
-  access(['admin']),
+  access(['admin', 'shop']),
   validate(categoryValidationSchema),
   categoryController.addCategory,
 );
