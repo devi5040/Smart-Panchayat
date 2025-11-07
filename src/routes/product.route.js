@@ -40,6 +40,7 @@ const productValidator = require('../utils/validation/product.validation');
  * @type {object}
  */
 const productController = require('../controllers/product.controller');
+const { fileUploadSchema } = require('../utils/validation/fileUploadValidation');
 
 /**
  * @swagger
@@ -143,6 +144,14 @@ router.patch(
  */
 router.get('/:productId', authentication, productController.getProductDetails);
 
+router.post(
+  '/signed-url',
+  authentication,
+  authorization(['admin', 'shop']),
+  validate(fileUploadSchema),
+  productController.getSignedUrl,
+);
+
 /**
  * @swagger
  * /:
@@ -175,7 +184,7 @@ router.post(
 router.post(
   '/',
   authentication,
-  authorization(['admin']),
+  authorization(['admin', 'shop']),
   validate(productValidator.productValidation),
   productController.addProduct,
 );
