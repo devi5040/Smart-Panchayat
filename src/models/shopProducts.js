@@ -39,7 +39,7 @@ const ShopProducts = sequelize.define(
       },
     },
     quality: {
-      type: Sequelize.ENUM('premium', 'medium', 'low'),
+      type: Sequelize.ENUM('Premium', 'High', 'Medium'),
       allowNull: false,
       defaultValue: 'medium',
     },
