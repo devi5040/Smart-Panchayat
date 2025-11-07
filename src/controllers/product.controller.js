@@ -255,7 +255,8 @@ exports.deleteProduct = async (req, res) => {
  * @throws {Error} If there's an error adding the shop product. Returns an appropriate HTTP status code and error message.
  */
 exports.addShopProduct = async (req, res) => {
-  const { quantity, price, quality, shopId, productId, name, image, categoryId, date } = req.body;
+  const shopId = req.user.shop;
+  const { quantity, price, quality, productId, name, image, categoryId, date } = req.body;
   try {
     const product = await productServices.addProductShop(
       quantity,
@@ -395,5 +396,17 @@ exports.searchProducts = async (req, res) => {
     res
       .status(500)
       .json({ message: 'Internal error while fetching products', error: error.message });
+  }
+};
+
+exports.getSignedUrl = async (req, res) => {
+  try {
+    const { fileName, fileType } = req.body;
+    const result = await productServices.getSignedUrlS3(fileName, fileType);
+
+    res.status(200).json({ ...result });
+  } catch (error) {
+    logger.error(`Error while getting signed URL: ${error}`);
+    res.status(500).json({ error: error.message });
   }
 };
