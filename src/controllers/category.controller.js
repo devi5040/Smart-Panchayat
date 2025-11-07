@@ -46,8 +46,8 @@ exports.getSignedUrl = async (req, res) => {
 exports.addCategory = async (req, res) => {
   try {
     const { name, imageUrl } = req.body;
-    await categoryServices.addCategory(name, imageUrl);
-    res.status(201).json({ message: 'Category added successfully' });
+    const category = await categoryServices.addCategory(name, imageUrl);
+    res.status(201).json({ message: 'Category added successfully', category });
   } catch (error) {
     logger.error(`Internal error while creating a category: ${error}`);
     res.status(500).json({
