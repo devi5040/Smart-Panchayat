@@ -9,6 +9,7 @@
 const { Products, ShopProducts, Category, Shops } = require('../models');
 const { NotFoundError, BadRequestError, ConflictError, NoContentError } = require('../utils/error');
 const esClient = require('../config/elasticsearch.config');
+const s3 = require('../config/aws/aws.s3.config');
 
 /**
  * Retrieves all products associated with a given category ID.
@@ -559,4 +560,19 @@ exports.searchProducts = async (q) => {
   });
 
   return hits;
+};
+
+exports.getSignedUrlS3 = async (fileName, fileType) => {
+  const params = {
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: `uploads/products/${Date.now()}-${fileName}`,
+    ContentType: fileType,
+    // ACL: 'public-read',
+  };
+  const signedURL = await s3.getSignedUrlPromise('putObject', params);
+  if (!signedURL) throw new Error('Could not generate signedUrl');
+  return {
+    signedURL,
+    fileUrl: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${params.Key}`,
+  };
 };
