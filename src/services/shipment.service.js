@@ -274,8 +274,6 @@ exports.getShipmentForShop = async (userId, pageNo) => {
 
   const totalPages = Math.ceil(count / limit);
 
-  const isLastPage = page >= totalPages;
-
   //Returning empty array instead of throwing error for better error handling.
   if (!shipmentData) return [];
   const products = shipmentData.flatMap((shipment) =>
@@ -287,7 +285,7 @@ exports.getShipmentForShop = async (userId, pageNo) => {
       status: shop.status,
     })),
   );
-  return { shipments: products, isLastPage };
+  return { shipments: products, totalPages };
 };
 
 /**
