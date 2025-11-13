@@ -274,7 +274,7 @@ exports.addShopProduct = async (req, res) => {
     const status = error.statusCode || 500;
     logger.error(`Error creating shop product: ${error}`);
     res.status(status).json({
-      message: 'Failed to create shop product.',
+      message: error?.message || 'Failed to create shop product.',
       error: error.message,
     });
   }
