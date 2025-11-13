@@ -38,8 +38,9 @@ exports.productShopSchema = Joi.object({
 });
 
 exports.updateProductShopSchema = Joi.object({
-  quality: Joi.string().valid('premium', 'high', 'medium'),
+  quality: Joi.string().valid('Premium', 'High', 'Medium'),
   quantity: Joi.number().min(1).required(),
   price: Joi.number().min(1).required(),
   date: Joi.date(),
+  image: Joi.string(),
 });
