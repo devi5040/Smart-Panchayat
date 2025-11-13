@@ -429,9 +429,9 @@ exports.removeShopFromShipment = async (shipmentId, shopId) => {
 
 exports.updateShipmentStatus = async (shipmentId, shopId, status) => {
   const shipment = await Shipments.findByPk(shipmentId);
-  if (!shipment) throw NotFoundError('Shipment not found!');
+  if (!shipment) throw new NotFoundError('Shipment not found!');
   const shop = await Shops.findByPk(shopId);
-  if (!shop) throw NotFoundError('Shop not found!');
+  if (!shop) throw new NotFoundError('Shop not found!');
   const [numRowsUpdated] = await ShipmentShops.update(
     { status },
     { where: { shipmentId, shopId } },
@@ -439,4 +439,48 @@ exports.updateShipmentStatus = async (shipmentId, shopId, status) => {
   if (numRowsUpdated == 0) throw new NoContentError('No rows updated!');
   const shipmentData = await ShipmentShops.findOne({ where: { shipmentId, shopId } });
   return shipmentData;
+};
+
+exports.getShipmentDetails = async (shipmentId, shopId) => {
+  console.log(shipmentId, shopId);
+  let result = {};
+  const shop = await Shops.findByPk(shopId);
+  if (!shop) throw new NotFoundError('Shop does not exists!');
+  const shipment = await Shipments.findByPk(shipmentId);
+  if (!shipment) throw new NotFoundError('Shipment does not found!');
+  result.shipment = shipment;
+  const shipmentShopProducts = await Products.findAll({
+    include: [
+      {
+        model: ShipmentShops,
+        where: { shipmentId, shopId },
+        attributes: ['status', 'remarks'],
+        through: {
+          attributes: ['quantity'],
+        },
+      },
+    ],
+  });
+  // Convert Sequelize objects to plain JS
+  const plainProducts = shipmentShopProducts.map((p) => p.toJSON());
+
+  const shipmentShop = await ShipmentShops.findOne({
+    where: { shipmentId, shopId },
+    attributes: ['id', 'status', 'remarks'],
+  });
+  if (!shipmentShop) throw new NotFoundError('Shipment does not exists for your shop!');
+
+  result.shipmentShop = shipmentShop;
+  // Extract product list with quantities
+  const shipmentShopProductsList = plainProducts.map((p) => ({
+    id: p.id,
+    name_en: p.name_en,
+    name_kn: p.name_kn,
+    price: p.price,
+    image: p.image,
+    categoryId: p.categoryId,
+    quantity: p['shipment-shops']?.[0]?.['shipment-shop-products']?.quantity ?? 0,
+  }));
+  result.shipmentShopProducts = shipmentShopProductsList;
+  return result;
 };
