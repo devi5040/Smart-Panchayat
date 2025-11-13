@@ -10,6 +10,7 @@ const { Products, ShopProducts, Category, Shops } = require('../models');
 const { NotFoundError, BadRequestError, ConflictError, NoContentError } = require('../utils/error');
 const esClient = require('../config/elasticsearch.config');
 const s3 = require('../config/aws/aws.s3.config');
+const logger = require('../utils/logger');
 
 /**
  * Retrieves all products associated with a given category ID.
@@ -86,7 +87,7 @@ exports.getProductsForShop = async (shopId, pageNo, status) => {
         model: Shops,
         attributes: ['id'],
         through: {
-          attributes: ['quantity', 'status', 'quality'],
+          attributes: ['quantity', 'status', 'quality', 'id'],
           where: whereClause,
         },
         required: true,
@@ -95,9 +96,8 @@ exports.getProductsForShop = async (shopId, pageNo, status) => {
     limit,
     offset,
   });
-  const totalPages = Math.ceil(count / limit);
 
-  const isLastPage = page >= totalPages;
+  const totalPages = Math.ceil(count / limit);
 
   const shopProducts = rows.map((product) => {
     const shopData = product.shops?.[0]?.['shop-products'];
@@ -115,10 +115,10 @@ exports.getProductsForShop = async (shopId, pageNo, status) => {
       quantity: shopData?.quantity,
       status: shopData?.status,
       quality: shopData?.quality,
+      shopProductId: shopData?.id,
     };
   });
-
-  return { products: shopProducts, isLastPage }; //Return empty array if no products found
+  return { products: shopProducts, totalPages }; //Return empty array if no products found
 };
 
 /**
