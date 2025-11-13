@@ -251,3 +251,18 @@ exports.updateShipmentStatus = async (req, res) => {
       .json({ message: 'Internal error while updating the shipment status', error: error.message });
   }
 };
+
+exports.getShipmentDetails = async (req, res) => {
+  const { shipmentId } = req.params;
+  const shopId = req.user.shop;
+  try {
+    const shipment = await shipmentServices.getShipmentDetails(shipmentId, shopId);
+    res.status(200).json({ message: 'Shipment details fetched successfully!', shipment });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error wile updating the status: ${error}`);
+    res
+      .status(status)
+      .json({ message: 'Internal error while updating the shipment status', error: error.message });
+  }
+};
