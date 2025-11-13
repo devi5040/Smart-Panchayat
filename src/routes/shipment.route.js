@@ -122,6 +122,8 @@ router.get(
   shipmentController.getShipmentByTransportationMode,
 );
 
+router.get('/:shipmentId', auth, access(['admin', 'shop']), shipmentController.getShipmentDetails);
+
 /**
  * @route DELETE /:shipmentId/shop/:shopId/product/:productId
  * @description Removes a product from a shipment for a specific shop.
