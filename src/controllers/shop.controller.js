@@ -67,7 +67,7 @@ exports.getShops = async (req, res) => {
  * @async
  */
 exports.getShopDetails = async (req, res) => {
-  const { shopId } = req.params;
+  const { shopId } = req.user.shop;
   try {
     /** @type {Object} shop - The shop object corresponding to the provided shopId. */
     const shop = await shopServices.getShopDetails(shopId);
