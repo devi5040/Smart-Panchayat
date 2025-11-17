@@ -50,7 +50,7 @@ router.get('/', auth, access(['admin']), shopController.getShops);
  * @param {string} shopId - The ID of the shop to retrieve.
  * @middleware {shopController.getShopDetails} Shop controller method to handle the request.
  */
-router.get('/:shopId', auth, access(['shop']), shopController.getShopDetails);
+router.get('/details', auth, access(['shop']), shopController.getShopDetails);
 
 /**
  * @route POST /
