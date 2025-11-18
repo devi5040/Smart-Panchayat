@@ -95,13 +95,11 @@ exports.getShopDetails = async (shopId) => {
  * @throws {Error} If the shop cannot be updated.
  * @returns {Promise<object>} A promise that resolves to the updated Sequelize Shop instance.
  */
-exports.updateShopDetails = async (userId, shopId, name, pinCode, latitude, longitude) => {
+exports.updateShopDetails = async (userId, shopId, pinCode, latitude, longitude) => {
   const shop = await Shops.findOne({ where: { userId, id: shopId } });
   if (!shop) throw new NotFoundError('Shop not found');
   const [numRowsUpdated] = await Shops.update(
     {
-      shop_name_en: name,
-      shop_name_kn: name,
       pin_code: pinCode,
       latitude,
       longitude,
