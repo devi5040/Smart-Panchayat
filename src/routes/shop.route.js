@@ -70,10 +70,10 @@ router.post('/', auth, validation(shopValidator.shopSchema), shopController.addS
  * @middleware {shopController.updateShopDetails} Shop controller method to handle the request.
  */
 router.put(
-  '/:shopId',
+  '/',
   auth,
   access(['admin', 'shop']),
-  validation(shopValidator.shopSchema),
+  validation(shopValidator.shopUpdateSchema),
   shopController.updateShopDetails,
 );
 
