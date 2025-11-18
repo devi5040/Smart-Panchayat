@@ -122,7 +122,8 @@ exports.updateShopDetails = async (req, res) => {
  */
 exports.addRemarks = async (req, res) => {
   const { shipmentId } = req.params;
-  const { remarks, shopId } = req.body;
+  const { remarks } = req.body;
+  const shopId = req.user.shop;
   try {
     /** @type {Object} shipment - The updated shipment object including remarks. */
     const shipment = await shopServices.addRemarksToShipments(shopId, shipmentId, remarks);
