@@ -46,5 +46,4 @@ exports.remarksSchema = Joi.object({
     'string.empty': 'Remarks should not be empty',
     'string.required': 'Remarks is required',
   }),
-  shopId: Joi.number(),
 });
