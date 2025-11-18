@@ -67,7 +67,7 @@ exports.getShops = async (req, res) => {
  * @async
  */
 exports.getShopDetails = async (req, res) => {
-  const { shopId } = req.user.shop;
+  const shopId = req.user.shop;
   try {
     /** @type {Object} shop - The shop object corresponding to the provided shopId. */
     const shop = await shopServices.getShopDetails(shopId);
@@ -95,20 +95,13 @@ exports.getShopDetails = async (req, res) => {
  * @async
  */
 exports.updateShopDetails = async (req, res) => {
-  const { shopId } = req.params;
+  const shopId = req.user.shop;
   const userId = req.user.id;
-  const { name, pinCode, latitude, longitude } = req.body;
+  const { pinCode, latitude, longitude } = req.body;
   try {
     /** @type {Object} shopDetails - The updated shop object. */
-    const shopDetails = await shopServices.updateShopDetails(
-      userId,
-      shopId,
-      name,
-      pinCode,
-      latitude,
-      longitude,
-    );
-    res.status(200).json({ message: '✅ Shop details updated successfully!', shopDetails });
+    const shop = await shopServices.updateShopDetails(userId, shopId, pinCode, latitude, longitude);
+    res.status(200).json({ message: '✅ Shop details updated successfully!', shop });
   } catch (error) {
     logger.error(`Internal error while updating the shop: ${error}`);
     const status = error.statusCode || 500;
