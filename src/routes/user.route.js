@@ -191,7 +191,7 @@ router.get('/status/:status', userController.getUsersByStatus);
  *       '404':
  *         description: No users found with specified role.
  */
-router.get('/role/:role', authMiddleware, userController.getUsersByRole);
+router.get('/role', authMiddleware, userController.getUsersByRole);
 
 /**
  * @openapi
