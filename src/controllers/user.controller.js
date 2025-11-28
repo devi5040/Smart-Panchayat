@@ -314,9 +314,9 @@ exports.getUsersByStatus = async (req, res) => {
  * @throws {Error} If there's an error retrieving users by role. Error details are logged and a 500 status code is returned.
  */
 exports.getUsersByRole = async (req, res) => {
-  const { role } = req.params;
+  const { role, page } = req.query;
   try {
-    const users = await userServices.getUserByRole(role);
+    const users = await userServices.getUserByRole(role, page);
     res.status(200).json({ message: '✅ Users fetched by role successfully!', users });
   } catch (error) {
     const status = error.statusCode || 500;
