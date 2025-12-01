@@ -26,7 +26,8 @@ const logger = require('../utils/logger');
  * @returns {Promise<void>}
  */
 exports.createAgent = async (req, res) => {
-  const { mobileNumber, name, latitude, longitude, languagePreference } = req.body;
+  const { mobileNumber, name, latitude, longitude, languagePreference, collectionCentreId } =
+    req.body;
   try {
     /** @type {import('../models/agent').Agent} user - The newly created agent object from the database (a Sequelize instance). */
     const user = await agentServices.addAgent(
@@ -35,6 +36,7 @@ exports.createAgent = async (req, res) => {
       latitude,
       longitude,
       languagePreference,
+      collectionCentreId,
     );
     res.status(201).json({ message: 'Agent created successfully!', user: user.toJSON() }); // Use toJSON() for safer JSON serialization
   } catch (error) {
@@ -85,9 +87,10 @@ exports.removeAgent = async (req, res) => {
  */
 exports.changeRoleToAgent = async (req, res) => {
   const { userId } = req.params;
+  const { collectionCentreId } = req.query;
   try {
     /** @type {import('../models/user').User} user - The updated user object from the database (a Sequelize instance) after role change. */
-    const user = await agentServices.changeToAgent(userId);
+    const user = await agentServices.changeToAgent(userId, collectionCentreId);
     res.status(200).json({
       message: 'Change role to agent successfully!',
       user: user.toJSON(),
