@@ -10,7 +10,15 @@
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
 const sequelize = require('../config/db');
-const { Shipments, ShipmentShops, ShipmentShopProducts, Shops, Products } = require('../models');
+const {
+  Shipments,
+  ShipmentShops,
+  ShipmentShopProducts,
+  Shops,
+  Products,
+  Users,
+  CollectionCentre,
+} = require('../models');
 const { ConflictError, NotFoundError, NoContentError } = require('../utils/error');
 
 /**
@@ -483,4 +491,43 @@ exports.getShipmentDetails = async (shipmentId, shopId) => {
   }));
   result.shipmentShopProducts = shipmentShopProductsList;
   return result;
+};
+
+exports.getShipmentsForCollectionCentre = async (userId, pageNumber) => {
+  const user = await Users.findByPk(userId);
+  if (!user) throw new NotFoundError('User not found!');
+  const collectionCentre = await CollectionCentre.findByPk(user.collectionCentreId);
+  if (!collectionCentre) throw new NotFoundError('Collection centre not found for the user!');
+  const page = parseInt(pageNumber) || 1;
+  const limit = 10;
+  const offset = (page - 1) * limit;
+
+  const { count, rows: shipmentData } = await Shipments.findAndCountAll({
+    where: { collection_centre: collectionCentre.name },
+    include: [
+      {
+        model: ShipmentShops,
+        attributes: ['status'],
+        required: true,
+      },
+    ],
+    order: [['createdAt', 'DESC']],
+    limit,
+    offset,
+  });
+
+  const totalPages = Math.ceil(count / limit);
+
+  //Returning empty array instead of throwing error for better error handling.
+  if (!shipmentData) return [];
+  const products = shipmentData.flatMap((shipment) =>
+    shipment['shipment-shops'].map((shop) => ({
+      id: shipment.id,
+      date: shipment.date,
+      collectionCentre: shipment.collection_centre,
+      transportationMode: shipment.transportation_mode,
+      status: shop.status,
+    })),
+  );
+  return { shipments: products, totalPages };
 };
