@@ -25,7 +25,14 @@ const { ConflictError, NotFoundError, NoContentError } = require('../utils/error
  * @throws {Error} If the user creation fails.
  * @returns {Promise<object>} The newly created agent object.  Returns the Sequelize instance of the created User.
  */
-exports.addAgent = async (mobileNumber, name, latitude, longitude, languagePreference) => {
+exports.addAgent = async (
+  mobileNumber,
+  name,
+  latitude,
+  longitude,
+  languagePreference,
+  collectionCentreId,
+) => {
   const userExist = await Users.findOne({
     where: { phone_number: mobileNumber },
   });
@@ -38,6 +45,7 @@ exports.addAgent = async (mobileNumber, name, latitude, longitude, languagePrefe
     longitude,
     language_preference: languagePreference,
     user_role: 'agent',
+    collectionCentreId,
   });
   if (!user) throw new Error('User not created');
   return user;
@@ -68,10 +76,13 @@ exports.removeAgent = async (agentId) => {
  * @throws {NoContentError} If no rows were updated.
  * @returns {Promise<object>} The updated user object with specific attributes. Returns the Sequelize instance of the updated User.
  */
-exports.changeToAgent = async (userId) => {
+exports.changeToAgent = async (userId, collectionCentreId) => {
   const user = await Users.findByPk(userId);
   if (!user) throw new NotFoundError('User not found!');
-  const [numRowsUpdated] = await Users.update({ user_role: 'agent' }, { where: { id: userId } });
+  const [numRowsUpdated] = await Users.update(
+    { user_role: 'agent', collectionCentreId },
+    { where: { id: userId } },
+  );
   if (numRowsUpdated == 0) throw new NoContentError('No rows updated!');
   const data = await Users.findByPk(userId, {
     attributes: [
