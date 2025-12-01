@@ -19,6 +19,7 @@ const Shipments = require('./shipments');
 const ShipmentShops = require('./shipmentShops');
 const ShipmentShopProducts = require('./shipmentShopsProducts');
 const Category = require('./category');
+const CollectionCentre = require('./collectionCentre');
 
 // One-to-One: User <-> Shop
 // A User has exactly one Shop.
@@ -65,6 +66,9 @@ Products.belongsTo(Category);
 ShipmentShops.belongsTo(Shipments);
 Shipments.hasMany(ShipmentShops);
 
+Users.belongsTo(CollectionCentre);
+CollectionCentre.hasMany(Users);
+
 module.exports = {
   Users,
   Shops,
@@ -76,4 +80,5 @@ module.exports = {
   ShipmentShopProducts,
   ShopProducts,
   Category,
+  CollectionCentre,
 };
