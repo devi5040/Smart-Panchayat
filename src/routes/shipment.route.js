@@ -155,4 +155,11 @@ router.delete(
   shipmentController.removeShipmentShop,
 );
 
+router.get(
+  '/collection-centre',
+  auth,
+  access(['admin', 'agent']),
+  shipmentController.getShipmentsForCollectionCentre,
+);
+
 module.exports = router;
