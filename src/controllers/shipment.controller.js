@@ -266,3 +266,24 @@ exports.getShipmentDetails = async (req, res) => {
       .json({ message: 'Internal error while updating the shipment status', error: error.message });
   }
 };
+
+exports.getShipmentsForCollectionCentre = async (req, res) => {
+  const userId = req.user.id;
+  const { page } = req.query;
+  try {
+    const { shipments, totalPages } = await shipmentServices.getShipmentsForCollectionCentre(
+      userId,
+      page,
+    );
+    res.status(200).json({ message: 'Shipments fetched successfully!', shipments, totalPages });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while fetching shipments for the collection centre: ${error}`);
+    res
+      .status(status)
+      .json({
+        message: 'Internal error fetching the shipments for collection centre!',
+        error: error.message,
+      });
+  }
+};
