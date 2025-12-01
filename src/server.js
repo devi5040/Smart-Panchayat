@@ -22,10 +22,11 @@ const startServer = async () => {
     // Verify db connection
     await sequelize.authenticate();
     logger.info('The db is connected successfully');
-    await syncProductsToElasticSearch();
-    // sync the db
+
+    // Sync the db
     await sequelize.sync();
 
+    await syncProductsToElasticSearch();
     app.listen(PORT, () => {
       logger.info(`The server started with port: ${PORT}`);
     });
