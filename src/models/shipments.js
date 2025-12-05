@@ -23,10 +23,6 @@ const Shipments = sequelize.define('shipments', {
     type: Sequelize.DATE,
     allowNull: false,
   },
-  collection_centre: {
-    type: Sequelize.STRING(255),
-    allowNull: false,
-  },
   transportation_mode: {
     type: Sequelize.ENUM('truck', 'bus', 'train', 'others'),
     allowNull: false,
