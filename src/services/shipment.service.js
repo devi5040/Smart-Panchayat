@@ -503,7 +503,7 @@ exports.getShipmentsForCollectionCentre = async (userId, pageNumber) => {
   const offset = (page - 1) * limit;
 
   const { count, rows: shipmentData } = await Shipments.findAndCountAll({
-    where: { collection_centre: collectionCentre.name },
+    where: { collectionCentreId: collectionCentre.id },
     include: [
       {
         model: ShipmentShops,
