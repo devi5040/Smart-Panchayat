@@ -96,7 +96,32 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
+      collectionCentreId: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'collection-centres',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+      },
     });
+    // Add named constraint to avoid rollback errors
+    await queryInterface.addConstraint('users', {
+      fields: ['collectionCentreId'],
+      type: 'foreign key',
+      name: 'fk_users_collectionCentre',
+      references: {
+        table: 'collection-centres',
+        field: 'id',
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+    });
+
+    // Add index for better performance
+    await queryInterface.addIndex('users', ['collectionCentreId']);
   },
 
   async down(queryInterface, Sequelize) {
@@ -106,6 +131,18 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
+    // Remove FK constraint first
+    await queryInterface.removeConstraint('users', 'fk_users_collectionCentre');
+
+    // Drop index
+    await queryInterface.removeIndex('users', ['collectionCentreId']);
+
+    // Drop the users table
     await queryInterface.dropTable('users');
+
+    // Clean ENUM types (important!)
+    await queryInterface.sequelize.query(`DROP TYPE IF EXISTS "enum_users_language_preference"`);
+    await queryInterface.sequelize.query(`DROP TYPE IF EXISTS "enum_users_account_status"`);
+    await queryInterface.sequelize.query(`DROP TYPE IF EXISTS "enum_users_user_role"`);
   },
 };
