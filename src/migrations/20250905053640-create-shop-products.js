@@ -18,14 +18,14 @@ module.exports = {
       },
       shopId: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: { model: 'shops', key: 'id' },
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       },
       productId: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: { model: 'products', key: 'id' },
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
@@ -64,6 +64,29 @@ module.exports = {
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
     });
+
+    // Add named foreign key constraints
+    await queryInterface.addConstraint('shop-products', {
+      fields: ['shopId'],
+      type: 'foreign key',
+      name: 'fk_shop_products_shop',
+      references: { table: 'shops', field: 'id' },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
+
+    await queryInterface.addConstraint('shop-products', {
+      fields: ['productId'],
+      type: 'foreign key',
+      name: 'fk_shop_products_product',
+      references: { table: 'products', field: 'id' },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
+
+    // Add indexes
+    await queryInterface.addIndex('shop-products', ['shopId']);
+    await queryInterface.addIndex('shop-products', ['productId']);
   },
 
   async down(queryInterface, Sequelize) {
@@ -73,6 +96,19 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
+    // Remove constraints first
+    await queryInterface.removeConstraint('shop-products', 'fk_shop_products_shop');
+    await queryInterface.removeConstraint('shop-products', 'fk_shop_products_product');
+
+    // Remove indexes
+    await queryInterface.removeIndex('shop-products', ['shopId']);
+    await queryInterface.removeIndex('shop-products', ['productId']);
+
+    // Drop table
     await queryInterface.dropTable('shop-products');
+
+    // Drop ENUM types to prevent duplication errors
+    await queryInterface.sequelize.query(`DROP TYPE IF EXISTS "enum_shop_products_status"`);
+    await queryInterface.sequelize.query(`DROP TYPE IF EXISTS "enum_shop_products_quality"`);
   },
 };
