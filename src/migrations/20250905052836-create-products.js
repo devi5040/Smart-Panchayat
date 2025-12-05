@@ -39,6 +39,7 @@ module.exports = {
       },
       categoryId: {
         type: Sequelize.INTEGER,
+        allowNull: true,
         references: { model: 'categories', key: 'id' },
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
@@ -54,6 +55,22 @@ module.exports = {
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
     });
+
+    // Add named foreign key constraint
+    await queryInterface.addConstraint('products', {
+      fields: ['categoryId'],
+      type: 'foreign key',
+      name: 'fk_products_category',
+      references: {
+        table: 'categories',
+        field: 'id',
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
+
+    // Add index for performance
+    await queryInterface.addIndex('products', ['categoryId']);
   },
 
   async down(queryInterface, Sequelize) {
@@ -63,6 +80,13 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
+    // Remove FK first
+    await queryInterface.removeConstraint('products', 'fk_products_category');
+
+    // Remove index
+    await queryInterface.removeIndex('products', ['categoryId']);
+
+    // Drop table
     await queryInterface.dropTable('products');
   },
 };
