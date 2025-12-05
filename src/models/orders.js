@@ -23,10 +23,6 @@ const Orders = sequelize.define('orders', {
       min: 0.01,
     },
   },
-  collection_centre: {
-    type: Sequelize.STRING(255),
-    allowNull: false,
-  },
   payment_status: {
     type: Sequelize.ENUM('paid', 'pending'),
     allowNull: false,
