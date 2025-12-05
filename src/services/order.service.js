@@ -26,10 +26,14 @@ const { NotFoundError } = require('../utils/error');
  * @throws {Error} If no rows are updated after creating the order.
  * @returns {Promise<Order>} The created order instance with associated products.  Includes quantity and product_quality from the OrderItems join table.
  */
-exports.addOrder = async (orderData, items) => {
-  const { collectionCentre, paymentStatus = 'pending', userId } = orderData;
+exports.addOrder = async (orderData, items, agentUserId) => {
+  const { paymentStatus = 'pending', userId } = orderData;
 
   return await sequelize.transaction(async (t) => {
+    const agent = await Users.findByPk(agentUserId);
+    if (!agent) throw new NotFoundError('Agent not found!');
+
+    const collectionCentreId = agent.collectionCentreId;
     // Check if user exists
     const user = await Users.findByPk(userId, { transaction: t });
     if (!user) throw new NotFoundError('❌ User not found!');
@@ -38,7 +42,7 @@ exports.addOrder = async (orderData, items) => {
     const order = await Orders.create(
       {
         price: 1, // Initial price, updated later
-        collection_centre: collectionCentre,
+        collectionCentreId,
         payment_status: paymentStatus,
         userId,
       },
