@@ -16,6 +16,8 @@ const authMiddleware = require('../middleware/firebaseAuthMiddleware');
 /** @type {import('../middleware/validation.middleware')} */
 const validate = require('../middleware/validation.middleware');
 
+const access = require('../middleware/authorization.middleware');
+
 /** @type {import('../utils/validation/fileUploadValidation')} */
 const fileUploadValidation = require('../utils/validation/fileUploadValidation');
 
@@ -366,5 +368,7 @@ router.patch(
  *         description: Unauthorized - Requires authentication.
  */
 router.post('/logout', authMiddleware, userController.logout);
+
+router.get('/sort', authMiddleware, access(['agent', 'admin']), userController.sortUsers);
 
 module.exports = router;
