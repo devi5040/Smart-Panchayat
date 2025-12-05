@@ -33,8 +33,9 @@ const logger = require('../utils/logger');
  */
 exports.addOrder = async (req, res) => {
   const { orderData, items } = req.body;
+  const userId = req.user.id;
   try {
-    const order = await orderServices.addOrder(orderData, items);
+    const order = await orderServices.addOrder(orderData, items, userId);
     res.status(201).json({ message: '✅ Order added successfully!', order });
   } catch (error) {
     const status = error.statusCode || 500;
