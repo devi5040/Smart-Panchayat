@@ -9,21 +9,17 @@ const itemsSchema = Joi.object({
     'string.empty': 'Product quality cannot be empty.',
     'string.valid': 'The quality should either be premium, high or medium',
   }),
-  productId: Joi.string()
+  productId: Joi.number()
     .required()
     .messages({ 'string.empty': 'The product id field cannot be empty.' }),
 });
 
 const orderDataSchema = Joi.object({
-  collectionCentre: Joi.string().required().min(3).messages({
-    'string.empty': 'collection centre should not be empty and it is required.',
-    'string.min': 'Collection centre should have at least 3 letters.',
-  }),
   paymentStatus: Joi.string().valid('pending', 'paid').messages({
     'string.empty': 'Payment status cannot be empty',
     'string.valid': 'Payment status should either be paid or pending',
   }),
-  userId: Joi.string()
+  userId: Joi.number()
     .required()
     .messages({ 'string.required': 'The user id should not be empty.' }),
 });
