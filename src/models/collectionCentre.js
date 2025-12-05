@@ -8,11 +8,19 @@ const CollectionCentre = sequelize.define('collection-centre', {
     primaryKey: true,
     autoIncrement: true,
   },
-  name: {
+  name_en: {
     type: Sequelize.STRING(255),
     allowNull: false,
   },
-  address: {
+  name_kn: {
+    type: Sequelize.STRING(255),
+    allowNull: false,
+  },
+  address_en: {
+    type: Sequelize.STRING(1000),
+    allowNull: false,
+  },
+  address_kn: {
     type: Sequelize.STRING(1000),
     allowNull: false,
   },
