@@ -314,9 +314,9 @@ exports.getUsersByStatus = async (req, res) => {
  * @throws {Error} If there's an error retrieving users by role. Error details are logged and a 500 status code is returned.
  */
 exports.getUsersByRole = async (req, res) => {
-  const { role, page } = req.query;
+  const { role, limit } = req.query;
   try {
-    const users = await userServices.getUserByRole(role, page);
+    const users = await userServices.getUserByRole(role, limit);
     res.status(200).json({ message: '✅ Users fetched by role successfully!', users });
   } catch (error) {
     const status = error.statusCode || 500;
@@ -380,5 +380,18 @@ exports.checkShopExists = async (req, res) => {
     res
       .status(status)
       .json({ message: 'Internal error while fetching shop status', error: error.message });
+  }
+};
+
+exports.sortUsers = async (req, res) => {
+  const { field, order, role } = req.query;
+  try {
+    const users = await userServices.getSortedUsers(field, role, order);
+    res.status(200).json({ message: 'Users fetched successfully!', users });
+  } catch (error) {
+    logger.error(`Internal error while fetching the sorted users list: ${error}`);
+    res
+      .status(500)
+      .json({ message: 'Internal error while fetching sorted users list', error: error.message });
   }
 };
