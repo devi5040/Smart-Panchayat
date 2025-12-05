@@ -43,6 +43,7 @@ module.exports = {
       },
       userId: {
         type: Sequelize.INTEGER,
+        allowNull: true,
         references: { model: 'users', key: 'id' },
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
@@ -58,6 +59,20 @@ module.exports = {
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
     });
+
+    await queryInterface.addConstraint('shops', {
+      fields: ['userId'],
+      type: 'foreign key',
+      name: 'fk_shops_userId',
+      references: {
+        table: 'users',
+        field: 'id',
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
+
+    await queryInterface.addIndex('shops', ['userId']);
   },
 
   async down(queryInterface, Sequelize) {
@@ -67,6 +82,16 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
+    // Remove FK constraint
+    await queryInterface.removeConstraint('shops', 'fk_shops_userId');
+
+    // Remove index
+    await queryInterface.removeIndex('shops', ['userId']);
+
+    // Drop table
     await queryInterface.dropTable('shops');
+
+    // Cleanup ENUM to prevent duplicate ENUM errors
+    await queryInterface.sequelize.query(`DROP TYPE IF EXISTS "enum_shops_priority"`);
   },
 };
