@@ -64,10 +64,16 @@ Category.hasMany(Products, { onDelete: 'CASCADE' });
 Products.belongsTo(Category);
 
 ShipmentShops.belongsTo(Shipments);
-Shipments.hasMany(ShipmentShops);
+Shipments.hasMany(ShipmentShops, { onDelete: 'CASCADE' });
 
 Users.belongsTo(CollectionCentre);
-CollectionCentre.hasMany(Users);
+CollectionCentre.hasMany(Users, { onDelete: 'CASCADE' });
+
+CollectionCentre.hasMany(Orders, { onDelete: 'CASCADE' });
+Orders.belongsTo(CollectionCentre);
+
+CollectionCentre.hasMany(Shipments, { onDelete: 'CASCADE' });
+Shipments.belongsTo(CollectionCentre);
 
 module.exports = {
   Users,
