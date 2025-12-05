@@ -122,6 +122,13 @@ router.get(
   shipmentController.getShipmentByTransportationMode,
 );
 
+router.get(
+  '/collection-centre',
+  auth,
+  access(['admin', 'agent']),
+  shipmentController.getShipmentsForCollectionCentre,
+);
+
 router.get('/:shipmentId', auth, access(['admin', 'shop']), shipmentController.getShipmentDetails);
 
 /**
@@ -153,13 +160,6 @@ router.delete(
   auth,
   access(['admin']),
   shipmentController.removeShipmentShop,
-);
-
-router.get(
-  '/collection-centre',
-  auth,
-  access(['admin', 'agent']),
-  shipmentController.getShipmentsForCollectionCentre,
 );
 
 module.exports = router;
