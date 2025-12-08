@@ -375,17 +375,21 @@ exports.getUsersByStatus = async (status) => {
  * @throws {Error} - If the role is not provided or invalid.
  * @throws {BadRequestError} - If the role is not one of the valid roles.
  */
-exports.getUserByRole = async (role, limit) => {
+exports.getUserByRole = async (role, limit, page) => {
   if (!role) throw new Error('User role is not provided');
   if (role !== 'user' && role !== 'shop' && role !== 'admin' && role !== 'agent')
     throw new BadRequestError('User role provided is invalid');
-  const users = await Users.findAll({
+  const pageNum = parseInt(page) || 1;
+  const offset = (pageNum - 1) * limit;
+  const { count, rows: users } = await Users.findAndCountAll({
     where: { user_role: role },
     limit: parseInt(limit),
+    offset,
     order: [['createdAt', 'DESC']],
   });
+  const totalPages = Math.ceil(count / limit);
   if (!users) throw new Error('Users data is invalid');
-  return users;
+  return { users, totalPages };
 };
 
 /**
