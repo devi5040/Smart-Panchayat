@@ -196,3 +196,17 @@ exports.getOrderByID = async (req, res) => {
     });
   }
 };
+
+exports.getUserOrders = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const orders = await orderServices.getUsersOrder(userId);
+    res.status(200).json({ message: 'Fetched orders for the user successfully!', orders });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while fetching the orders: ${error}`);
+    res
+      .status(status)
+      .json({ message: 'Internal error while fetching the orders!', error: error.message });
+  }
+};
