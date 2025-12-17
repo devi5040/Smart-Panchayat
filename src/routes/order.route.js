@@ -52,6 +52,8 @@ router.get('/', auth, access(['admin', 'agent']), orderController.getOrders);
  */
 router.get('/history', auth, orderController.getOrderHistory);
 
+router.get('/user/:userId', auth, orderController.getUserOrders);
+
 /**
  * @route GET /:orderId
  * @description Retrieves a single order by its ID.
