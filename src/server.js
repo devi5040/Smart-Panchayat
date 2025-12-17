@@ -11,7 +11,10 @@
 const app = require('./app');
 const logger = require('./utils/logger');
 const sequelize = require('./config/db');
-const syncProductsToElasticSearch = require('./utils/elasticsearch.sync');
+const {
+  syncProductsToElasticSearch,
+  syncUsersToElasticSearch,
+} = require('./utils/elasticsearch.sync');
 
 // Initialize PORT
 const PORT = process.env.PORT || 5050;
@@ -27,6 +30,7 @@ const startServer = async () => {
     await sequelize.sync();
 
     await syncProductsToElasticSearch();
+    await syncUsersToElasticSearch();
     app.listen(PORT, () => {
       logger.info(`The server started with port: ${PORT}`);
     });
