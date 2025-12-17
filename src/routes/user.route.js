@@ -371,4 +371,6 @@ router.post('/logout', authMiddleware, userController.logout);
 
 router.get('/sort', authMiddleware, access(['agent', 'admin']), userController.sortUsers);
 
+router.get('/search', authMiddleware, access(['admin', 'agent']), userController.searchFarmers);
+
 module.exports = router;
