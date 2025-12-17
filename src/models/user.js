@@ -10,6 +10,8 @@
 
 const Sequelize = require('sequelize');
 const sequelize = require('../config/db');
+const logger = require('../utils/logger');
+const esClient = require('../config/elasticsearch.config');
 
 const Users = sequelize.define('users', {
   id: {
@@ -98,6 +100,46 @@ const Users = sequelize.define('users', {
     type: Sequelize.DECIMAL(9, 6),
     allowNull: true,
   },
+});
+
+const syncUserToES = async (user) => {
+  if (user.user_role !== 'user') return;
+
+  await esClient.index({
+    index: 'users',
+    id: user.id,
+    document: {
+      id: user.id,
+      user_name_en: user.user_name_en,
+      user_name_kn: user.user_name_kn,
+      family_name_en: user.family_name_en,
+      family_name_kn: user.family_name_kn,
+      phone_number: user.phone_number,
+      home_address_en: user.home_address_en,
+      home_address_kn: user.home_address_kn,
+    },
+  });
+};
+
+Users.afterCreate(async (user) => {
+  await syncUserToES(user);
+});
+
+// After Update (role-aware)
+Users.afterUpdate(async (user) => {
+  if (user.user_role === 'user') {
+    await syncUserToES(user);
+  } else {
+    await esClient.delete({ index: 'users', id: user.id }).catch((err) => {
+      logger.error(err);
+    });
+  }
+});
+
+Users.afterDestroy(async (user) => {
+  await esClient.delete({ index: 'users', id: user.id }).catch((err) => {
+    logger.error(err);
+  });
 });
 
 module.exports = Users;
