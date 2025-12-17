@@ -14,6 +14,7 @@ const admin = require('firebase-admin');
 const { encryptPassword, comparePasswords } = require('../utils/hashPassword');
 const { NotFoundError, BadRequestError, NoContentError } = require('../utils/error');
 const sequelize = require('../config/db');
+const esClient = require('../config/elasticsearch.config');
 
 /**
  * Generates a pre-signed URL for uploading a profile image to AWS S3.
@@ -457,4 +458,95 @@ exports.getSortedUsers = async (field, role, order) => {
   const fieldName = field || 'createdAt';
   const users = await Users.findAll({ where: { user_role: role }, order: [[fieldName, order]] });
   return users;
+};
+
+exports.searchFarmers = async (query) => {
+  const { hits } = await esClient.search({
+    index: 'users',
+    size: 10,
+    query: {
+      bool: {
+        should: [
+          // match name, family name, address and phone number
+          {
+            match_phrase_prefix: {
+              user_name_en: { query, boost: 3 },
+            },
+          },
+          {
+            match_phrase_prefix: {
+              user_name_kn: { query, boost: 3 },
+            },
+          },
+          {
+            match_phrase_prefix: {
+              phone_number: {
+                query,
+                boost: 3,
+              },
+            },
+          },
+          {
+            match_phrase_prefix: {
+              family_name_en: {
+                query,
+                boost: 2,
+              },
+            },
+          },
+          {
+            match_phrase_prefix: {
+              family_name_kn: {
+                query,
+                boost: 2,
+              },
+            },
+          },
+          {
+            match_phrase_prefix: {
+              home_address_en: {
+                query,
+                boost: 1,
+              },
+            },
+          },
+          {
+            match_phrase_prefix: {
+              home_address_kn: {
+                query,
+                boost: 1,
+              },
+            },
+          },
+          {
+            multi_match: {
+              query,
+              fields: [
+                'user_name_en',
+                'user_name_kn',
+                'family_name_en',
+                'family_name_kn',
+                'phone_number',
+                'home_address_en',
+                'home_address_kn',
+              ],
+              fuzziness: 'AUTO',
+              boost: 2,
+            },
+          },
+        ],
+      },
+    },
+    fields: [
+      'user_name_en',
+      'user_name_kn',
+      'family_name_en',
+      'family_name_kn',
+      'phone_number',
+      'home_address_en',
+      'home_address_kn',
+    ],
+  });
+
+  return hits;
 };
