@@ -395,3 +395,19 @@ exports.sortUsers = async (req, res) => {
       .json({ message: 'Internal error while fetching sorted users list', error: error.message });
   }
 };
+
+exports.searchFarmers = async (req, res) => {
+  const { q } = req.query;
+  try {
+    const users = await userServices.searchFarmers(q);
+    res.status(200).json({
+      message: 'Search results fetched successfully',
+      users: users.hits.map((user) => user._source),
+    });
+  } catch (error) {
+    logger.error(`Internal error while searching for users: ${error}`);
+    res
+      .status(500)
+      .json({ message: 'Internal error while searching for users', error: error.message });
+  }
+};
