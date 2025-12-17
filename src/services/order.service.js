@@ -10,7 +10,7 @@
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
 const sequelize = require('../config/db');
-const { OrderItems, Orders, Users, Products } = require('../models');
+const { OrderItems, Orders, Users, Products, CollectionCentre } = require('../models');
 const { NotFoundError } = require('../utils/error');
 
 /**
@@ -122,10 +122,15 @@ exports.getOrderHistory = async (userId) => {
   if (!user) throw new NotFoundError('User not found!');
   const orders = await Orders.findAll({
     where: { userId },
-    include: {
-      model: Products,
-      through: { attributes: ['quantity', 'product_quality'] },
-    },
+    include: [
+      {
+        model: Products,
+        through: { attributes: ['quantity', 'product_quality'] },
+      },
+      {
+        model: CollectionCentre,
+      },
+    ],
   });
   if (!orders) throw new Error('Order data is undefined/null');
   return orders;
@@ -212,11 +217,37 @@ exports.updatePaymentStatus = async (orderId, paymentStatus) => {
  */
 exports.getOrderById = async (orderId) => {
   const order = await Orders.findByPk(orderId, {
-    include: {
-      model: Products,
-      through: { attributes: ['quantity', 'product_quality'] },
-    },
+    include: [
+      {
+        model: Products,
+        through: { attributes: ['quantity', 'product_quality'] },
+      },
+      {
+        model: CollectionCentre,
+      },
+    ],
   });
   if (!order) throw new NotFoundError('Order not found');
+  return order;
+};
+
+exports.getUsersOrder = async (userId) => {
+  const user = await Users.findByPk(userId);
+  if (!user) throw new NotFoundError('User not found!');
+  const order = await Orders.findAll({
+    where: { userId },
+    include: [
+      {
+        model: Products,
+        attributes: ['id', 'name_en', 'name_kn'],
+        through: {
+          attributes: ['quantity', 'price'],
+        },
+      },
+      {
+        model: CollectionCentre,
+      },
+    ],
+  });
   return order;
 };
