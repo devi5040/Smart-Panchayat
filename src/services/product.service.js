@@ -21,23 +21,29 @@ const logger = require('../utils/logger');
  * @throws {Error} If categoryId is invalid (0, NaN, undefined, null, or negative).
  * @throws {NotFoundError} If the category with the given ID is not found.
  */
-exports.getProductsByCategory = async (categoryId) => {
-  // Input validation
-  if (categoryId <= 0 || isNaN(categoryId) || categoryId == null) {
-    throw new Error('Invalid categoryId. Must be a positive integer.');
+exports.getProductsByCategory = async (categoryId, pageNumber) => {
+  const whereCondition = {
+    isVerified: true,
+  };
+
+  const page = parseInt(pageNumber) || 1;
+  const limit = 10;
+  const offset = (page - 1) * limit;
+
+  if (parseInt(categoryId) !== 0) {
+    whereCondition.categoryId = categoryId;
   }
 
-  // Find the category
-  const category = await Category.findByPk(categoryId);
-  if (!category) {
-    throw new NotFoundError(`Category with ID ${categoryId} not found.`);
-  }
+  const { count, rows: products } = await Products.findAndCountAll({
+    where: whereCondition,
+    offset,
+    limit,
+    order: [['createdAt', 'DESC']],
+  });
 
-  if (category.name_en === 'All') return this.getVerifiedProducts();
+  const totalPages = Math.ceil(count / limit);
 
-  // Find products associated with the category
-  const products = await Products.findAll({ where: { categoryId, isVerified: true } });
-  return products || []; //Return empty array if no products found
+  return { products, totalPages } || { products: [], totalPages: 0 }; //Return empty array if no products found
 };
 
 /**
