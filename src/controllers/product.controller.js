@@ -23,9 +23,10 @@ const logger = require('../utils/logger');
  */
 exports.getAllProductsByCategory = async (req, res) => {
   const { categoryId } = req.params;
+  const { page } = req.query;
   try {
-    const products = await productServices.getProductsByCategory(categoryId);
-    res.status(200).json({ message: 'Products fetched successfully.', products });
+    const { products, totalPages } = await productServices.getProductsByCategory(categoryId, page);
+    res.status(200).json({ message: 'Products fetched successfully.', products, totalPages });
   } catch (error) {
     const status = error.statusCode || 500;
     logger.error(`Error retrieving products by category ${categoryId}: ${error}`);
