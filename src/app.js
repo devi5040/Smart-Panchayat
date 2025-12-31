@@ -17,6 +17,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const logger = require('./utils/logger');
 const routes = require('./routes');
+const cors = require('cors');
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use(
     },
   }),
 );
+app.use(cors());
 app.use('/api/v1/', routes);
 
 // ===============
