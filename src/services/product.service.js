@@ -54,7 +54,7 @@ exports.getProductsByCategory = async (categoryId, pageNumber) => {
  * @throws {NotFoundError} If no products are found.  This should ideally never happen unless there's a database issue.
  */
 exports.getAllProducts = async () => {
-  const products = await Products.findAll();
+  const products = await Products.findAll({ include: [{ model: Category }] });
   return products || []; //Return empty array if no products found.  Improved error handling would be to check for database errors.
 };
 
