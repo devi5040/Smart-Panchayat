@@ -44,8 +44,9 @@ exports.getAllProductsByCategory = async (req, res) => {
  * @throws {Error} If there's an error retrieving products from the database. Returns a 500 status code and error message.
  */
 exports.getAllProducts = async (req, res) => {
+  const { page, limit } = req.query;
   try {
-    const products = await productServices.getAllProducts();
+    const products = await productServices.getAllProducts(page, parseInt(limit));
     res.status(200).json({ message: 'Products fetched successfully.', products });
   } catch (error) {
     logger.error(`Error fetching all products: ${error}`);
