@@ -99,7 +99,7 @@ exports.getUserByID = async (id) => {
     throw new Error('Invalid user ID: ID cannot be null or undefined');
   }
   const user = await Users.findByPk(id, {
-    attributes: { exclude: ['password'] },
+    attributes: { exclude: ['password', 'firebaseUid'] },
   });
   if (!user) throw new NotFoundError('User not found');
   return user;
@@ -140,7 +140,9 @@ exports.updateUserDetails = async ({ userId, data }) => {
     { where: { id: userId } },
   );
   if (numRowsUpdated == 0) throw new NoContentError('No rows are updated!');
-  const user = await Users.findByPk(userId);
+  const user = await Users.findByPk(userId, {
+    attributes: { exclude: ['password', 'firebaseUid'] },
+  });
   return user;
 };
 
@@ -169,15 +171,7 @@ exports.setPreferredLanguage = async (userId, prefferedLanguage) => {
   );
   if (numRowsUpdated == 0) throw new NoContentError('No rows are updated!');
   const user = await Users.findByPk(userId, {
-    attributes: [
-      'id',
-      'phone_number',
-      'user_name_en',
-      'user_name_kn',
-      'user_role',
-      'account_status',
-      'language_preference',
-    ],
+    attributes: { exclude: ['password', 'firebaseUid'] },
   });
   return user;
 };
@@ -207,23 +201,7 @@ exports.changeUserRole = async (userId, currentRole) => {
   const [numRowsUpdated] = await Users.update({ user_role: userRole }, { where: { id: userId } });
   if (numRowsUpdated == 0) throw new NoContentError('No rows updated!');
   const data = await Users.findByPk(userId, {
-    attributes: [
-      'id',
-      'phone_number',
-      'user_name_en',
-      'user_name_kn',
-      'user_role',
-      'account_status',
-      'language_preference',
-      'home_address_en',
-      'home_address_kn',
-      'family_name_en',
-      'family_name_kn',
-      'pin_code',
-      'profile_image',
-      'latitude',
-      'longitude',
-    ],
+    attributes: { exclude: ['password', 'firebaseUid'] },
   });
   return data;
 };
@@ -258,15 +236,7 @@ exports.addPassword = async (userId, password) => {
   );
   if (numRowsUpdated == 0) throw new NoContentError('No rows updated!');
   const data = await Users.findByPk(userId, {
-    attributes: [
-      'id',
-      'phone_number',
-      'user_name_en',
-      'user_name_kn',
-      'user_role',
-      'account_status',
-      'language_preference',
-    ],
+    attributes: { exclude: ['password', 'firebaseUid'] },
   });
   return data;
 };
@@ -310,15 +280,7 @@ exports.updatePassword = async (userId, oldPassword, newPassword) => {
   );
   if (numRowsUpdated == 0) throw new NoContentError('No rows updated!');
   const data = await Users.findByPk(userId, {
-    attributes: [
-      'id',
-      'phone_number',
-      'user_name_en',
-      'user_name_kn',
-      'user_role',
-      'account_status',
-      'language_preference',
-    ],
+    attributes: { exclude: ['password', 'firebaseUid'] },
   });
   return data;
 };
@@ -330,7 +292,7 @@ exports.updatePassword = async (userId, oldPassword, newPassword) => {
  * @throws {NotFoundError} - If no users are found.
  */
 exports.getAllUsers = async () => {
-  const users = await Users.findAll();
+  const users = await Users.findAll({ attributes: { exclude: ['password', 'firebaseUid'] } });
   if (!users) throw new NotFoundError('users not found');
   return users;
 };
@@ -363,7 +325,10 @@ exports.getUsersByStatus = async (status) => {
   if (!status) throw new Error('status is not provided');
   if (status !== 'active' && status !== 'inactive')
     throw new BadRequestError('Status should either be active or inactive.');
-  const users = await Users.findAll({ where: { account_status: status } });
+  const users = await Users.findAll({
+    where: { account_status: status },
+    attributes: { exclude: ['password', 'firebaseUid'] },
+  });
   if (!users) throw new Error('Users data is invalid');
   return users;
 };
@@ -384,6 +349,7 @@ exports.getUserByRole = async (role, limit, page) => {
   const offset = (pageNum - 1) * limit;
   const { count, rows: users } = await Users.findAndCountAll({
     where: { user_role: role },
+    attributes: { exclude: ['password', 'firebaseUid'] },
     limit: parseInt(limit),
     offset,
     order: [['createdAt', 'DESC']],
@@ -402,7 +368,10 @@ exports.getUserByRole = async (role, limit, page) => {
 exports.verifyUser = async (decodedToken) => {
   console.log('connected to db:', sequelize.getDatabaseName());
   console.log(decodedToken.uid);
-  let user = await Users.findOne({ where: { firebaseUid: decodedToken.uid } });
+  let user = await Users.findOne({
+    where: { firebaseUid: decodedToken.uid },
+    attributes: { exclude: ['password', 'firebaseUid'] },
+  });
   if (!user) {
     user = await Users.create({
       firebaseUid: decodedToken.uid,
@@ -438,7 +407,9 @@ exports.deactivateAccount = async (userId) => {
     { where: { id: userId } },
   );
   if (numRowsUpdated === 0) throw new NoContentError('No rows updated!');
-  const userData = await Users.findByPk(userId);
+  const userData = await Users.findByPk(userId, {
+    attributes: { exclude: ['password', 'firebaseUid'] },
+  });
   return userData;
 };
 
@@ -456,7 +427,11 @@ exports.checkShopExists = async (userId) => {
 
 exports.getSortedUsers = async (field, role, order) => {
   const fieldName = field || 'createdAt';
-  const users = await Users.findAll({ where: { user_role: role }, order: [[fieldName, order]] });
+  const users = await Users.findAll({
+    where: { user_role: role },
+    order: [[fieldName, order]],
+    attributes: { exclude: ['password', 'firebaseUid'] },
+  });
   return users;
 };
 
