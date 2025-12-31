@@ -53,9 +53,17 @@ exports.getProductsByCategory = async (categoryId, pageNumber) => {
  * @returns {Promise<Array<object>>} - A promise that resolves to an array of all product objects. Returns an empty array if no products are found.
  * @throws {NotFoundError} If no products are found.  This should ideally never happen unless there's a database issue.
  */
-exports.getAllProducts = async () => {
-  const products = await Products.findAll({ include: [{ model: Category }] });
-  return products || []; //Return empty array if no products found.  Improved error handling would be to check for database errors.
+exports.getAllProducts = async (pageNumber, limit = 25) => {
+  const page = parseInt(pageNumber) || 1;
+  const offset = (page - 1) * limit;
+
+  const { count, rows: products } = await Products.findAndCountAll({
+    include: [{ model: Category }],
+    limit,
+    offset,
+  });
+  const totalPages = Math.ceil(count / limit);
+  return { products, totalPages }; //Return empty array if no products found.  Improved error handling would be to check for database errors.
 };
 
 /**
