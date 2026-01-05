@@ -6,10 +6,10 @@ exports.productValidation = Joi.object({
     'string.empty': 'Product price should not be empty',
     'string.min': 'Product price should be greater than 0.',
   }),
-  imageUrl: Joi.string().uri().messages({
-    'string.empty': 'The image url should not be empty',
-    'string.uri': 'Product image should be an url',
-  }),
+  // imageUrl: Joi.string().uri().messages({
+  //   'string.empty': 'The image url should not be empty',
+  //   'string.uri': 'Product image should be an url',
+  // }),
   categoryId: Joi.number()
     .required()
     .messages({ 'string.empty': 'Category id should not be empty' }),
