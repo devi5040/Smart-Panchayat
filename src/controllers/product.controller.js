@@ -145,8 +145,11 @@ exports.getProductDetails = async (req, res) => {
  * @throws {Error} If there's an error adding the product. Returns an appropriate HTTP status code and error message.
  */
 exports.addProduct = async (req, res) => {
-  const { name, price, imageUrl, categoryId } = req.body;
+  const { name, price, categoryId } = req.body;
+  const image = req.file;
   try {
+    if (!image) throw new Error('Image is not valid ');
+    const imageUrl = `product/${image.filename}`;
     const product = await productServices.addProduct(name, price, imageUrl, categoryId);
     res.status(201).json({ message: 'Product added successfully.', product });
   } catch (error) {
