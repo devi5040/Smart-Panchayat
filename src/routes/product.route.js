@@ -11,6 +11,8 @@
  */
 const router = require('express').Router();
 
+const imageUpload = require('../middleware/image-upload.middleware');
+
 /**
  * @description Middleware for Firebase authentication.  Verifies user authentication.
  * @type {function}
@@ -181,10 +183,12 @@ router.post(
   validate(productValidator.productShopSchema),
   productController.addShopProduct,
 );
+
 router.post(
   '/',
   authentication,
   authorization(['admin', 'shop']),
+  imageUpload('product').single('image'),
   validate(productValidator.productValidation),
   productController.addProduct,
 );
