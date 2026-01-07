@@ -175,14 +175,19 @@ exports.addProduct = async (req, res) => {
  */
 exports.updateProduct = async (req, res) => {
   const { productId } = req.params;
-  const { name, price, imageUrl, categoryId } = req.body;
+  const { name_en, name_kn, price, categoryId, status } = req.body;
+  const image = req.file;
   try {
+    let imageUrl;
+    if (image) imageUrl = `product/${image.filename}`;
     const product = await productServices.updateProduct(
       productId,
-      name,
+      name_en,
+      name_kn,
       price,
       imageUrl,
       categoryId,
+      status,
     );
     res.status(200).json({ message: 'Product updated successfully.', product });
   } catch (error) {
