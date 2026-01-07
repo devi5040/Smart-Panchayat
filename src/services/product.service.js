@@ -255,7 +255,15 @@ exports.addProduct = async (name, price, imageUrl, categoryId) => {
  * @throws {NotFoundError} If the product or category with the given ID is not found.
  * @throws {NoContentError} If no rows were updated (product not found).
  */
-exports.updateProduct = async (productId, name, price, imageUrl, categoryId) => {
+exports.updateProduct = async (
+  productId,
+  name_en,
+  name_kn,
+  price,
+  imageUrl,
+  categoryId,
+  status = 'pending',
+) => {
   // Input validation
   if (productId <= 0 || isNaN(productId) || productId == null || price <= 0 || categoryId <= 0) {
     throw new Error('Invalid input parameters.');
@@ -272,10 +280,22 @@ exports.updateProduct = async (productId, name, price, imageUrl, categoryId) => 
   }
 
   // Update the product
-  const [numRowsUpdated] = await Products.update(
-    { name_en: name, name_kn: name, price, imageUrl, categoryId },
-    { where: { id: productId } },
-  );
+  const updateData = {
+    name_en,
+    name_kn,
+    price,
+    categoryId,
+    isVerified: status === 'verified',
+  };
+
+  // Add image only if provided
+  if (imageUrl) {
+    updateData.image = imageUrl;
+  }
+
+  const [numRowsUpdated] = await Products.update(updateData, {
+    where: { id: productId },
+  });
   if (numRowsUpdated === 0) {
     throw new NoContentError(`Product with ID ${productId} not updated.`);
   }
