@@ -281,7 +281,8 @@ router.put(
   '/:productId',
   authentication,
   authorization(['admin']),
-  validate(productValidator.productValidation),
+  imageUpload('product').single('image'),
+  validate(productValidator.updateProductValidation),
   productController.updateProduct,
 );
 
