@@ -58,6 +58,13 @@ router.post(
   categoryController.addCategory,
 );
 
+router.get(
+  '/paginated',
+  authMiddleware,
+  access(['admin']),
+  categoryController.fetchPaginatedCategories,
+);
+
 router.get('/:categoryId/products', authMiddleware, productController.getAllProductsByCategory);
 
 /**
