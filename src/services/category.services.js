@@ -63,13 +63,21 @@ exports.addCategory = async (name, imageUrl) => {
  * @param {string} name - The new name of the category.
  * @param {string} imageUrl - The new URL of the category image.
  */
-exports.updateCategory = async (categoryId, name, imageUrl) => {
+exports.updateCategory = async (categoryId, name_en, name_kn, imageUrl) => {
   if (categoryId === null || categoryId === 0 || isNaN(categoryId))
     throw new Error('Category ID is not valid'); // Validate categoryId.
   const category = await Category.findByPk(categoryId);
   if (!category) throw new NotFoundError('Category not found!');
-  const updatedRows = await Category.update(
-    { name_en: name, name_kn: name, imageUrl },
+
+  const updateData = {
+    name_en,
+    name_kn,
+  };
+
+  if (imageUrl) updateData.imageUrl = imageUrl;
+
+  const [updatedRows] = await Category.update(
+    updateData,
     { where: { id: categoryId } }, // Update the category with the given ID.
   );
   if (updatedRows == 0) throw new Error('Category ID is not valid. No records updated.'); // Throw error if no rows were updated.
@@ -103,4 +111,10 @@ exports.fetchPaginatedCategories = async (pageNumber, limit = 10) => {
   });
   const totalPages = Math.ceil(count / limit);
   return { categories, totalPages };
+};
+
+exports.fetchCategoryDetails = async (categoryId) => {
+  const category = await Category.findByPk(categoryId);
+  if (!category) throw new NotFoundError('Category not found!');
+  return category;
 };
