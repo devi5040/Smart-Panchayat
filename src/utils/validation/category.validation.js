@@ -11,7 +11,12 @@ const Joi = require('joi');
 
 exports.categoryValidationSchema = Joi.object({
   name: Joi.string().required().messages({ 'string.required': 'Category name cannot be empty' }),
-  imageUrl: Joi.string().uri().messages({
-    'string.uri': 'The imageUrl should be an url.',
-  }),
+  // imageUrl: Joi.string().uri().messages({
+  //   'string.uri': 'The imageUrl should be an url.',
+  // }),
+});
+
+exports.updateCategoryValidationSchema = Joi.object({
+  name_en: Joi.string().required().messages({ 'string.required': 'Category name cannot be empty' }),
+  name_kn: Joi.string().required().messages({ 'string.required': 'Category name cannot be empty' }),
 });
