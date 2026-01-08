@@ -86,3 +86,17 @@ exports.deleteCategory = async (req, res) => {
     });
   }
 };
+
+exports.fetchPaginatedCategories = async (req, res) => {
+  const { page, limit } = req.query;
+  try {
+    const { categories, totalPages } = await categoryServices.fetchPaginatedCategories(page, limit);
+    res.status(200).json({ message: 'Categories fetched successfully', categories, totalPages });
+  } catch (error) {
+    logger.error(`Internal error while fetching categories:${error}`);
+    res.status(500).json({
+      message: 'Internal error while fetching categories',
+      error: error.message,
+    });
+  }
+};
