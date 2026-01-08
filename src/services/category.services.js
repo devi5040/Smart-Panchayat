@@ -92,3 +92,15 @@ exports.deleteCategory = async (categoryId) => {
   if (numOfDeletedRows == 0) throw new Error('Category ID is invalid. No records deleted.'); // Throw error if no rows were deleted.
   return true;
 };
+
+exports.fetchPaginatedCategories = async (pageNumber, limit = 10) => {
+  const page = Number(pageNumber) || 1;
+  const offset = (page - 1) * Number(limit);
+
+  const { count, rows: categories } = await Category.findAndCountAll({
+    limit: Number(limit),
+    offset,
+  });
+  const totalPages = Math.ceil(count / limit);
+  return { categories, totalPages };
+};
