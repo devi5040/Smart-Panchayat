@@ -18,10 +18,14 @@ const categoryController = require('../controllers/category.controller'); // Imp
 const validate = require('../middleware/validation.middleware'); // Import validation middleware
 const authMiddleware = require('../middleware/firebaseAuthMiddleware'); // Import Firebase authentication middleware
 const access = require('../middleware/authorization.middleware');
+const imageUpload = require('../middleware/image-upload.middleware');
 
 // Import validation schemas
 const { fileUploadSchema } = require('../utils/validation/fileUploadValidation');
-const { categoryValidationSchema } = require('../utils/validation/category.validation');
+const {
+  categoryValidationSchema,
+  updateCategoryValidationSchema,
+} = require('../utils/validation/category.validation');
 
 /**
  * @route GET /
@@ -54,6 +58,7 @@ router.post(
   '/',
   authMiddleware,
   access(['admin', 'shop']),
+  imageUpload('category').single('image'),
   validate(categoryValidationSchema),
   categoryController.addCategory,
 );
@@ -64,6 +69,8 @@ router.get(
   access(['admin']),
   categoryController.fetchPaginatedCategories,
 );
+
+router.get('/:categoryId', authMiddleware, access(['admin']), categoryController.getCategory);
 
 router.get('/:categoryId/products', authMiddleware, productController.getAllProductsByCategory);
 
@@ -78,7 +85,8 @@ router.put(
   '/:categoryId',
   authMiddleware,
   access(['admin']),
-  validate(categoryValidationSchema),
+  imageUpload('category').single('image'),
+  validate(updateCategoryValidationSchema),
   categoryController.updateCatogory,
 );
 
