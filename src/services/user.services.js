@@ -291,10 +291,22 @@ exports.updatePassword = async (userId, oldPassword, newPassword) => {
  * @returns {Promise<object[]>} - An array of Sequelize User model instances.
  * @throws {NotFoundError} - If no users are found.
  */
-exports.getAllUsers = async () => {
-  const users = await Users.findAll({ attributes: { exclude: ['password', 'firebaseUid'] } });
-  if (!users) throw new NotFoundError('users not found');
-  return users;
+exports.getAllUsers = async (pageNumber, limit) => {
+  const pageNum = Number(pageNumber);
+  if (!pageNum || pageNum <= 0) {
+    const users = await Users.findAll({ attributes: { exclude: ['password', 'firebaseUid'] } });
+    if (!users) throw new NotFoundError('users not found');
+    return { users, totalPages: 1 };
+  }
+  const page = Number(pageNumber) || 1;
+  const offset = (page - 1) * Number(limit);
+  const { rows: users, count } = await Users.findAndCountAll(
+    { attributes: { exclude: ['password', 'firebaseUid'] } },
+    limit,
+    offset,
+  );
+  const totalPages = Math.ceil(count / Number(limit));
+  return { users, totalPages };
 };
 
 /**
