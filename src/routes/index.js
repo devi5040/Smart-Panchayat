@@ -6,6 +6,7 @@ const shopRoutes = require('./shop.route');
 const orderRoutes = require('./order.route');
 const shipmentRoutes = require('./shipment.route');
 const agentRoutes = require('./agent.route');
+const collectionCentreRoutes = require('./collection-centre.route');
 
 router.use('/user', userRoutes);
 
@@ -20,5 +21,7 @@ router.use('/order', orderRoutes);
 router.use('/shipment', shipmentRoutes);
 
 router.use('/agent', agentRoutes);
+
+router.use('/collection-centre', collectionCentreRoutes);
 
 module.exports = router;
