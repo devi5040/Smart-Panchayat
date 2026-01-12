@@ -98,15 +98,25 @@ exports.addOrder = async (orderData, items, agentUserId) => {
  * @returns {Promise<Order[]>} An array of Order instances, each with associated product information.  Includes quantity and product_quality from the OrderItems join table.
  * @throws {Error} If no orders are found.
  */
-exports.getOrders = async () => {
-  const orders = await Orders.findAll({
-    include: {
-      model: Products,
-      through: { attributes: ['quantity', 'product_quality'] },
-    },
+exports.getOrders = async (pageNumber, limit) => {
+  const page = Number(pageNumber) || 1;
+  const offset = (page - 1) * Number(limit);
+
+  const { count, rows: orders } = await Orders.findAndCountAll({
+    include: [
+      {
+        model: Products,
+      },
+      {
+        model: CollectionCentre,
+      },
+    ],
+    offset,
+    limit: Number(limit),
   });
   if (!orders) throw new Error('Order is undefined/null'); //Improved error message
-  return orders;
+  const totalPages = Math.ceil(count / limit);
+  return { orders, totalPages };
 };
 
 /**
