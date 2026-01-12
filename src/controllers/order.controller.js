@@ -56,9 +56,10 @@ exports.addOrder = async (req, res) => {
  * @throws {Error} If there's an error fetching orders.
  */
 exports.getOrders = async (req, res) => {
+  const { page, limit } = req.query;
   try {
-    const orders = await orderServices.getOrders();
-    res.status(200).json({ message: '✅ Orders data fetched successfully!', orders });
+    const { orders, totalPages } = await orderServices.getOrders(page, limit);
+    res.status(200).json({ message: '✅ Orders data fetched successfully!', orders, totalPages });
   } catch (error) {
     logger.error(`Internal error while fetching orders data: ${error}`);
     res.status(500).json({
