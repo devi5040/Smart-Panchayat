@@ -46,8 +46,8 @@ exports.getAllProductsByCategory = async (req, res) => {
 exports.getAllProducts = async (req, res) => {
   const { page, limit } = req.query;
   try {
-    const products = await productServices.getAllProducts(page, parseInt(limit));
-    res.status(200).json({ message: 'Products fetched successfully.', products });
+    const { products, totalPages } = await productServices.getAllProducts(page, parseInt(limit));
+    res.status(200).json({ message: 'Products fetched successfully.', products, totalPages });
   } catch (error) {
     logger.error(`Error fetching all products: ${error}`);
     res.status(500).json({ message: 'Failed to fetch products.', error: error.message });
