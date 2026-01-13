@@ -46,6 +46,22 @@ exports.addOrder = async (req, res) => {
   }
 };
 
+exports.updateOrder = async (req, res) => {
+  const { orderData, items } = req.body;
+  const { orderId } = req.params;
+  try {
+    const order = await orderServices.updateOrder(orderData, items, orderId);
+    res.status(200).json({ message: '✅ Order updated successfully!', order });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while updating an order: ${error}`);
+    res.status(status).json({
+      message: '⚠️ An internal error occurred while updating the order. Please try again later.',
+      error: error.message,
+    });
+  }
+};
+
 /**
  * Retrieves all orders.
  * @async
@@ -208,5 +224,19 @@ exports.getUserOrders = async (req, res) => {
     res
       .status(status)
       .json({ message: 'Internal error while fetching the orders!', error: error.message });
+  }
+};
+
+exports.deleteOrder = async (req, res) => {
+  const { orderId } = req.params;
+  try {
+    const orders = await orderServices.deleteOrder(orderId);
+    res.status(200).json({ message: 'Deleted orders for the user successfully!', orders });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while deleting the orders: ${error}`);
+    res
+      .status(status)
+      .json({ message: 'Internal error while deleting the orders!', error: error.message });
   }
 };
