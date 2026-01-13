@@ -107,6 +107,16 @@ router.post(
   orderController.addOrder,
 );
 
+router.put(
+  '/:orderId',
+  validate(orderSchema.orderSchema),
+  auth,
+  access(['admin']),
+  orderController.updateOrder,
+);
+
+router.delete('/:orderId', auth, access(['admin']), orderController.deleteOrder);
+
 /**
  * @route PATCH /:orderId
  * @description Updates the payment status of an order. Input validation is performed using the `orderSchema.paymentStatusOrderSchema`.
