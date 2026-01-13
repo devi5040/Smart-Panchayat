@@ -87,6 +87,59 @@ exports.addOrder = async (orderData, items) => {
   });
 };
 
+exports.updateOrder = async (orderData, items) => {
+  const { paymentStatus = 'pending', userId, collectionCentreId, orderId } = orderData;
+
+  return await sequelize.transaction(async (t) => {
+    const user = await Users.findByPk(userId, { transaction: t });
+    if (!user) throw new NotFoundError('❌ User not found!');
+
+    const order = await Orders.findByPk(orderId, { transaction: t });
+    if (!order) throw new NotFoundError('Order not found!');
+
+    let totalPrice = 0;
+
+    for (const item of items) {
+      const { quantity, quality, productId } = item;
+
+      // Check if product exists
+      const product = await Products.findByPk(productId, { transaction: t });
+      if (!product) throw new NotFoundError('❌ Product not found!');
+
+      totalPrice += product.price * quantity; // Accumulate total price
+
+      // Insert into order-items table
+      await OrderItems.create(
+        {
+          price: product.price * quantity,
+          quantity,
+          product_quality: quality,
+          productId,
+          orderId: orderId,
+        },
+        { transaction: t },
+      );
+    }
+
+    // Update order price with calculated total
+    const [numRowsUpdated] = await Orders.update(
+      { paymentStatus, collectionCentreId, userId, price: totalPrice },
+      { where: { id: orderId }, transaction: t },
+    );
+    if (numRowsUpdated === 0) throw new Error('No rows updated');
+
+    // Return the order with included products
+    const orderData = await Orders.findByPk(orderId, {
+      include: {
+        model: Products,
+        through: { attributes: ['quantity', 'product_quality'] },
+      },
+      transaction: t,
+    });
+    return orderData;
+  });
+};
+
 /**
  * Retrieves all orders from the database. Includes associated products.
  * @async
