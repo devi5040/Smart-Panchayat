@@ -12,6 +12,7 @@
 const sequelize = require('../config/db');
 const { OrderItems, Orders, Users, Products, CollectionCentre } = require('../models');
 const { NotFoundError } = require('../utils/error');
+const { Op } = require('sequelize');
 
 /**
  * Adds a new order to the database.  Handles creation of associated order items.
@@ -87,56 +88,85 @@ exports.addOrder = async (orderData, items) => {
   });
 };
 
-exports.updateOrder = async (orderData, items) => {
-  const { paymentStatus = 'pending', userId, collectionCentreId, orderId } = orderData;
+exports.updateOrder = async (orderData, items, orderId) => {
+  const { paymentStatus = 'pending', userId, collectionCentreId } = orderData;
 
   return await sequelize.transaction(async (t) => {
     const user = await Users.findByPk(userId, { transaction: t });
     if (!user) throw new NotFoundError('❌ User not found!');
 
     const order = await Orders.findByPk(orderId, { transaction: t });
-    if (!order) throw new NotFoundError('Order not found!');
+    if (!order) throw new NotFoundError('❌ Order not found!');
 
-    let totalPrice = 0;
+    // Keep track of productIds sent from frontend
+    const incomingProductIds = items.map((i) => i.productId);
 
     for (const item of items) {
       const { quantity, quality, productId } = item;
 
-      // Check if product exists
       const product = await Products.findByPk(productId, { transaction: t });
       if (!product) throw new NotFoundError('❌ Product not found!');
 
-      totalPrice += product.price * quantity; // Accumulate total price
-
-      // Insert into order-items table
-      await OrderItems.create(
-        {
-          price: product.price * quantity,
+      const [orderItem, created] = await OrderItems.findOrCreate({
+        where: { productId, orderId },
+        defaults: {
           quantity,
+          price: product.price * quantity,
           product_quality: quality,
-          productId,
-          orderId: orderId,
         },
-        { transaction: t },
-      );
+        transaction: t,
+      });
+
+      if (!created) {
+        const newQuantity = quantity;
+
+        await orderItem.update(
+          {
+            quantity: newQuantity,
+            price: product.price * newQuantity,
+            product_quality: quality,
+          },
+          { transaction: t },
+        );
+      }
     }
 
-    // Update order price with calculated total
-    const [numRowsUpdated] = await Orders.update(
-      { paymentStatus, collectionCentreId, userId, price: totalPrice },
+    // 🔥 Remove deleted products
+    await OrderItems.destroy({
+      where: {
+        orderId,
+        productId: { [Op.notIn]: incomingProductIds },
+      },
+      transaction: t,
+    });
+
+    // 🔥 Recalculate total price from DB (single source of truth)
+    const orderItems = await OrderItems.findAll({
+      where: { orderId },
+      transaction: t,
+    });
+
+    const totalPrice = orderItems.reduce((sum, item) => sum + item.price, 0);
+
+    // Update order
+    await Orders.update(
+      {
+        payment_status: paymentStatus,
+        collectionCentreId,
+        userId,
+        price: totalPrice,
+      },
       { where: { id: orderId }, transaction: t },
     );
-    if (numRowsUpdated === 0) throw new Error('No rows updated');
 
-    // Return the order with included products
-    const orderData = await Orders.findByPk(orderId, {
+    // Return updated order
+    return await Orders.findByPk(orderId, {
       include: {
         model: Products,
         through: { attributes: ['quantity', 'product_quality'] },
       },
       transaction: t,
     });
-    return orderData;
   });
 };
 
@@ -278,7 +308,6 @@ exports.getOrderById = async (orderId) => {
     include: [
       {
         model: Products,
-        through: { attributes: ['quantity', 'product_quality'] },
       },
       {
         model: CollectionCentre,
@@ -308,4 +337,16 @@ exports.getUsersOrder = async (userId) => {
     ],
   });
   return order;
+};
+
+exports.deleteOrder = async (orderId) => {
+  return await sequelize.transaction(async (t) => {
+    const order = await Orders.findByPk(orderId, { transaction: t });
+    if (!order) throw new Error('Order not found!');
+    const numRowsDeleted = await OrderItems.destroy({ where: { orderId }, transaction: t });
+    if (numRowsDeleted === 0) throw new Error('Delete failed!');
+    const deleteProduct = await Orders.destroy({ where: { id: orderId }, transaction: t });
+    if (deleteProduct === 0) throw new Error('Delete failed!');
+    return true;
+  });
 };
