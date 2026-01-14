@@ -23,6 +23,8 @@ const shipmentController = require('../controllers/shipment.controller');
 
 router.get('/admin', auth, access(['admin']), shipmentController.fetchShipmentsForAdmin);
 
+router.get('/admin/:shipmentId', auth, access(['admin']), shipmentController.fetchShipmentDetails);
+
 /**
  * @route GET /
  * @description Retrieves a list of shipments.
