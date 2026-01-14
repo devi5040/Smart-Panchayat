@@ -21,6 +21,8 @@ const schema = require('../utils/validation/shipment.validation');
 // Import shipment controller functions.
 const shipmentController = require('../controllers/shipment.controller');
 
+router.get('/admin', auth, access(['admin']), shipmentController.fetchShipmentsForAdmin);
+
 /**
  * @route GET /
  * @description Retrieves a list of shipments.
