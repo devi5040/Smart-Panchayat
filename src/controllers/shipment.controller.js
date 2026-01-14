@@ -298,3 +298,18 @@ exports.fetchShipmentsForAdmin = async (req, res) => {
       .json({ message: 'Internal error wile fetching shipments for admin', error: error.message });
   }
 };
+
+exports.fetchShipmentDetails = async (req, res) => {
+  const { page, limit } = req.query;
+  const { shipmentId } = req.params;
+  try {
+    const data = await shipmentServices.fetchShipmentDetails(shipmentId, page, limit);
+    res.status(200).json({ message: 'Fetched shipment details successfully!', data });
+  } catch (error) {
+    logger.error(`Internal error while fetching shipment details for admin: ${error}`);
+    res.status(500).json({
+      message: 'Internal error wile fetching shipment details for admin',
+      error: error.message,
+    });
+  }
+};
