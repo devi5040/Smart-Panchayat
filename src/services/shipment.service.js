@@ -563,13 +563,31 @@ exports.fetchShipmentsAdmin = async (pageNumber, limit = 10) => {
     offset,
   });
 
-  console.log(`--------------------`);
-  console.log(count);
-  console.log('-----------------');
-
   if (!shipments) throw new Error('Error fetching shipments data!');
 
   const totalPages = Math.ceil(count / Number(limit));
 
   return { shipments, totalPages };
+};
+
+exports.fetchShipmentDetails = async (shipmentId, pageNumber, limit = 10) => {
+  const page = Number(pageNumber) || 1;
+  const offset = (page - 1) * Number(limit);
+  const shipments = await Shipments.findByPk(shipmentId);
+  if (!shipments) throw new Error('Error finding shipments');
+  const data = await Shipments.findOne({
+    where: { id: shipmentId },
+    include: [
+      {
+        model: Shops,
+      },
+      {
+        model: CollectionCentre,
+      },
+    ],
+    offset,
+    limit: Number(limit),
+  });
+
+  return data;
 };
