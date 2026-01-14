@@ -531,3 +531,45 @@ exports.getShipmentsForCollectionCentre = async (userId, pageNumber) => {
   );
   return { shipments: products, totalPages };
 };
+
+exports.fetchShipmentsAdmin = async (pageNumber, limit = 10) => {
+  const page = Number(pageNumber) || 1;
+  const offset = (page - 1) * Number(limit);
+
+  const { count, rows: shipments } = await Shipments.findAndCountAll({
+    distinct: true,
+    include: [
+      {
+        model: ShipmentShops,
+        attributes: [], // exclude all, we will count
+      },
+      {
+        model: CollectionCentre,
+      },
+    ],
+    attributes: {
+      include: [
+        [
+          sequelize.literal(`(
+          SELECT COUNT(*)
+          FROM \`shipment-shops\`
+          WHERE \`shipment-shops\`.\`shipmentId\` = \`shipments\`.\`id\`
+        )`),
+          'totalShops',
+        ],
+      ],
+    },
+    limit: Number(limit),
+    offset,
+  });
+
+  console.log(`--------------------`);
+  console.log(count);
+  console.log('-----------------');
+
+  if (!shipments) throw new Error('Error fetching shipments data!');
+
+  const totalPages = Math.ceil(count / Number(limit));
+
+  return { shipments, totalPages };
+};
