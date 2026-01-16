@@ -71,13 +71,13 @@ exports.getShipmentList = async () => {
  * @throws {Error} If an error occurs during shipment creation.
  */
 exports.createShipment = async (shipmentDetails, shops) => {
-  const { date, location, collectionCentre, transportationMode } = shipmentDetails;
+  const { date, location, collectionCentreId, transportationMode } = shipmentDetails;
   return await sequelize.transaction(async (t) => {
     const existingShipment = await Shipments.findAll({
       where: {
         date,
         location,
-        collection_centre: collectionCentre,
+        collectionCentreId: collectionCentreId,
         transportation_mode: transportationMode,
       },
       transaction: t,
@@ -90,7 +90,7 @@ exports.createShipment = async (shipmentDetails, shops) => {
       {
         date,
         location,
-        collection_centre: collectionCentre,
+        collectionCentreId,
         transportation_mode: transportationMode,
       },
       { transaction: t },
@@ -127,7 +127,7 @@ exports.createShipment = async (shipmentDetails, shops) => {
       }
     }
     const shipmentData = await Shipments.findAll({
-      attributes: ['id', 'date', 'collection_centre', 'transportation_mode'],
+      attributes: ['id', 'date', 'transportation_mode'],
       include: {
         model: Shops,
         attributes: ['shop_name_en', 'shop_name_kn', 'id', 'latitude', 'longitude', 'pin_code'],
