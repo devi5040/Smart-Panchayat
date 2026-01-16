@@ -31,7 +31,7 @@ exports.shipmentSchema = Joi.object({
       'date.required': 'The date is required field',
       'any.date': 'Enter valid date',
     }),
-    collectionCentre: Joi.string().required().messages({
+    collectionCentreId: Joi.number().required().messages({
       'string.empty': 'The collection centre should not be empty',
       'any.required': 'The collection centre field is required',
     }),
