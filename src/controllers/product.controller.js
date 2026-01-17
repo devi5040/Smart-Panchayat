@@ -147,10 +147,15 @@ exports.getProductDetails = async (req, res) => {
 exports.addProduct = async (req, res) => {
   const { name, price, categoryId } = req.body;
   const image = req.file;
+
+  const parsedPrice = parseFloat(price);
+  const parsedCategoryId = parseInt(categoryId);
+
   try {
     if (!image) throw new Error('Image is not valid ');
     const imageUrl = `product/${image.filename}`;
-    const product = await productServices.addProduct(name, price, imageUrl, categoryId);
+    const product = await productServices.addProduct(name, parsedPrice, imageUrl, parsedCategoryId);
+
     res.status(201).json({ message: 'Product added successfully.', product });
   } catch (error) {
     const status = error.statusCode || 500;
