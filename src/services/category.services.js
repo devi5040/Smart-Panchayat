@@ -52,7 +52,7 @@ exports.getSignedUrl = async (fileName, fileType) => {
  * @param {string} imageUrl - The URL of the category image.
  * Throws an error if database interaction fails.
  */
-exports.addCategory = async (name, imageUrl) => {
+exports.addCategory = async (name, imageUrl='https://infostoredeviprasadrai.s3.ap-southeast-2.amazonaws.com/uploads/all.png') => {
   const category = await Category.create({ name_en: name, name_kn: name, imageUrl }); // Create a new category in the database.
   return category;
 };
