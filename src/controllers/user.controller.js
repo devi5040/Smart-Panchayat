@@ -110,6 +110,15 @@ exports.getUserDetails = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   const userId = req.user.id;
   const data = req.body;
+  
+  const image = req.file;
+  if (image) {
+    data.profileImage = `profile_image/${image.filename}`;
+  }
+  else {
+    data.profileImage = req.body.profileImage; // retain existing URL if no new image is uploaded
+  }
+
   try {
     const user = await userServices.updateUserDetails({ userId, data });
     res.status(200).json({ message: 'User details updated successfully', user });
