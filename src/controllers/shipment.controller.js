@@ -279,11 +279,37 @@ exports.getShipmentsForCollectionCentre = async (req, res) => {
   } catch (error) {
     const status = error.statusCode || 500;
     logger.error(`Internal error while fetching shipments for the collection centre: ${error}`);
+    res.status(status).json({
+      message: 'Internal error fetching the shipments for collection centre!',
+      error: error.message,
+    });
+  }
+};
+
+exports.fetchShipmentsForAdmin = async (req, res) => {
+  const { page, limit } = req.query;
+  try {
+    const { shipments, totalPages } = await shipmentServices.fetchShipmentsAdmin(page, limit);
+    res.status(200).json({ message: 'Fetched shipments successfully!', shipments, totalPages });
+  } catch (error) {
+    logger.error(`Internal error while fetching shipments for admin: ${error}`);
     res
-      .status(status)
-      .json({
-        message: 'Internal error fetching the shipments for collection centre!',
-        error: error.message,
-      });
+      .status(500)
+      .json({ message: 'Internal error wile fetching shipments for admin', error: error.message });
+  }
+};
+
+exports.fetchShipmentDetails = async (req, res) => {
+  const { page, limit } = req.query;
+  const { shipmentId } = req.params;
+  try {
+    const data = await shipmentServices.fetchShipmentDetails(shipmentId, page, limit);
+    res.status(200).json({ message: 'Fetched shipment details successfully!', data });
+  } catch (error) {
+    logger.error(`Internal error while fetching shipment details for admin: ${error}`);
+    res.status(500).json({
+      message: 'Internal error wile fetching shipment details for admin',
+      error: error.message,
+    });
   }
 };

@@ -44,8 +44,11 @@ exports.getSignedUrl = async (req, res) => {
 };
 
 exports.addCategory = async (req, res) => {
+  const { name } = req.body;
+  const image = req.file;
   try {
-    const { name, imageUrl } = req.body;
+    if (!image) throw new Error('Category image is required');
+    const imageUrl = `/category/${image.filename}`;
     const category = await categoryServices.addCategory(name, imageUrl);
     res.status(201).json({ message: 'Category added successfully', category });
   } catch (error) {
@@ -59,9 +62,12 @@ exports.addCategory = async (req, res) => {
 
 exports.updateCatogory = async (req, res) => {
   const { categoryId } = req.params;
-  const { name, imageUrl } = req.body;
+  const { name_en, name_kn } = req.body;
+  const image = req.file;
   try {
-    await categoryServices.updateCategory(categoryId, name, imageUrl);
+    let imageUrl;
+    if (image) imageUrl = `/category/${image.filename}`;
+    await categoryServices.updateCategory(categoryId, name_en, name_kn, imageUrl);
     res.status(200).json({ message: 'Category details updated successfully.' });
   } catch (error) {
     logger.error(`Internal error while updating the category: ${error}`);
@@ -84,5 +90,33 @@ exports.deleteCategory = async (req, res) => {
       message: 'Internal error while deleting the category.',
       error: error.message,
     });
+  }
+};
+
+exports.fetchPaginatedCategories = async (req, res) => {
+  const { page, limit } = req.query;
+  try {
+    const { categories, totalPages } = await categoryServices.fetchPaginatedCategories(page, limit);
+    res.status(200).json({ message: 'Categories fetched successfully', categories, totalPages });
+  } catch (error) {
+    logger.error(`Internal error while fetching categories:${error}`);
+    res.status(500).json({
+      message: 'Internal error while fetching categories',
+      error: error.message,
+    });
+  }
+};
+
+exports.getCategory = async (req, res) => {
+  const { categoryId } = req.params;
+  try {
+    const category = await categoryServices.fetchCategoryDetails(categoryId);
+    res.status(200).json({ message: 'Fetched category details successfully', category });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while fetching category details: ${error}`);
+    res
+      .status(status)
+      .json({ message: 'Internal error while fetching category details', error: error.message });
   }
 };

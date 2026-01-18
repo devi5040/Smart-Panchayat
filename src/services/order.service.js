@@ -12,6 +12,7 @@
 const sequelize = require('../config/db');
 const { OrderItems, Orders, Users, Products, CollectionCentre } = require('../models');
 const { NotFoundError } = require('../utils/error');
+const { Op } = require('sequelize');
 
 /**
  * Adds a new order to the database.  Handles creation of associated order items.
@@ -26,15 +27,10 @@ const { NotFoundError } = require('../utils/error');
  * @throws {Error} If no rows are updated after creating the order.
  * @returns {Promise<Order>} The created order instance with associated products.  Includes quantity and product_quality from the OrderItems join table.
  */
-exports.addOrder = async (orderData, items, agentUserId) => {
-  const { paymentStatus = 'pending', userId } = orderData;
+exports.addOrder = async (orderData, items) => {
+  const { paymentStatus = 'pending', userId, collectionCentreId } = orderData;
 
   return await sequelize.transaction(async (t) => {
-    const agent = await Users.findByPk(agentUserId);
-    if (!agent) throw new NotFoundError('Agent not found!');
-
-    const collectionCentreId = agent.collectionCentreId;
-    // Check if user exists
     const user = await Users.findByPk(userId, { transaction: t });
     if (!user) throw new NotFoundError('❌ User not found!');
 
@@ -92,21 +88,113 @@ exports.addOrder = async (orderData, items, agentUserId) => {
   });
 };
 
+exports.updateOrder = async (orderData, items, orderId) => {
+  const { paymentStatus = 'pending', userId, collectionCentreId } = orderData;
+
+  return await sequelize.transaction(async (t) => {
+    const user = await Users.findByPk(userId, { transaction: t });
+    if (!user) throw new NotFoundError('❌ User not found!');
+
+    const order = await Orders.findByPk(orderId, { transaction: t });
+    if (!order) throw new NotFoundError('❌ Order not found!');
+
+    // Keep track of productIds sent from frontend
+    const incomingProductIds = items.map((i) => i.productId);
+
+    for (const item of items) {
+      const { quantity, quality, productId } = item;
+
+      const product = await Products.findByPk(productId, { transaction: t });
+      if (!product) throw new NotFoundError('❌ Product not found!');
+
+      const [orderItem, created] = await OrderItems.findOrCreate({
+        where: { productId, orderId },
+        defaults: {
+          quantity,
+          price: product.price * quantity,
+          product_quality: quality,
+        },
+        transaction: t,
+      });
+
+      if (!created) {
+        const newQuantity = quantity;
+
+        await orderItem.update(
+          {
+            quantity: newQuantity,
+            price: product.price * newQuantity,
+            product_quality: quality,
+          },
+          { transaction: t },
+        );
+      }
+    }
+
+    // 🔥 Remove deleted products
+    await OrderItems.destroy({
+      where: {
+        orderId,
+        productId: { [Op.notIn]: incomingProductIds },
+      },
+      transaction: t,
+    });
+
+    // 🔥 Recalculate total price from DB (single source of truth)
+    const orderItems = await OrderItems.findAll({
+      where: { orderId },
+      transaction: t,
+    });
+
+    const totalPrice = orderItems.reduce((sum, item) => sum + item.price, 0);
+
+    // Update order
+    await Orders.update(
+      {
+        payment_status: paymentStatus,
+        collectionCentreId,
+        userId,
+        price: totalPrice,
+      },
+      { where: { id: orderId }, transaction: t },
+    );
+
+    // Return updated order
+    return await Orders.findByPk(orderId, {
+      include: {
+        model: Products,
+        through: { attributes: ['quantity', 'product_quality'] },
+      },
+      transaction: t,
+    });
+  });
+};
+
 /**
  * Retrieves all orders from the database. Includes associated products.
  * @async
  * @returns {Promise<Order[]>} An array of Order instances, each with associated product information.  Includes quantity and product_quality from the OrderItems join table.
  * @throws {Error} If no orders are found.
  */
-exports.getOrders = async () => {
-  const orders = await Orders.findAll({
-    include: {
-      model: Products,
-      through: { attributes: ['quantity', 'product_quality'] },
-    },
+exports.getOrders = async (pageNumber, limit) => {
+  const page = Number(pageNumber) || 1;
+  const offset = (page - 1) * Number(limit);
+
+  const { count, rows: orders } = await Orders.findAndCountAll({
+    include: [
+      {
+        model: Products,
+      },
+      {
+        model: CollectionCentre,
+      },
+    ],
+    offset,
+    limit: Number(limit),
   });
   if (!orders) throw new Error('Order is undefined/null'); //Improved error message
-  return orders;
+  const totalPages = Math.ceil(count / limit);
+  return { orders, totalPages };
 };
 
 /**
@@ -220,7 +308,6 @@ exports.getOrderById = async (orderId) => {
     include: [
       {
         model: Products,
-        through: { attributes: ['quantity', 'product_quality'] },
       },
       {
         model: CollectionCentre,
@@ -250,4 +337,16 @@ exports.getUsersOrder = async (userId) => {
     ],
   });
   return order;
+};
+
+exports.deleteOrder = async (orderId) => {
+  return await sequelize.transaction(async (t) => {
+    const order = await Orders.findByPk(orderId, { transaction: t });
+    if (!order) throw new Error('Order not found!');
+    const numRowsDeleted = await OrderItems.destroy({ where: { orderId }, transaction: t });
+    if (numRowsDeleted === 0) throw new Error('Delete failed!');
+    const deleteProduct = await Orders.destroy({ where: { id: orderId }, transaction: t });
+    if (deleteProduct === 0) throw new Error('Delete failed!');
+    return true;
+  });
 };

@@ -5,7 +5,7 @@ const itemsSchema = Joi.object({
     'string.requierd': 'The quantity should not be empty and it is required',
     'string.min': 'The minimum quantity should be 1',
   }),
-  quality: Joi.string().valid('premium', 'high', 'medium').messages({
+  quality: Joi.string().optional().valid('premium', 'high', 'medium').messages({
     'string.empty': 'Product quality cannot be empty.',
     'string.valid': 'The quality should either be premium, high or medium',
   }),
@@ -22,6 +22,9 @@ const orderDataSchema = Joi.object({
   userId: Joi.number()
     .required()
     .messages({ 'string.required': 'The user id should not be empty.' }),
+  collectionCentreId: Joi.number()
+    .required()
+    .messages({ 'number.empty': 'Collection centre id is required' }),
 });
 
 exports.orderSchema = Joi.object({

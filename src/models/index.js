@@ -66,6 +66,9 @@ Products.belongsTo(Category);
 ShipmentShops.belongsTo(Shipments);
 Shipments.hasMany(ShipmentShops, { onDelete: 'CASCADE' });
 
+// Shipments.hasMany(ShipmentShopProducts, { onDelete: 'CASCADE' });
+// ShipmentShopProducts.belongsTo(Shipments);
+
 Users.belongsTo(CollectionCentre);
 CollectionCentre.hasMany(Users, { onDelete: 'CASCADE' });
 
