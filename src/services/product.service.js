@@ -53,9 +53,24 @@ exports.getProductsByCategory = async (categoryId, pageNumber) => {
  * @returns {Promise<Array<object>>} - A promise that resolves to an array of all product objects. Returns an empty array if no products are found.
  * @throws {NotFoundError} If no products are found.  This should ideally never happen unless there's a database issue.
  */
-exports.getAllProducts = async () => {
-  const products = await Products.findAll();
-  return products || []; //Return empty array if no products found.  Improved error handling would be to check for database errors.
+exports.getAllProducts = async (pageNumber, limit = 10) => {
+  const pageNum = Number(pageNumber);
+  if (!pageNum || pageNum <= 0) {
+    const products = await Products.findAll();
+    if (!products) throw new Error('Error finding products!');
+    return { products, totalPages: 1 };
+  }
+
+  const page = parseInt(pageNum) || 1;
+  const offset = (page - 1) * Number(limit);
+
+  const { count, rows: products } = await Products.findAndCountAll({
+    include: [{ model: Category }],
+    limit,
+    offset,
+  });
+  const totalPages = Math.ceil(count / Number(limit));
+  return { products, totalPages }; //Return empty array if no products found.  Improved error handling would be to check for database errors.
 };
 
 /**
@@ -247,7 +262,15 @@ exports.addProduct = async (name, price, imageUrl, categoryId) => {
  * @throws {NotFoundError} If the product or category with the given ID is not found.
  * @throws {NoContentError} If no rows were updated (product not found).
  */
-exports.updateProduct = async (productId, name, price, imageUrl, categoryId) => {
+exports.updateProduct = async (
+  productId,
+  name_en,
+  name_kn,
+  price,
+  imageUrl,
+  categoryId,
+  status = 'pending',
+) => {
   // Input validation
   if (productId <= 0 || isNaN(productId) || productId == null || price <= 0 || categoryId <= 0) {
     throw new Error('Invalid input parameters.');
@@ -264,10 +287,22 @@ exports.updateProduct = async (productId, name, price, imageUrl, categoryId) => 
   }
 
   // Update the product
-  const [numRowsUpdated] = await Products.update(
-    { name_en: name, name_kn: name, price, imageUrl, categoryId },
-    { where: { id: productId } },
-  );
+  const updateData = {
+    name_en,
+    name_kn,
+    price,
+    categoryId,
+    isVerified: status === 'verified',
+  };
+
+  // Add image only if provided
+  if (imageUrl) {
+    updateData.image = imageUrl;
+  }
+
+  const [numRowsUpdated] = await Products.update(updateData, {
+    where: { id: productId },
+  });
   if (numRowsUpdated === 0) {
     throw new NoContentError(`Product with ID ${productId} not updated.`);
   }

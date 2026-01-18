@@ -24,6 +24,9 @@ const fileUploadValidation = require('../utils/validation/fileUploadValidation')
 /** @type {import('../utils/validation/user.validate')} */
 const userDataValidation = require('../utils/validation/user.validate');
 
+/** @type {import('../middleware/image-upload.middleware')} */
+const imageUpload = require('../middleware/image-upload.middleware');
+
 /**
  * @openapi
  * /signed-url:
@@ -229,6 +232,7 @@ router.get('/role', authMiddleware, userController.getUsersByRole);
 router.put(
   '/update-profile',
   authMiddleware,
+  imageUpload('profile_image').single('profileImage'),
   validate(userDataValidation.updateUserDataSchema),
   userController.updateProfile,
 );

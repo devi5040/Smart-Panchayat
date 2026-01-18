@@ -73,9 +73,9 @@ const Users = sequelize.define('users', {
   profile_image: {
     type: Sequelize.STRING(255),
     allowNull: true,
-    validate: {
-      isUrl: true,
-    },
+    // validate: {
+    //   isUrl: true,
+    // },
     defaultValue: process.env.DEFAULT_PROFILE_IMAGE,
   },
   password: {

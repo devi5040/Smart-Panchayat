@@ -110,6 +110,15 @@ exports.getUserDetails = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   const userId = req.user.id;
   const data = req.body;
+  
+  const image = req.file;
+  if (image) {
+    data.profileImage = `profile_image/${image.filename}`;
+  }
+  else {
+    data.profileImage = req.body.profileImage; // retain existing URL if no new image is uploaded
+  }
+
   try {
     const user = await userServices.updateUserDetails({ userId, data });
     res.status(200).json({ message: 'User details updated successfully', user });
@@ -244,9 +253,10 @@ exports.updatePassword = async (req, res) => {
  * @throws {Error} If there's an error retrieving all users. Error details are logged and a 500 status code is returned.
  */
 exports.getAllUsers = async (req, res) => {
+  const { page, limit } = req.query;
   try {
-    const users = await userServices.getAllUsers();
-    res.status(200).json({ message: 'Retrieved all users successfully.', users });
+    const { users, totalPages } = await userServices.getAllUsers(page, limit);
+    res.status(200).json({ message: 'Retrieved all users successfully.', users, totalPages });
   } catch (error) {
     logger.error(`Internal error while getting all users: ${error}`);
     res.status(500).json({

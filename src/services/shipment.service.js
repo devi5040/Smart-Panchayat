@@ -71,13 +71,13 @@ exports.getShipmentList = async () => {
  * @throws {Error} If an error occurs during shipment creation.
  */
 exports.createShipment = async (shipmentDetails, shops) => {
-  const { date, location, collectionCentre, transportationMode } = shipmentDetails;
+  const { date, location, collectionCentreId, transportationMode } = shipmentDetails;
   return await sequelize.transaction(async (t) => {
     const existingShipment = await Shipments.findAll({
       where: {
         date,
         location,
-        collection_centre: collectionCentre,
+        collectionCentreId: collectionCentreId,
         transportation_mode: transportationMode,
       },
       transaction: t,
@@ -90,7 +90,7 @@ exports.createShipment = async (shipmentDetails, shops) => {
       {
         date,
         location,
-        collection_centre: collectionCentre,
+        collectionCentreId,
         transportation_mode: transportationMode,
       },
       { transaction: t },
@@ -127,7 +127,7 @@ exports.createShipment = async (shipmentDetails, shops) => {
       }
     }
     const shipmentData = await Shipments.findAll({
-      attributes: ['id', 'date', 'collection_centre', 'transportation_mode'],
+      attributes: ['id', 'date', 'transportation_mode'],
       include: {
         model: Shops,
         attributes: ['shop_name_en', 'shop_name_kn', 'id', 'latitude', 'longitude', 'pin_code'],
@@ -530,4 +530,64 @@ exports.getShipmentsForCollectionCentre = async (userId, pageNumber) => {
     })),
   );
   return { shipments: products, totalPages };
+};
+
+exports.fetchShipmentsAdmin = async (pageNumber, limit = 10) => {
+  const page = Number(pageNumber) || 1;
+  const offset = (page - 1) * Number(limit);
+
+  const { count, rows: shipments } = await Shipments.findAndCountAll({
+    distinct: true,
+    include: [
+      {
+        model: ShipmentShops,
+        attributes: [], // exclude all, we will count
+      },
+      {
+        model: CollectionCentre,
+      },
+    ],
+    attributes: {
+      include: [
+        [
+          sequelize.literal(`(
+          SELECT COUNT(*)
+          FROM \`shipment-shops\`
+          WHERE \`shipment-shops\`.\`shipmentId\` = \`shipments\`.\`id\`
+        )`),
+          'totalShops',
+        ],
+      ],
+    },
+    limit: Number(limit),
+    offset,
+  });
+
+  if (!shipments) throw new Error('Error fetching shipments data!');
+
+  const totalPages = Math.ceil(count / Number(limit));
+
+  return { shipments, totalPages };
+};
+
+exports.fetchShipmentDetails = async (shipmentId, pageNumber, limit = 10) => {
+  const page = Number(pageNumber) || 1;
+  const offset = (page - 1) * Number(limit);
+  const shipments = await Shipments.findByPk(shipmentId);
+  if (!shipments) throw new Error('Error finding shipments');
+  const data = await Shipments.findOne({
+    where: { id: shipmentId },
+    include: [
+      {
+        model: Shops,
+      },
+      {
+        model: CollectionCentre,
+      },
+    ],
+    offset,
+    limit: Number(limit),
+  });
+
+  return data;
 };

@@ -44,9 +44,10 @@ exports.getAllProductsByCategory = async (req, res) => {
  * @throws {Error} If there's an error retrieving products from the database. Returns a 500 status code and error message.
  */
 exports.getAllProducts = async (req, res) => {
+  const { page, limit } = req.query;
   try {
-    const products = await productServices.getAllProducts();
-    res.status(200).json({ message: 'Products fetched successfully.', products });
+    const { products, totalPages } = await productServices.getAllProducts(page, parseInt(limit));
+    res.status(200).json({ message: 'Products fetched successfully.', products, totalPages });
   } catch (error) {
     logger.error(`Error fetching all products: ${error}`);
     res.status(500).json({ message: 'Failed to fetch products.', error: error.message });
@@ -144,9 +145,17 @@ exports.getProductDetails = async (req, res) => {
  * @throws {Error} If there's an error adding the product. Returns an appropriate HTTP status code and error message.
  */
 exports.addProduct = async (req, res) => {
-  const { name, price, imageUrl, categoryId } = req.body;
+  const { name, price, categoryId } = req.body;
+  const image = req.file;
+
+  const parsedPrice = parseFloat(price);
+  const parsedCategoryId = parseInt(categoryId);
+
   try {
-    const product = await productServices.addProduct(name, price, imageUrl, categoryId);
+    if (!image) throw new Error('Image is not valid ');
+    const imageUrl = `product/${image.filename}`;
+    const product = await productServices.addProduct(name, parsedPrice, imageUrl, parsedCategoryId);
+
     res.status(201).json({ message: 'Product added successfully.', product });
   } catch (error) {
     const status = error.statusCode || 500;
@@ -171,14 +180,19 @@ exports.addProduct = async (req, res) => {
  */
 exports.updateProduct = async (req, res) => {
   const { productId } = req.params;
-  const { name, price, imageUrl, categoryId } = req.body;
+  const { name_en, name_kn, price, categoryId, status } = req.body;
+  const image = req.file;
   try {
+    let imageUrl;
+    if (image) imageUrl = `product/${image.filename}`;
     const product = await productServices.updateProduct(
       productId,
-      name,
+      name_en,
+      name_kn,
       price,
       imageUrl,
       categoryId,
+      status,
     );
     res.status(200).json({ message: 'Product updated successfully.', product });
   } catch (error) {

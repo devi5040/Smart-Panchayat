@@ -17,6 +17,8 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const logger = require('./utils/logger');
 const routes = require('./routes');
+const cors = require('cors');
+const path = require('path');
 
 const app = express();
 
@@ -24,7 +26,13 @@ const app = express();
 // Middleware
 // ===============
 app.use(express.json());
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: {
+      policy: 'cross-origin',
+    },
+  }),
+);
 // stream morgan logs to winston's http level
 app.use(
   morgan('combined', {
@@ -33,6 +41,8 @@ app.use(
     },
   }),
 );
+app.use(cors({ origin: '*' }));
+app.use('/api/v1/public', express.static(path.join(process.cwd(), 'public')));
 app.use('/api/v1/', routes);
 
 // ===============

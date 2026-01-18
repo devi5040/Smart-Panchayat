@@ -29,9 +29,9 @@ const Category = sequelize.define('category', {
   },
   imageUrl: {
     type: Sequelize.STRING(1000),
-    validate: {
-      isUrl: true,
-    },
+    // validate: {
+    //   isUrl: true,
+    // },
     defaultValue: process.env.DEFAULT_CATEGORY_IMAGE,
   },
 });
