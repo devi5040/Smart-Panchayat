@@ -214,28 +214,52 @@ exports.addShopsToShipments = async (shipmentId, shopId, products) => {
       where: { shopId, shipmentId },
       transaction: t,
     });
-    if (existsData && existsData?.length > 0)
-      throw new ConflictError('Shop already exists in the given shipment');
-    const shipmentShops = await ShipmentShops.create({ shopId, shipmentId }, { transaction: t });
+    let shipmentShop;
+
+    const existingShipmentShop = await ShipmentShops.findOne({
+      where: { shopId, shipmentId },
+      transaction: t,
+    });
+
+    if (existingShipmentShop) {
+      shipmentShop = existingShipmentShop;
+    } else {
+      shipmentShop = await ShipmentShops.create({ shopId, shipmentId }, { transaction: t });
+    }
+
     for (const product of products) {
       const { quantity, productId } = product;
-      const existingProduct = await Products.findByPk(productId, {
-        transaction: t,
-      });
+
+      const existingProduct = await Products.findByPk(productId, { transaction: t });
       if (!existingProduct)
         throw new NotFoundError(`Product with product id ${productId} not found`);
-      const shipmentShopProduct = await ShipmentShopProducts.create(
-        {
-          quantity,
+
+      const existingShipmentShopProduct = await ShipmentShopProducts.findOne({
+        where: {
+          shipmentShopId: shipmentShop.id,
           productId,
-          shipmentShopId: shipmentShops.id,
         },
-        { transaction: t },
-      );
-      if (!shipmentShopProduct) throw new Error('shipment shop product not created');
+        transaction: t,
+      });
+
+      if (existingShipmentShopProduct) {
+        // ✅ UPDATE quantity
+        await existingShipmentShopProduct.update({ quantity }, { transaction: t });
+      } else {
+        // ✅ CREATE new
+        await ShipmentShopProducts.create(
+          {
+            quantity,
+            productId,
+            shipmentShopId: shipmentShop.id,
+          },
+          { transaction: t },
+        );
+      }
     }
+
     const shipmentData = await Shipments.findByPk(shipmentId, {
-      attributes: ['id', 'date', 'collection_centre', 'transportation_mode'],
+      attributes: ['id', 'date', 'transportation_mode'],
       include: {
         model: Shops,
         attributes: ['shop_name_en', 'shop_name_kn', 'id', 'latitude', 'longitude', 'pin_code'],
@@ -450,7 +474,6 @@ exports.updateShipmentStatus = async (shipmentId, shopId, status) => {
 };
 
 exports.getShipmentDetails = async (shipmentId, shopId) => {
-  console.log(shipmentId, shopId);
   let result = {};
   const shop = await Shops.findByPk(shopId);
   if (!shop) throw new NotFoundError('Shop does not exists!');
@@ -576,17 +599,23 @@ exports.fetchShipmentDetails = async (shipmentId, pageNumber, limit = 10) => {
   const shipments = await Shipments.findByPk(shipmentId);
   if (!shipments) throw new Error('Error finding shipments');
   const data = await Shipments.findOne({
-    where: { id: shipmentId },
     include: [
-      {
-        model: Shops,
-      },
       {
         model: CollectionCentre,
       },
+      {
+        model: ShipmentShops,
+        include: [
+          {
+            model: Products,
+            through: {},
+          },
+          {
+            model: Shops,
+          },
+        ],
+      },
     ],
-    offset,
-    limit: Number(limit),
   });
 
   return data;
