@@ -78,6 +78,9 @@ Orders.belongsTo(CollectionCentre);
 CollectionCentre.hasMany(Shipments, { onDelete: 'CASCADE' });
 Shipments.belongsTo(CollectionCentre);
 
+ShipmentShops.belongsTo(Shops);
+Shops.hasMany(ShipmentShops);
+
 module.exports = {
   Users,
   Shops,
