@@ -133,9 +133,10 @@ exports.updateUserDetails = async ({ userId, data }) => {
       family_name_kn: data.familyName,
       pin_code: data.pinCode,
       profile_image: data.profileImage,
-      password: data.password, // This will be handled by encryptPassword util
       latitude: data.latitude,
       longitude: data.longitude,
+      user_role: data.userRole,
+      account_status: data.accountStatus,
     },
     { where: { id: userId } },
   );
@@ -536,4 +537,19 @@ exports.searchFarmers = async (query) => {
   });
 
   return hits;
+};
+
+exports.fetchUserDetails = async (userId) => {
+  const user = await Users.findByPk(userId, {
+    attributes: { exclude: ['password', 'firebaseUid'] },
+  });
+  if (!user) throw new NotFoundError('User not found');
+  return user;
+};
+
+exports.deleteUser = async (userId) => {
+  const user = await Users.findByPk(userId);
+  if (!user) throw new NotFoundError('User not found');
+  await Users.destroy({ where: { id: userId } });
+  return true;
 };
