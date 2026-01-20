@@ -48,6 +48,8 @@ exports.updateUserDataSchema = Joi.object({
     'number.min': 'Longitude cannot be less than -180',
     'number.max': 'Longitude cannot be greater than 180',
   }),
+  userRole: Joi.string(),
+  accountStatus: Joi.string(),
 });
 
 exports.updateLanguageSchema = Joi.object({
