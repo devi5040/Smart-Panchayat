@@ -230,7 +230,7 @@ router.get('/role', authMiddleware, userController.getUsersByRole);
  *         description: User not found.
  */
 router.put(
-  '/update-profile',
+  '/update-profile/:userId',
   authMiddleware,
   imageUpload('profile_image').single('profileImage'),
   validate(userDataValidation.updateUserDataSchema),
@@ -376,5 +376,9 @@ router.post('/logout', authMiddleware, userController.logout);
 router.get('/sort', authMiddleware, access(['agent', 'admin']), userController.sortUsers);
 
 router.get('/search', authMiddleware, access(['admin', 'agent']), userController.searchFarmers);
+
+router.get('/:userId', authMiddleware, access(['admin']), userController.fetchUserDetails);
+
+router.delete('/:userId', authMiddleware, access(['admin']), userController.deleteUser);
 
 module.exports = router;
