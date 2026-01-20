@@ -108,14 +108,13 @@ exports.getUserDetails = async (req, res) => {
  * @throws {Error} If there's an error updating the user. Error details are logged and a 500 status code is returned.
  */
 exports.updateProfile = async (req, res) => {
-  const userId = req.user.id;
+  const { userId } = req.params;
   const data = req.body;
-  
+
   const image = req.file;
   if (image) {
     data.profileImage = `profile_image/${image.filename}`;
-  }
-  else {
+  } else {
     data.profileImage = req.body.profileImage; // retain existing URL if no new image is uploaded
   }
 
@@ -419,5 +418,33 @@ exports.searchFarmers = async (req, res) => {
     res
       .status(500)
       .json({ message: 'Internal error while searching for users', error: error.message });
+  }
+};
+
+exports.fetchUserDetails = async (req, res) => {
+  const userId = req.params.userId;
+  try {
+    const user = await userServices.fetchUserDetails(userId);
+    res.status(200).json({ message: 'User details fetched successfully', user });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while fetching user details: ${error}`);
+    res
+      .status(status)
+      .json({ message: 'Internal error while fetching user details', error: error.message });
+  }
+};
+
+exports.deleteUser = async (req, res) => {
+  const userId = req.params.userId;
+  try {
+    await userServices.deleteUser(userId);
+    res.status(200).json({ message: 'User deleted successfully' });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while deleting user: ${error}`);
+    res
+      .status(status)
+      .json({ message: 'Internal error while deleting user', error: error.message });
   }
 };
