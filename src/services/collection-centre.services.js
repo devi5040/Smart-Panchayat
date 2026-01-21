@@ -18,3 +18,60 @@ exports.fetchCollectionCentres = async (pageNumber, limit) => {
   const totalPages = Math.ceil(count / Number(limit));
   return { collectionCentres, totalPages };
 };
+
+exports.addCollectionCentre = async (
+  name_en,
+  name_kn,
+  address_en,
+  address_kn,
+  isProcessingUnit,
+) => {
+  const collectionCentre = await CollectionCentre.create({
+    name_en,
+    name_kn,
+    address_en,
+    address_kn,
+    isProcessingUnit,
+  });
+  return collectionCentre;
+};
+
+exports.updateCollectionCentre = async (
+  collectionCentreId,
+  name_en,
+  name_kn,
+  address_en,
+  address_kn,
+  isProcessingUnit,
+) => {
+  const collectionCentre = await CollectionCentre.findByPk(collectionCentreId);
+  if (!collectionCentre) throw new Error('Collection centre not found');
+  const [numRowsUpdated] = await CollectionCentre.update(
+    {
+      name_en,
+      name_kn,
+      address_en,
+      address_kn,
+      isProcessingUnit,
+    },
+    { where: { id: collectionCentreId } },
+  );
+  if (numRowsUpdated === 0) throw new Error('No rows updated');
+  return collectionCentre;
+};
+
+exports.fetchCollectionCentreDetails = async (collectionCentreId) => {
+  const collectionCentre = await CollectionCentre.findByPk(collectionCentreId);
+  return collectionCentre;
+};
+
+exports.deleteCollectionCentre = async (collectionCentreId) => {
+  const collectionCentre = await CollectionCentre.findByPk(collectionCentreId);
+  if (!collectionCentre) throw new Error('Collection centre not found');
+  const numOfDeletedRows = await CollectionCentre.destroy({
+    where: { id: collectionCentreId },
+  });
+  if (numOfDeletedRows == 0)
+    throw new Error('Collection centre ID is invalid. No records deleted.');
+  return true;
+};
