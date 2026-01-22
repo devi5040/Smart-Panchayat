@@ -299,6 +299,8 @@ router.patch(
  */
 router.patch('/change-role', authMiddleware, userController.changeUserRole);
 
+router.patch('/role/:userId', authMiddleware, access(['admin']), userController.removeTeamMember);
+
 /**
  * @openapi
  * /users/add-password:
