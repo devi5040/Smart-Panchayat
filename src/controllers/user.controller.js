@@ -323,10 +323,10 @@ exports.getUsersByStatus = async (req, res) => {
  * @throws {Error} If there's an error retrieving users by role. Error details are logged and a 500 status code is returned.
  */
 exports.getUsersByRole = async (req, res) => {
-  const { role, limit, page } = req.query;
+  const { roles, limit, page } = req.query;
   try {
-    const users = await userServices.getUserByRole(role, limit, page);
-    res.status(200).json({ message: '✅ Users fetched by role successfully!', users });
+    const { users, totalPages } = await userServices.getUserByRole(roles, limit, page);
+    res.status(200).json({ message: '✅ Users fetched by role successfully!', users, totalPages });
   } catch (error) {
     const status = error.statusCode || 500;
     logger.error(`Internal error while getting users by role: ${error}`);
@@ -446,5 +446,19 @@ exports.deleteUser = async (req, res) => {
     res
       .status(status)
       .json({ message: 'Internal error while deleting user', error: error.message });
+  }
+};
+
+exports.removeTeamMember = async (req, res) => {
+  const userId = req.params.userId;
+  const { role } = req.query;
+  try {
+    await userServices.removeTeamMember(userId, role);
+    res.status(200).json({ message: 'Team member removed successfully' });
+  } catch (error) {
+    logger.error(`Internal error while removing team member: ${error}`);
+    res
+      .status(500)
+      .json({ message: 'Internal error while removing team member', error: error.message });
   }
 };
