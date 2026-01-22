@@ -15,6 +15,7 @@ const { encryptPassword, comparePasswords } = require('../utils/hashPassword');
 const { NotFoundError, BadRequestError, NoContentError } = require('../utils/error');
 const sequelize = require('../config/db');
 const esClient = require('../config/elasticsearch.config');
+const { Op } = require('sequelize');
 
 /**
  * Generates a pre-signed URL for uploading a profile image to AWS S3.
@@ -354,21 +355,43 @@ exports.getUsersByStatus = async (status) => {
  * @throws {Error} - If the role is not provided or invalid.
  * @throws {BadRequestError} - If the role is not one of the valid roles.
  */
-exports.getUserByRole = async (role, limit, page) => {
-  if (!role) throw new Error('User role is not provided');
-  if (role !== 'user' && role !== 'shop' && role !== 'admin' && role !== 'agent')
-    throw new BadRequestError('User role provided is invalid');
+exports.getUserByRole = async (roles, limit, page) => {
+  if (!roles) throw new Error('User role is not provided');
+
+  // ✅ FIX HERE
+  let roleArray = [];
+
+  if (Array.isArray(roles)) {
+    roleArray = roles
+      .flatMap((role) => role.split(',')) // split "admin,agent"
+      .map((role) => role.trim()); // remove spaces
+  } else {
+    roleArray = roles.split(',').map((role) => role.trim());
+  }
+
+  const allowedRoles = ['user', 'shop', 'admin', 'agent'];
+
+  const isValid = roleArray.every((role) => allowedRoles.includes(role));
+  if (!isValid) throw new BadRequestError('Invalid user role provided');
+
   const pageNum = parseInt(page) || 1;
-  const offset = (pageNum - 1) * limit;
+  const pageLimit = parseInt(limit) || 10;
+  const offset = (pageNum - 1) * pageLimit;
+
   const { count, rows: users } = await Users.findAndCountAll({
-    where: { user_role: role },
+    where: {
+      user_role: {
+        [Op.in]: roleArray, // ✅ WORKS NOW
+      },
+    },
     attributes: { exclude: ['password', 'firebaseUid'] },
-    limit: parseInt(limit),
+    limit: pageLimit,
     offset,
-    order: [['createdAt', 'DESC']],
+    order: [['id', 'ASC']],
   });
-  const totalPages = Math.ceil(count / limit);
-  if (!users) throw new Error('Users data is invalid');
+
+  const totalPages = Math.ceil(count / pageLimit);
+
   return { users, totalPages };
 };
 
@@ -552,4 +575,11 @@ exports.deleteUser = async (userId) => {
   if (!user) throw new NotFoundError('User not found');
   await Users.destroy({ where: { id: userId } });
   return true;
+};
+
+exports.removeTeamMember = async (userId, role) => {
+  const user = await Users.findByPk(userId);
+  if (!user) throw new NotFoundError('User not found');
+  const [numRowsUpdated] = await Users.update({ user_role: role }, { where: { id: userId } });
+  return numRowsUpdated;
 };
