@@ -24,10 +24,10 @@ const transports = [
 if (!isVercel) {
   transports.push(
     new winston.transports.File({
-      filename: "logs/combined.log"
+      filename: "tmp/combined.log"
     }),
     new winston.transports.File({
-      filename: "logs/error.log",
+      filename: "tmp/error.log",
       level: "error"
     })
   );
