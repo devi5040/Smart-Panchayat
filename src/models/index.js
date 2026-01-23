@@ -20,6 +20,8 @@ const ShipmentShops = require('./shipmentShops');
 const ShipmentShopProducts = require('./shipmentShopsProducts');
 const Category = require('./category');
 const CollectionCentre = require('./collectionCentre');
+const DeviceToken = require('./deviceToken');
+const Notifications = require('./notifications');
 
 // One-to-One: User <-> Shop
 // A User has exactly one Shop.
@@ -81,6 +83,9 @@ Shipments.belongsTo(CollectionCentre);
 ShipmentShops.belongsTo(Shops);
 Shops.hasMany(ShipmentShops);
 
+Users.hasOne(DeviceToken, { onDelete: 'CASCADE' });
+DeviceToken.belongsTo(Users);
+
 module.exports = {
   Users,
   Shops,
@@ -93,4 +98,6 @@ module.exports = {
   ShopProducts,
   Category,
   CollectionCentre,
+  DeviceToken,
+  Notifications,
 };
