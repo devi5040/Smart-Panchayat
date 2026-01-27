@@ -64,4 +64,6 @@ router.patch('/:userId', auth, access(['admin']), agentController.changeRoleToAg
  */
 router.delete('/:agentId', auth, access(['admin']), agentController.removeAgent);
 
+router.get('/dashboard', auth, access(['admin', 'agent']), agentController.fetchDashboardStats);
+
 module.exports = router;
