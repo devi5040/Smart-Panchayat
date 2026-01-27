@@ -1,37 +1,52 @@
 /**
  * @file logger.js
- * @description Configure winston logger
- * Winston will be used to log the information, error, warning for particular files/console.
- * @version v1.0.0
- * @created 13-08-2025
- * @author Deviprasad Rai P <dpraidola@gmail.com>
+ * @description Winston logger (Vercel-safe)
+ * @version v1.1.0
  */
 
-const winston = require('winston');
+const winston = require("winston");
 const { combine, timestamp, printf } = winston.format;
 
-// Define custom log format
+// Custom log format
 const logFormat = printf(({ level, message, timestamp }) => {
   return `${timestamp} [${level.toUpperCase()}]: ${message}`;
 });
 
-// create the logger for logging messages
+// Detect Vercel environment
+const isVercel = process.env.VERCEL === "1";
+
+// Transports
+const transports = [
+  new winston.transports.Console()
+];
+
+// Enable file logs ONLY in local environment
+if (!isVercel) {
+  transports.push(
+    new winston.transports.File({
+      filename: "tmp/combined.log"
+    }),
+    new winston.transports.File({
+      filename: "tmp/error.log",
+      level: "error"
+    })
+  );
+}
+
+// Create logger
 const logger = winston.createLogger({
-  level: 'http',
+  level: "info",
   format: combine(
     timestamp({
-      format: new Date().toLocaleString('en-IN', {
-        hour12: false,
-        timeZone: 'Asia/Kolkata',
-      }),
+      format: () =>
+        new Date().toLocaleString("en-IN", {
+          hour12: false,
+          timeZone: "Asia/Kolkata",
+        }),
     }),
-    logFormat,
+    logFormat
   ),
-  transports: [
-    new winston.transports.Console(),
-    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'logs/combined.log' }),
-  ],
+  transports,
 });
 
 module.exports = logger;
