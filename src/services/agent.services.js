@@ -10,8 +10,10 @@
  * @author Deviprasad Rai P <dpraidola@gmail.com>
  */
 
-const { Users } = require('../models');
+const { Op } = require('sequelize');
+const { Users, Products, Orders, Shipments, ShipmentShops, Notifications } = require('../models');
 const { ConflictError, NotFoundError, NoContentError } = require('../utils/error');
+const { calculatePercentage } = require('../utils/calculatePercentage');
 
 /**
  * Adds a new agent to the database.
@@ -95,4 +97,217 @@ exports.changeToAgent = async (userId, collectionCentreId) => {
     ],
   });
   return data;
+};
+
+exports.fetchDashboardItems = async () => {
+  const todayDate = () => {
+    return new Date();
+  };
+  const today = todayDate();
+  today.setHours(0, 0, 0, 0);
+
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  let value, isPositive, percentage, yesterdayValue;
+  // Total users
+  const [totalUsers, todayUsers, yesterdayUsers] = await Promise.all([
+    Users.count(),
+    Users.count({
+      where: { createdAt: { [Op.gte]: today } },
+    }),
+    Users.count({
+      where: {
+        createdAt: {
+          [Op.gte]: yesterday,
+          [Op.lt]: today,
+        },
+      },
+    }),
+  ]);
+
+  percentage = calculatePercentage(todayUsers, yesterdayUsers);
+  isPositive = todayUsers >= yesterdayUsers;
+  const total_users = { value: totalUsers, isPositive, percentage };
+
+  // Total Farmers
+  const [totalFarmers, todayFarmers, yesterdayFarmers] = await Promise.all([
+    Users.count({ where: { user_role: 'user' } }),
+    Users.count({
+      where: { createdAt: { [Op.gte]: today }, user_role: 'user' },
+    }),
+    Users.count({
+      where: {
+        createdAt: {
+          [Op.gte]: yesterday,
+          [Op.lt]: today,
+        },
+        user_role: 'user',
+      },
+    }),
+  ]);
+  percentage = calculatePercentage(todayFarmers, yesterdayFarmers);
+  isPositive = todayFarmers >= yesterdayFarmers;
+  const total_farmers = { value: totalFarmers, isPositive, percentage };
+
+  // Total Shops
+  const [totalShops, todayShops, yesterdayShops] = await Promise.all([
+    Users.count({ where: { user_role: 'shop' } }),
+    Users.count({
+      where: { createdAt: { [Op.gte]: today }, user_role: 'shop' },
+    }),
+    Users.count({
+      where: {
+        createdAt: {
+          [Op.gte]: yesterday,
+          [Op.lt]: today,
+        },
+        user_role: 'shop',
+      },
+    }),
+  ]);
+  percentage = calculatePercentage(todayShops, yesterdayShops);
+  isPositive = todayShops >= yesterdayShops;
+  const total_shops = { value: totalShops, isPositive, percentage };
+
+  // Total Products
+  const [totalProducts, todayProducts, yesterdayProducts] = await Promise.all([
+    Products.count(),
+    Products.count({
+      where: { createdAt: { [Op.gte]: today } },
+    }),
+    Products.count({
+      where: {
+        createdAt: {
+          [Op.gte]: yesterday,
+          [Op.lt]: today,
+        },
+      },
+    }),
+  ]);
+  percentage = calculatePercentage(todayProducts, yesterdayProducts);
+  isPositive = todayProducts >= yesterdayProducts;
+  const total_products = { value: totalProducts, isPositive, percentage };
+
+  //App pending products
+  const [pendingProducts, todayPendingProducts, yesterdayPendingProducts] = await Promise.all([
+    Products.count({ where: { isVerified: false } }),
+    Products.count({
+      where: { createdAt: { [Op.gte]: today }, isVerified: false },
+    }),
+    Products.count({
+      where: {
+        createdAt: {
+          [Op.gte]: yesterday,
+          [Op.lt]: today,
+        },
+        isVerified: false,
+      },
+    }),
+  ]);
+  percentage = calculatePercentage(todayPendingProducts, yesterdayPendingProducts);
+  isPositive = todayPendingProducts >= yesterdayPendingProducts;
+  const pending_products = { value: pendingProducts, isPositive, percentage };
+
+  //Orders Today
+  const [ordersToday, ordersYesterday] = await Promise.all([
+    Orders.count({ where: { createdAt: { [Op.gte]: today } } }),
+    Orders.count({
+      where: {
+        createdAt: {
+          [Op.gte]: yesterday,
+          [Op.lt]: today,
+        },
+      },
+    }),
+  ]);
+  percentage = calculatePercentage(ordersToday, ordersYesterday);
+  isPositive = ordersToday >= ordersYesterday;
+  const orders_today = { value: ordersToday, isPositive, percentage };
+
+  // Active shipments
+  const [todayActiveShipments, yesterdayActiveShipments] = await Promise.all([
+    Shipments.count({ include: { model: ShipmentShops, where: { status: 'pending' } } }),
+    Shipments.count({
+      where: { createdAt: { [Op.gte]: today } },
+      include: { model: ShipmentShops, where: { status: 'pending' } },
+    }),
+    Shipments.count({
+      where: {
+        createdAt: {
+          [Op.gte]: yesterday,
+          [Op.lt]: today,
+        },
+      },
+      include: { model: ShipmentShops, where: { status: 'pending' } },
+    }),
+  ]);
+  percentage = calculatePercentage(todayActiveShipments, yesterdayActiveShipments);
+  isPositive = todayActiveShipments >= yesterdayActiveShipments;
+  const active_shipments = { value: todayActiveShipments, isPositive, percentage };
+
+  // Delivered shipments
+  const [deliveredShipments, todayDeliveredShipments, yesterdayDeliveredShipments] =
+    await Promise.all([
+      Shipments.count({ include: { model: ShipmentShops, where: { status: 'delivered' } } }),
+      Shipments.count({
+        where: { createdAt: { [Op.gte]: today } },
+        include: { model: ShipmentShops, where: { status: 'delivered' } },
+      }),
+      Shipments.count({
+        where: {
+          createdAt: {
+            [Op.gte]: yesterday,
+            [Op.lt]: today,
+          },
+        },
+        include: { model: ShipmentShops, where: { status: 'delivered' } },
+      }),
+    ]);
+  percentage = calculatePercentage(todayDeliveredShipments, yesterdayDeliveredShipments);
+  isPositive = todayDeliveredShipments >= yesterdayDeliveredShipments;
+  const delivered_shipments = { value: deliveredShipments, isPositive, percentage };
+
+  // Pending shipments
+  const [penidngShipments, todayPendingShipments, yesterdayPendingShipments] = await Promise.all([
+    Shipments.count({ include: { model: ShipmentShops, where: { status: 'pending' } } }),
+    Shipments.count({
+      where: { createdAt: { [Op.gte]: today } },
+      include: { model: ShipmentShops, where: { status: 'pending' } },
+    }),
+    Shipments.count({
+      where: {
+        createdAt: {
+          [Op.gte]: yesterday,
+          [Op.lt]: today,
+        },
+      },
+      include: { model: ShipmentShops, where: { status: 'pending' } },
+    }),
+  ]);
+  percentage = calculatePercentage(todayPendingShipments, yesterdayPendingShipments);
+  isPositive = todayPendingShipments >= yesterdayPendingShipments;
+  const pending_shipments = { value: penidngShipments, isPositive, percentage };
+
+  // Notifications Count
+  const [notifications, todayNotifications, yesterdayNotifications] = await Promise.all([
+    Notifications.count(),
+    Notifications.count({ where: { createdAt: { [Op.gte]: today } } }),
+    Notifications.count({ where: { createdAt: { [Op.gte]: yesterday, [Op.lt]: today } } }),
+  ]);
+  percentage = calculatePercentage(todayNotifications, yesterdayNotifications);
+  isPositive = todayNotifications >= yesterdayNotifications;
+  const notifications_count = { value: notifications, isPositive, percentage };
+
+  return {
+    total_users,
+    total_farmers,
+    total_shops,
+    total_products,
+    orders_today,
+    pending_products,
+    active_shipments,
+    delivered_shipments,
+    pending_shipments,
+    notifications_count,
+  };
 };
