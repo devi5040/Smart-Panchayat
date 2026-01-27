@@ -352,6 +352,7 @@ exports.getUsersByRole = async (req, res) => {
  */
 exports.checkUserExists = async (req, res) => {
   const firebaseUid = req.user.uid;
+  console.log(`Firebase uid is: ${req.user.uid}`);
   try {
     const status = await userServices.checkUserExists(firebaseUid);
     res.status(200).json({ message: 'User status fetched successfully.', status });
