@@ -104,3 +104,17 @@ exports.changeRoleToAgent = async (req, res) => {
     });
   }
 };
+
+exports.fetchDashboardStats = async (req, res) => {
+  try {
+    const stats = await agentServices.fetchDashboardItems();
+    res.status(200).json({ message: `Dashboard stats fetched successfully`, stats });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    logger.error(`Internal error while changing user role to agent: ${error}`);
+    res.status(status).json({
+      message: 'Internal error while changing user role',
+      error: error.message,
+    });
+  }
+};
