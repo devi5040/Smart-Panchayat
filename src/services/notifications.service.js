@@ -3,7 +3,7 @@ const { DeviceToken, Notifications, Users } = require('../models/index');
 const admin = require('../config/firebase/firebase_config');
 
 exports.saveToken = async (userId, token, platform) => {
-  const tokenExists = await deviceToken.findOne({ where: { userId } });
+  const tokenExists = await DeviceToken.findOne({ where: { userId } });
   if (tokenExists) {
     await DeviceToken.update({ token, platform }, { where: { userId } });
   } else {
@@ -16,9 +16,16 @@ exports.notifyUsers = async (role, title, message, data = {}) => {
   let tokensData;
   if (role === 'all') {
     tokensData = await DeviceToken.findAll();
+    const count = await DeviceToken.count();
   } else {
-    const userIds = await Users.findAll({ where: { role }, attributes: ['id'] });
-    tokensData = await DeviceToken.findAll({ where: { userId: { [Op.in]: userIds } } });
+    const userIds = await Users.findAll({ where: { user_role: role }, attributes: ['id'] });
+    const userIdsArr = userIds.map((u) => u.id);
+
+    tokensData = await DeviceToken.findAll({
+      where: {
+        userId: { [Op.in]: userIdsArr },
+      },
+    });
   }
 
   const tokens = tokensData.map((token) => token.token);
@@ -37,11 +44,11 @@ exports.notifyUsers = async (role, title, message, data = {}) => {
 
   response.responses.forEach(async (r, index) => {
     if (!r.success) {
-      console.log('Failed token:', tokens[index]);
-      await DeviceToken.destroy({ where: { token: tokens[index] } });
+      //await DeviceToken.destroy({ where: { token: tokens[index] } });
+      logger.error(`error is: ${JSON.stringify(r.error)}`);
     }
   });
-
+  await Notifications.create({ title, message, role });
   return { success: true, sent: response.successCount, failed: response.failureCount };
 };
 
