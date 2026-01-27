@@ -2,9 +2,10 @@ const services = require('../services/notifications.service');
 const logger = require('../utils/logger');
 
 exports.saveToken = async (req, res) => {
-  const { userId, token, platform } = req.body;
+  const userId = req.user.id;
+  const { deviceToken, platform } = req.body;
   try {
-    const success = await services.saveToken(userId, token, platform);
+    const success = await services.saveToken(userId, deviceToken, platform);
     res.status(201).json({ message: 'Token saved successfully', success });
   } catch (error) {
     logger.error(`Internal error while saving the token: ${error}`);
